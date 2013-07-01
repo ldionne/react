@@ -16,9 +16,11 @@ function(react_add_test name sources)
         APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
     )
     set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_PROJECT_DIR}/include
+        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/include
     )
     add_test(NAME ${name} COMMAND ${name})
     add_dependencies(unit ${name})
 endfunction()
 
+
+react_add_test(master_header master_header.cpp)
