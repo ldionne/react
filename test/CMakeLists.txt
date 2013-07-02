@@ -23,4 +23,5 @@ function(react_add_test name sources)
 endfunction()
 
 
+react_add_test(archetypes    archetypes.cpp)
 react_add_test(master_header master_header.cpp)
