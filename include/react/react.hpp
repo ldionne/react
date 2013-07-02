@@ -8,6 +8,8 @@
 
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
+#include <react/depends_on.hpp>
+#include <react/implements.hpp>
 #include <react/traits.hpp>
 
 #endif // !REACT_REACT_HPP
