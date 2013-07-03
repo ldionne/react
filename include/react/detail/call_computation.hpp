@@ -8,14 +8,14 @@
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/convertible_if.hpp>
-#include <react/detail/deferred_apply.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/detail/matches.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/deferred_apply.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/identity.hpp>
+#include <boost/mpl/matches.hpp>
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <utility>
@@ -40,7 +40,7 @@ namespace call_computation_detail {
 
     template <typename T, typename ...Args>
     struct is_metafunction_class
-        : has_nested_type<deferred_apply<T, Args...> >
+        : has_nested_type<mpl::deferred_apply<T, Args...> >
     { };
 
     template <typename Metafunction>
@@ -67,9 +67,9 @@ namespace call_computation_detail {
         : mpl::eval_if<
             is_metafunction_class<Pattern, Tag>,
             apply_or_matches_helper<
-                deferred_apply<Pattern, Tag>, matches<Tag, Pattern>
+                mpl::deferred_apply<Pattern, Tag>, mpl::matches<Tag, Pattern>
             >,
-            matches<Tag, Pattern>
+            mpl::matches<Tag, Pattern>
         >
     { };
 
