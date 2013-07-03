@@ -26,5 +26,9 @@ function(react_add_test name sources)
 endfunction()
 
 
-react_add_test(archetypes    archetypes.cpp)
-react_add_test(master_header master_header.cpp)
+react_add_test(archetypes                 archetypes.cpp)
+react_add_test(detail_cloaked_feature_set detail/cloaked_feature_set.cpp)
+react_add_test(detail_feature_set_by_ref  detail/feature_set_by_ref.cpp)
+react_add_test(detail_feature_set_union   detail/feature_set_union.cpp)
+react_add_test(feature_set_concept        feature_set/concept.cpp)
+react_add_test(master_header              master_header.cpp)
