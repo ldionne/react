@@ -9,6 +9,7 @@
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 #include <react/depends_on.hpp>
+#include <react/feature_set.hpp>
 #include <react/implements.hpp>
 #include <react/traits.hpp>
 
