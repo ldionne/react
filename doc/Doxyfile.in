@@ -197,18 +197,6 @@ TAB_SIZE               = 4
 
 ALIASES                =
 
-ALIASES += "this_is_equivalent_to{2}=this is essentially equivalent to the `\2` metafunction. However, the `\2` metafunction specifies the concept more tightly than `\1`. As a guideline, `\2` should be used in assertions and unit tests, while `\1` should be used everywhere else in order to reduce compilation times"
-
-ALIASES += "supports_wrappers_with{1}=This metafunction allows models of the `Wrapper` concept to pass through it. The parameter used to specify that a specialization is a wrapper specialization is `\1`."
-
-ALIASES += "supports_SFINAE_with{1}=The `\1` parameter can be used to trigger SFINAE in order to control which template is chosen by the compiler."
-
-ALIASES += "specialize_when_modeling{1}=This metafunction does not have a default implementation; it should be specialized when a new model of the `\1` concept is created."
-
-ALIASES += "mf_disabled_if{1}=If \1, this metafunction does not have a nested `type` member. This can be used to trigger SFINAE."
-
-ALIASES += "fn_disabled_if{1}=This function is removed from overload resolution when \1."
-
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding
 # "class=itcl::class" will allow you to use the command class in the
