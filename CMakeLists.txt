@@ -20,12 +20,12 @@ option(REACT_ENABLE_WERROR   "Fail and stop if a warning is triggered." OFF)
 option(REACT_ENABLE_CXX0X    "Enable -std=c++0x if the compiler supports it." ON)
 option(REACT_ENABLE_LIBCXX   "Enable -stdlib=libc++ if the compiler supports it." ON)
 CMAKE_DEPENDENT_OPTION(
-    REACT_ENABLE_TESTS "Enable the unit tests. To avoid target name conflicts and cluttering the list of targets, unit tests are disabled when react is nested inside another project."
+    REACT_ENABLE_TESTS "Enable the unit tests. To avoid target name conflicts and cluttering the list of targets, unit tests are disabled when the library is nested inside another project."
     OFF "REACT_IS_NESTED" # off if REACT_IS_NESTED
     ON                    # on otherwise
 )
 CMAKE_DEPENDENT_OPTION(
-    REACT_ENABLE_DOC "Enable the documentation target. To avoid target name conflicts and cluttering the list of targets, this is disabled when dyno is nested inside another project."
+    REACT_ENABLE_DOC "Enable the documentation target. To avoid target name conflicts and cluttering the list of targets, this is disabled when the library is nested inside another project."
     OFF "REACT_IS_NESTED" # off if REACT_IS_NESTED
     ON                    # on otherwise
 )
