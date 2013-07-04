@@ -12,8 +12,8 @@
 #include <react/detail/cloaked_feature_set.hpp>
 #include <react/detail/feature_dependency_graph.hpp>
 #include <react/detail/feature_set_by_ref.hpp>
-#include <react/detail/feature_set_union.hpp>
 #include <react/detail/pointers_to.hpp>
+#include <react/feature_set_union.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/for_each.hpp>
@@ -140,7 +140,7 @@ public:
             typename detail::pointers_to<FeaturesInVisitationOrder>::type
         >(
             execute_computation<SemanticTag>(
-                detail::feature_set_union(*this, std::forward<FeatureSet>(ext))
+                make_feature_set_union(*this, std::forward<FeatureSet>(ext))
             )
         );
     }

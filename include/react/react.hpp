@@ -11,6 +11,7 @@
 #include <react/depends_on.hpp>
 #include <react/factories.hpp>
 #include <react/feature_set.hpp>
+#include <react/feature_set_union.hpp>
 #include <react/implements.hpp>
 #include <react/traits.hpp>
 
