@@ -9,13 +9,19 @@
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/parameter/keyword.hpp>
+#include <boost/type_traits/add_pointer.hpp>
+#include <boost/type_traits/is_convertible.hpp>
+#include <boost/type_traits/is_function.hpp>
+#include <boost/type_traits/is_reference.hpp>
 #include <string>
-#include <type_traits>
 #include <utility>
 
 
 using namespace react;
+
+struct null_concept { BOOST_CONCEPT_USAGE(null_concept) { } };
 
 template <typename T>
 struct test_concept {
@@ -28,21 +34,29 @@ struct test_concept {
 
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
             ValueComputation,
-            // We must give the initial value of the computation when
-            // constructing it.
             decltype(keyword = std::declval<T>()),
             semantic_tags<>,
             dependency_results<>
         >));
 
+        BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<boost::is_reference<T>,
+            null_concept,
+            IncrementalComputation<
+                ValueComputation,
+                default_construct,
+                semantic_tags<>,
+                dependency_results<>
+            >
+        >::type));
+
         // If we want the
         // `ValueComputation::result_type v = value_comp.result(env)`
         // expression to be valid, we require `T` to be convertible
         // to `ValueComputation::result_type`.
-        using AdjustedT = typename std::conditional<
-            std::is_function<T>::value, typename std::add_pointer<T>::type, T
+        using AdjustedT = typename boost::mpl::if_<
+            boost::is_function<T>, typename boost::add_pointer<T>::type, T
         >::type;
-        static_assert(std::is_convertible<
+        static_assert(boost::is_convertible<
             AdjustedT, typename ValueComputation::result_type
         >::value, "");
     }

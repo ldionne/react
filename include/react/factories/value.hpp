@@ -23,6 +23,8 @@ namespace react { namespace factories {
 namespace value_detail {
     template <typename T, typename Feature>
     struct store_value : implements<Feature>, depends_on<> {
+        store_value() = default;
+
         template <typename Args>
         explicit store_value(Args&& args)
             : value_(std::forward<Args>(args)[
@@ -42,7 +44,8 @@ namespace value_detail {
  *
  * When creating the computation, its initial value must be provided in
  * the argument pack by using a keyword whose tag is the feature being
- * implemented.
+ * implemented. Otherwise, if the computation is default-constructed,
+ * the value stored in the computation is default-constructed.
  *
  * A value computation can't be executed. When its result is retrieved,
  * it returns a reference to the value it holds internally, with a `const`
@@ -52,7 +55,7 @@ namespace value_detail {
  * stored instead. Storing array types is not supported; use `std::array`
  * instead.
  *
- * Computations created with this factory are impliclty `typed` computations.
+ * Computations created with this factory are implicitly `typed`.
  */
 template <typename T, typename Feature>
 class value {
