@@ -10,16 +10,12 @@
 #include <react/traits.hpp>
 
 #include <boost/mpl/apply.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/fold.hpp>
-#include <boost/mpl/has_key.hpp>
 #include <boost/mpl/insert.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/reachable_set.hpp>
 #include <boost/mpl/set.hpp>
+#include <boost/mpl/transform_view.hpp>
 #include <boost/mpl/transform_view.hpp>
 
 
@@ -28,27 +24,14 @@ namespace feature_dependency_graph_detail {
     namespace mpl = boost::mpl;
 
     /*!
-     * Compile-time graph representing the dependencies between the features
+     * Compile-time graph representing dependencies between the features
      * of a `FeatureSet`.
      */
-    template <typename FeatureSet>
+    template <typename ComputationOf, typename TopLevelComputations>
     class feature_dependency_graph {
-        //! Map associating features whose implementation was explicitly
-        //! specified in the feature set to that implementation.
-        using MapOfSpecifiedFeatures = typename mpl::fold<
-            typename computations_of<FeatureSet>::type,
-            mpl::map<>,
-            mpl::insert<mpl::_1, mpl::pair<feature_of<mpl::_2>, mpl::_2>>
-        >::type;
-
-        //! Return the computation associated to a given feature in the set.
-        template <typename Feature>
+        template <typename ...Args>
         struct computation_of
-            : mpl::eval_if<
-                mpl::has_key<MapOfSpecifiedFeatures, Feature>,
-                mpl::at<MapOfSpecifiedFeatures, Feature>,
-                boost::mpl::apply<Feature>
-            >
+            : mpl::apply<ComputationOf, Args...>
         { };
 
         //! A vertex in the feature dependency graph represents a computation
@@ -65,7 +48,7 @@ namespace feature_dependency_graph_detail {
 
         struct pseudo_root_computation : incremental_computation_archetype<> {
             using dependencies = typename mpl::fold<
-                typename computations_of<FeatureSet>::type,
+                TopLevelComputations,
                 mpl::set<>,
                 mpl::insert<mpl::_1, feature_of<mpl::_2>>
             >::type;

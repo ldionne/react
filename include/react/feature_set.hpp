@@ -16,13 +16,21 @@
 #include <react/feature_set_union.hpp>
 #include <react/traits.hpp>
 
+#include <boost/mpl/apply.hpp>
+#include <boost/mpl/at.hpp>
+#include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/graph_intrinsics.hpp>
+#include <boost/mpl/has_key.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
+#include <boost/mpl/insert.hpp>
+#include <boost/mpl/map.hpp>
+#include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/topological_sort.hpp>
 #include <boost/mpl/transform_view.hpp>
+#include <boost/mpl/vector.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <type_traits>
@@ -77,10 +85,58 @@ struct computation_from_vertex {
 };
 
 template <typename ...Computations>
-struct feature_set {
-    using computations = mpl::set<Computations...>;
+class feature_set {
+private:
+    //! Map associating features whose implementation was explicitly
+    //! specified in the feature set to that implementation.
+    using PredefinedComputations = mpl::map<
+        mpl::pair<typename feature_of<Computations>::type, Computations>...
+    >;
+
+    template <typename Feature>
+    struct computation_of
+        : mpl::eval_if<
+            mpl::has_key<PredefinedComputations, Feature>,
+            mpl::at<PredefinedComputations, Feature>,
+            mpl::apply<Feature>
+        >
+    { };
+
+    using DependencyGraph = detail::feature_dependency_graph<
+        computation_of<mpl::_1>, mpl::vector<Computations...>
+    >;
+
+public:
+    using computations = typename mpl::fold<
+        typename mpl::vertices_of<DependencyGraph>::type,
+        mpl::set<>,
+        mpl::insert<mpl::_1, computation_from_vertex<mpl::_2>>
+    >::type;
+
 
 private:
+    using Storage = typename mpl::inherit_linearly<
+        typename mpl::vertices_of<DependencyGraph>::type,
+        storage_node<computation_from_vertex<mpl::_2>, mpl::_1>,
+        last_storage_node
+    >::type;
+    Storage features_;
+
+public:
+    feature_set() = default;
+
+    template <typename Args>
+    explicit feature_set(Args const& args)
+        : features_{args}
+    { }
+
+
+private:
+    using FeaturesInVisitationOrder = mpl::transform_view<
+        typename mpl::topological_sort<DependencyGraph>::type,
+        feature_of<computation_from_vertex<mpl::_1>>
+    >;
+
     template <typename SemanticTag, typename Union>
     struct computation_executer {
         feature_set& self;
@@ -98,19 +154,20 @@ private:
         return {*this, u};
     }
 
-    using DependencyGraph = detail::feature_dependency_graph<feature_set>;
-    using FeaturesInVisitationOrder = mpl::transform_view<
-        typename mpl::topological_sort<DependencyGraph>::type,
-        feature_of<computation_from_vertex<mpl::_1>>
-    >;
+public:
+    template <typename SemanticTag, typename FeatureSet>
+    void operator()(SemanticTag const& tag, FeatureSet&& ext) {
+        mpl::for_each<
+            typename detail::pointers_to<FeaturesInVisitationOrder>::type
+        >(
+            execute_computation<SemanticTag>(
+                make_feature_set_union(*this, std::forward<FeatureSet>(ext))
+            )
+        );
+    }
 
-    using Storage = typename mpl::inherit_linearly<
-        typename mpl::vertices_of<DependencyGraph>::type,
-        storage_node<computation_from_vertex<mpl::_2>, mpl::_1>,
-        last_storage_node
-    >::type;
-    Storage features_;
 
+private:
     template <typename Feature>
     struct computation_at
         : boost::remove_reference<decltype(
@@ -127,24 +184,6 @@ private:
     }
 
 public:
-    feature_set() = default;
-
-    template <typename Args>
-    explicit feature_set(Args const& args)
-        : features_{args}
-    { }
-
-    template <typename SemanticTag, typename FeatureSet>
-    void operator()(SemanticTag const& tag, FeatureSet&& ext) {
-        mpl::for_each<
-            typename detail::pointers_to<FeaturesInVisitationOrder>::type
-        >(
-            execute_computation<SemanticTag>(
-                make_feature_set_union(*this, std::forward<FeatureSet>(ext))
-            )
-        );
-    }
-
     template <typename SemanticTag>
     void operator()(SemanticTag const& tag) {
         return operator()(tag, feature_set<>{});
