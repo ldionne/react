@@ -16,9 +16,6 @@ function(react_add_test name sources)
         APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
     )
     set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/include
-    )
-    set_property(TARGET ${name}
         APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/ext/mpl_extensions/include
     )
     add_test(NAME ${name} COMMAND ${name})
