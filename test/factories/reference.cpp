@@ -6,6 +6,7 @@
 #include <react/factories/reference.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
+#include <react/feature_sets/from_argument_pack.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
@@ -29,7 +30,9 @@ struct test_concept {
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
             ReferenceComputation,
             // We must set the reference when we construct the computation.
-            decltype(keyword = std::declval<T&>()),
+            decltype(feature_sets::make_from_argument_pack(
+                keyword = std::declval<T&>()
+            )),
             semantic_tags<>,
             dependency_results<>
         >));
@@ -77,9 +80,11 @@ struct dont_care { };
 
 int main() {
     std::string original = "abcd";
-    MyReferenceComputation f{my_reference = original};
+    MyReferenceComputation ref{
+        feature_sets::make_from_argument_pack(my_reference = original)
+    };
 
-    std::string& retrieved = f.result(dont_care{});
+    std::string& retrieved = ref.result(dont_care{});
     BOOST_ASSERT(&retrieved == &original);
 
     retrieved = "modified";

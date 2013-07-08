@@ -13,7 +13,6 @@
 
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/parameter/keyword.hpp>
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/is_function.hpp>
 #include <utility>
@@ -25,10 +24,9 @@ namespace value_detail {
     struct store_value : implements<Feature>, depends_on<> {
         store_value() = default;
 
-        template <typename Args>
-        explicit store_value(Args&& args)
-            : value_(std::forward<Args>(args)[
-                boost::parameter::keyword<Feature>::get()])
+        template <typename FeatureSet>
+        explicit store_value(FeatureSet&& fset)
+            : value_(std::forward<FeatureSet>(fset)[Feature{}])
         { }
 
         T& result(detail::dont_care) { return value_; }
@@ -43,9 +41,9 @@ namespace value_detail {
  * Metafunction returning a computation implemented as a single value.
  *
  * When creating the computation, its initial value must be provided in
- * the argument pack by using a keyword whose tag is the feature being
- * implemented. Otherwise, if the computation is default-constructed,
- * the value stored in the computation is default-constructed.
+ * a `FeatureSet` implementing `Feature`. Otherwise, if the computation
+ * is default-constructed, the value stored in the computation is
+ * default-constructed.
  *
  * A value computation can't be executed. When its result is retrieved,
  * it returns a reference to the value it holds internally, with a `const`

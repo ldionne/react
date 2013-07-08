@@ -36,6 +36,8 @@ namespace react {
     //! Archetype for the `Feature` concept.
     template <typename Base>
     struct feature_archetype : Base {
+        feature_archetype();
+
         struct apply {
             using type = incremental_computation_archetype<>;
         };
@@ -48,8 +50,8 @@ namespace react {
     struct incremental_computation_archetype : Base {
         incremental_computation_archetype();
 
-        template <typename Args>
-        explicit incremental_computation_archetype(Args&);
+        template <typename FeatureSet>
+        explicit incremental_computation_archetype(FeatureSet&);
 
         template <typename Tag, typename FeatureSet>
         boost::null_archetype<>& operator()(Tag const&, FeatureSet&);

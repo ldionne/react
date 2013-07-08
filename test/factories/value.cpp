@@ -5,6 +5,7 @@
 
 #include <react/factories/value.hpp>
 #include <react/concepts.hpp>
+#include <react/feature_sets/from_argument_pack.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
@@ -14,8 +15,8 @@
 #include <boost/type_traits/add_pointer.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/is_reference.hpp>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 
@@ -34,19 +35,22 @@ struct test_concept {
 
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
             ValueComputation,
-            decltype(keyword = std::declval<T>()),
+            decltype(feature_sets::make_from_argument_pack(
+                keyword = std::declval<T>()
+            )),
             semantic_tags<>,
             dependency_results<>
         >));
 
-        BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<boost::is_reference<T>,
-            null_concept,
+        BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<
+            std::is_default_constructible<T>,
             IncrementalComputation<
                 ValueComputation,
                 default_construct,
                 semantic_tags<>,
                 dependency_results<>
-            >
+            >,
+            null_concept
         >::type));
 
         // If we want the
@@ -93,7 +97,7 @@ using MyValueFeature = factories::value<std::string, tag::my_value>::type;
 struct dont_care { };
 
 int main() {
-    MyValueFeature f{my_value = "abcd"};
+    MyValueFeature f{feature_sets::make_from_argument_pack(my_value = "abcd")};
 
     std::string abcd_value = f.result(dont_care{});
     BOOST_ASSERT(abcd_value == "abcd");

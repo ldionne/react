@@ -7,7 +7,6 @@
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/detail/empty_arg_pack.hpp>
 
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
@@ -40,9 +39,9 @@ struct test_concept {
 
     BOOST_CONCEPT_USAGE(test_concept) {
         // The dummy computation we're wrapping can be default constructed
-        // or constructed with any ArgumentPack.
+        // or constructed with any `FeatureSet`.
         BOOST_CONCEPT_ASSERT((check_incremental<default_construct>));
-        BOOST_CONCEPT_ASSERT((check_incremental<detail::empty_arg_pack_type>));
+        BOOST_CONCEPT_ASSERT((check_incremental<feature_set_archetype<>>));
 
         // If we want the
         // `TypedComputation::result_type v = typed_computation.result(env)`

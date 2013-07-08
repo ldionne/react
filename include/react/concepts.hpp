@@ -40,6 +40,7 @@ namespace react {
  * ## Valid expressions
  * | Expression                     | Return type                 | Semantics
  * | ----------                     | -----------                 | ---------
+ * | `F x{}`                        | None                        | None; this is a purely syntactic requirement.
  * | `apply<F, Args...>::type`      | An `IncrementalComputation` | The implementation of the feature when parameterized with `Args...`.
  * | `apply<F>::type`<sub>opt</sub> | An `IncrementalComputation` | The default implementation of the feature. The expression is only required if the feature is required in a feature set but its implementation is not explicitly specified.
  *
@@ -50,6 +51,8 @@ namespace react {
 template <typename F, typename ...Args>
 struct Feature {
     BOOST_CONCEPT_USAGE(Feature) {
+        F x{}; (void)x;
+
         using Implementation = typename boost::mpl::apply<F, Args...>::type;
     }
 };
@@ -128,7 +131,7 @@ namespace concept_detail {
  * ## Valid expressions
  * | Expression                  | Return type                                     | Semantics
  * | ----------                  | -----------                                     | ---------
- * | `IC x{args}` or `IC x{}`    | None                                            | Construct the computation object, providing the arguments contained in `args`. If `IC` is not constructible with `args`, it must be default constructible.
+ * | `IC x{fs}` or `IC x{}`      | None                                            | Construct the computation object, with `fs` being a `FeatureSet` implementing all the dependencies of `IC`. If `IC` is not constructible with `fs`, it must be default constructible.
  * | `ic(tag, fs)`<sub>opt</sub> | Any type                                        | Execute the computation with the semantic tag `tag` and the features provided by the feature set `fs`. If the expression is invalid, the computation is said to be non-executable for this combination of arguments.
  * | `ic.result(fs)`             | Any type                                        | Return the current result computed by the computation object.
  * | `dependencies_of<IC>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The set of features required in a feature set in order for this computation to be able to execute with any semantic tag. See `dependencies_of` for details.
@@ -139,8 +142,8 @@ namespace concept_detail {
  *         The type to be tested for modeling of the `IncrementalComputation`
  *         concept.
  *
- * @tparam ConstructionArgs
- *         An `ArgumentPack` sufficient for constructing `IC`, or
+ * @tparam ConstructionArg
+ *         A `FeatureSet` sufficient for constructing `IC`, or
  *         `default_construct` if it should be default-constructed.
  *
  * @tparam SemanticTags
@@ -152,11 +155,11 @@ namespace concept_detail {
  *         A Boost.MPL `AssociativeSequence` mapping each dependency of `IC`
  *         to its result type.
  */
-template <typename IC, typename ConstructionArgs,
+template <typename IC, typename ConstructionArg,
           typename SemanticTags, typename DependenciesResults>
 struct IncrementalComputation {
     BOOST_CONCEPT_USAGE(IncrementalComputation) {
-        concept_detail::construct<IC, ConstructionArgs>{}();
+        concept_detail::construct<IC, ConstructionArg>{}();
 
         boost::mpl::for_each<
             typename detail::pointers_to<SemanticTags>::type

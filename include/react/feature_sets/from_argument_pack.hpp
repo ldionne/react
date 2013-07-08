@@ -9,7 +9,7 @@
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 
-#include <utility>
+#include <boost/parameter/keyword.hpp>
 
 
 namespace react { namespace feature_sets {
@@ -22,9 +22,14 @@ namespace react { namespace feature_sets {
             : args_(args)
         { }
 
-        template <typename Key>
-        auto operator[](Key&& key) REACT_AUTO_RETURN(
-            args_[std::forward<Key>(key)]
+        template <typename Feature>
+        auto operator[](Feature const&) REACT_AUTO_RETURN(
+            args_[boost::parameter::keyword<Feature>::get()]
+        )
+
+        template <typename Feature>
+        auto operator[](Feature const&) const REACT_AUTO_RETURN(
+            args_[boost::parameter::keyword<Feature>::get()]
         )
 
         void operator()(detail::dont_care) const { }
@@ -32,10 +37,9 @@ namespace react { namespace feature_sets {
     };
 
     template <typename ArgumentPack>
-    from_argument_pack<ArgumentPack>
-    make_from_argument_pack(ArgumentPack& args) {
-        return {args};
-    }
+    auto make_from_argument_pack(ArgumentPack& args) REACT_AUTO_RETURN(
+        from_argument_pack<ArgumentPack>{args}
+    )
 }} // end namespace react::feature_sets
 
 #endif // !REACT_FEATURE_SETS_FROM_ARGUMENT_PACK_HPP

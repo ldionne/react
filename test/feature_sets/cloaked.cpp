@@ -26,10 +26,10 @@ using access_only = feature_sets::cloaked<
     feature_set_archetype<>, computation_depending_on<Dependencies...>
 >;
 
-struct feature1;
-struct feature2;
-struct feature3;
-struct feature4;
+struct feature1 { };
+struct feature2 { };
+struct feature3 { };
+struct feature4 { };
 
 namespace concept {
     template <typename ...Dependencies>
