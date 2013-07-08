@@ -161,7 +161,10 @@ public:
             typename detail::pointers_to<FeaturesInVisitationOrder>::type
         >(
             execute_computation<SemanticTag>(
-                make_feature_set_union(*this, std::forward<FeatureSet>(ext))
+                make_union(
+                    make_by_ref(*this),
+                    make_by_ref(std::forward<FeatureSet>(ext))
+                )
             )
         );
     }

@@ -14,21 +14,21 @@
 
 
 namespace react { namespace feature_sets {
-template <typename FeatureSet, typename Computation>
-struct cloaked : FeatureSet {
-    using FeatureSet::FeatureSet;
-    using FeatureSet::operator=;
+    template <typename FeatureSet, typename Computation>
+    struct cloaked : FeatureSet {
+        using FeatureSet::FeatureSet;
+        using FeatureSet::operator=;
 
-    template <typename Feature, typename = typename boost::enable_if<
-        boost::mpl::has_key<
-            typename dependencies_of<Computation>::type, Feature
-        >
-    >::type>
-    auto operator[](Feature const& feature)
-    -> decltype(std::declval<FeatureSet&>()[feature]) {
-        return static_cast<FeatureSet&>(*this)[feature];
-    }
-};
+        template <typename Feature, typename = typename boost::enable_if<
+            boost::mpl::has_key<
+                typename dependencies_of<Computation>::type, Feature
+            >
+        >::type>
+        auto operator[](Feature const& feature)
+        -> decltype(std::declval<FeatureSet&>()[feature]) {
+            return static_cast<FeatureSet&>(*this)[feature];
+        }
+    };
 }} // end namespace react::feature_sets
 
 #endif // !REACT_FEATURE_SETS_CLOAKED_HPP
