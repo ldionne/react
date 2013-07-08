@@ -209,13 +209,12 @@ private:
  *
  *
  * ## Valid expressions
- * | Expression                  | Return type                                                    | Semantics
- * | ----------                  | -----------                                                    | ---------
- * | `FS x{args}` or `FS x{}`    | None                                                           | Create a feature set, constructing all of its computations with an `ArgumentPack` containing a non-strict superset of the arguments in `args`. If a computation can't be constructed with the `ArgumentPack`, it is default-constructed instead. A `FeatureSet` may also (or solely) be default-constructible.
- * | `fs[feature]`               | Any type                                                       | Return the current result of the computation implementing `feature` in the set. If there is no such feature in the set, the expression shall be ill-formed.
- * | `fs(tag)`                   | Any type                                                       | Let `X` be the set of the computations of all the features in the `FeatureSet`, including those only present as a dependency. All of the computations `C` in `X` that are executable with `tag` as a semantic tag and `fs` as a feature set shall be executed in an order such that the computations implementing all of the dependencies of `C` are executed before `C`. Computations that are not executable for that combination of arguments shall not be executed.
- * | `fs(tag, ext)`              | Any type                                                       | Same as `fs(tag)`, except that computations are executed with a feature set containing the union of `fs` and `ext`'s features.
- * | `computations_of<FS>::type` | A Boost.MPL `AssociativeSequence` of `IncrementalComputation`s | The set of all the computations in the feature set.
+ * | Expression               | Return type | Semantics
+ * | ----------               | ----------- | ---------
+ * | `FS x{args}` or `FS x{}` | None        | Create a feature set, constructing all of its computations with an `ArgumentPack` containing a non-strict superset of the arguments in `args`. If a computation can't be constructed with the `ArgumentPack`, it is default-constructed instead. A `FeatureSet` may also (or solely) be default-constructible.
+ * | `fs[feature]`            | Any type    | Return the current result of the computation implementing `feature` in the set. If there is no such feature in the set, the expression shall be ill-formed.
+ * | `fs(tag)`                | Any type    | Let `X` be the set of the computations of all the features in the `FeatureSet`, including those only present as a dependency. All of the computations `C` in `X` that are executable with `tag` as a semantic tag and `fs` as a feature set shall be executed in an order such that the computations implementing all of the dependencies of `C` are executed before `C`. Computations that are not executable for that combination of arguments shall not be executed.
+ * | `fs(tag, ext)`           | Any type    | Same as `fs(tag)`, except that computations are executed with a feature set containing the union of `fs` and `ext`'s features.
  *
  *
  * @tparam FS
@@ -246,11 +245,6 @@ struct FeatureSet {
         boost::mpl::for_each<
             typename detail::pointers_to<AccessibleFeatures>::type
         >(retrieve_result{});
-
-        using Computations = typename computations_of<FS>::type;
-        static_assert(boost::mpl::is_sequence<Computations>::value,
-        "computations_of<FS>::type shall be the set of all the "
-        "computations in the feature set");
     }
 
 private:

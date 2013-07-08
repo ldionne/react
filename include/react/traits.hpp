@@ -7,11 +7,6 @@
 #define REACT_TRAITS_HPP
 
 namespace react {
-    template <typename FeatureSet>
-    struct computations_of {
-        using type = typename FeatureSet::computations;
-    };
-
     template <typename Computation>
     struct dependencies_of {
         using type = typename Computation::dependencies;

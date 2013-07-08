@@ -7,7 +7,6 @@
 #define REACT_DETAIL_FEATURE_SET_BY_REF_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/traits.hpp>
 
 #include <utility>
 
@@ -18,8 +17,6 @@ class feature_set_by_ref {
     FeatureSet& fset_;
 
 public:
-    using computations = typename computations_of<FeatureSet>::type;
-
     explicit feature_set_by_ref(FeatureSet& fset)
         : fset_(fset)
     { }

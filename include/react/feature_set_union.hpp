@@ -9,7 +9,6 @@
 #include <react/detail/auto_return.hpp>
 #include <react/traits.hpp>
 
-#include <boost/mpl/set_union.hpp>
 #include <utility>
 
 
@@ -23,11 +22,6 @@ public:
     feature_set_union(FS1& fs1, FS2& fs2)
         : fs1_(fs1), fs2_(fs2)
     { }
-
-    using computations = typename boost::mpl::set_union<
-        typename computations_of<FS1>::type,
-        typename computations_of<FS2>::type
-    >::type;
 
     template <typename SemanticTag>
     void operator()(SemanticTag const& tag) {

@@ -79,8 +79,6 @@ namespace react {
 
         template <typename Feature>
         boost::null_archetype<>& operator[](Feature const&);
-
-        using computations = boost::mpl::set<>;
     };
 
 } // end namespace react
