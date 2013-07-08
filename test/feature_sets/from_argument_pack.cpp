@@ -1,11 +1,12 @@
 /*!
  * @file
- * This file defines unit tests for `react::feature_set_union`.
+ * This file defines unit tests for `react::feature_sets::from_argument_pack`.
  */
 
-#include <react/feature_set_union.hpp>
+#include <react/feature_sets/from_argument_pack.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
+#include <react/detail/empty_arg_pack.hpp>
 
 #include <boost/concept/assert.hpp>
 
@@ -13,7 +14,7 @@
 using namespace react;
 
 struct default_constructible
-    : feature_set_union<feature_set_archetype<>, feature_set_archetype<>>
+    : feature_sets::from_argument_pack<detail::empty_arg_pack_type>
 {
     default_constructible();
 };

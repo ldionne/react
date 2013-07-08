@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file defines unit tests for `react::detail::feature_set_by_ref`.
+ * This file defines unit tests for `react::feature_sets::by_ref`.
  */
 
-#include <react/detail/feature_set_by_ref.hpp>
+#include <react/feature_sets/by_ref.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 
@@ -13,9 +13,7 @@
 
 using namespace react;
 
-struct default_constructible
-    : detail::feature_set_by_ref<feature_set_archetype<>>
-{
+struct default_constructible : feature_sets::by_ref<feature_set_archetype<>> {
     default_constructible();
 };
 

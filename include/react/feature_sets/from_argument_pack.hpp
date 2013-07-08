@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::argument_pack_as_feature_set`.
+ * This file defines `react::feature_sets::from_argument_pack`.
  */
 
-#ifndef REACT_ARGUMENT_PACK_AS_FEATURE_SET_HPP
-#define REACT_ARGUMENT_PACK_AS_FEATURE_SET_HPP
+#ifndef REACT_FEATURE_SETS_FROM_ARGUMENT_PACK_HPP
+#define REACT_FEATURE_SETS_FROM_ARGUMENT_PACK_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
@@ -12,13 +12,13 @@
 #include <utility>
 
 
-namespace react {
+namespace react { namespace feature_sets {
     template <typename ArgumentPack>
-    class argument_pack_as_feature_set {
+    class from_argument_pack {
         ArgumentPack& args_;
 
     public:
-        explicit argument_pack_as_feature_set(ArgumentPack& args)
+        explicit from_argument_pack(ArgumentPack& args)
             : args_(args)
         { }
 
@@ -32,10 +32,10 @@ namespace react {
     };
 
     template <typename ArgumentPack>
-    argument_pack_as_feature_set<ArgumentPack>
-    make_feature_set_from_argument_pack(ArgumentPack& args) {
+    from_argument_pack<ArgumentPack>
+    make_from_argument_pack(ArgumentPack& args) {
         return {args};
     }
-} // end namespace react
+}} // end namespace react::feature_sets
 
-#endif // !REACT_ARGUMENT_PACK_AS_FEATURE_SET_HPP
+#endif // !REACT_FEATURE_SETS_FROM_ARGUMENT_PACK_HPP

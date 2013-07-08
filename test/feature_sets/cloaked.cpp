@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file defines unit tests for `react::detail::cloaked_feature_set`.
+ * This file defines unit tests for `react::feature_sets::cloaked`.
  */
 
-#include <react/detail/cloaked_feature_set.hpp>
+#include <react/feature_sets/cloaked.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 
@@ -22,7 +22,7 @@ struct computation_depending_on : incremental_computation_archetype<> {
 };
 
 template <typename ...Dependencies>
-using access_only = detail::cloaked_feature_set<
+using access_only = feature_sets::cloaked<
     feature_set_archetype<>, computation_depending_on<Dependencies...>
 >;
 

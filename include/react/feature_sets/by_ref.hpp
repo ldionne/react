@@ -1,23 +1,23 @@
 /*!
  * @file
- * This file defines `react::detail::feature_set_by_ref`.
+ * This file defines `react::feature_sets::by_ref`.
  */
 
-#ifndef REACT_DETAIL_FEATURE_SET_BY_REF_HPP
-#define REACT_DETAIL_FEATURE_SET_BY_REF_HPP
+#ifndef REACT_FEATURE_SETS_BY_REF_HPP
+#define REACT_FEATURE_SETS_BY_REF_HPP
 
 #include <react/detail/auto_return.hpp>
 
 #include <utility>
 
 
-namespace react { namespace detail {
+namespace react { namespace feature_sets {
 template <typename FeatureSet>
-class feature_set_by_ref {
+class by_ref {
     FeatureSet& fset_;
 
 public:
-    explicit feature_set_by_ref(FeatureSet& fset)
+    explicit by_ref(FeatureSet& fset)
         : fset_(fset)
     { }
 
@@ -31,6 +31,6 @@ public:
         fset_[std::forward<Arg>(arg)]
     )
 };
-}} // end namespace react::detail
+}} // end namespace react::feature_sets
 
-#endif // !REACT_DETAIL_FEATURE_SET_BY_REF_HPP
+#endif // !REACT_FEATURE_SETS_BY_REF_HPP

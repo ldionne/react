@@ -1,19 +1,19 @@
 /*!
  * @file
- * This file defines `react::feature_set`.
+ * This file defines `react::feature_sets::default_`.
  */
 
-#ifndef REACT_FEATURE_SET_HPP
-#define REACT_FEATURE_SET_HPP
+#ifndef REACT_FEATURE_SETS_DEFAULT_HPP
+#define REACT_FEATURE_SETS_DEFAULT_HPP
 
 #include <react/archetypes.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/call_computation.hpp>
-#include <react/detail/cloaked_feature_set.hpp>
 #include <react/detail/feature_dependency_graph.hpp>
-#include <react/detail/feature_set_by_ref.hpp>
 #include <react/detail/pointers_to.hpp>
-#include <react/feature_set_union.hpp>
+#include <react/feature_sets/by_ref.hpp>
+#include <react/feature_sets/cloaked.hpp>
+#include <react/feature_sets/union.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/apply.hpp>
@@ -37,8 +37,8 @@
 #include <utility>
 
 
-namespace react {
-namespace feature_set_detail {
+namespace react { namespace feature_sets {
+namespace default_detail {
 namespace mpl = boost::mpl;
 
 struct last_storage_node {
@@ -85,7 +85,7 @@ struct computation_from_vertex {
 };
 
 template <typename ...Computations>
-class feature_set {
+class default_impl {
 private:
     //! Map associating features whose implementation was explicitly
     //! specified in the feature set to that implementation.
@@ -123,10 +123,10 @@ private:
     Storage features_;
 
 public:
-    feature_set() = default;
+    default_impl() = default;
 
     template <typename Args>
-    explicit feature_set(Args const& args)
+    explicit default_impl(Args const& args)
         : features_{args}
     { }
 
@@ -139,7 +139,7 @@ private:
 
     template <typename SemanticTag, typename Union>
     struct computation_executer {
-        feature_set& self;
+        default_impl& self;
         Union union_;
         template <typename Feature>
         void operator()(Feature* feature) {
@@ -176,17 +176,15 @@ private:
     { };
 
     template <typename FeatureSet, typename Feature>
-    static detail::cloaked_feature_set<
-        detail::feature_set_by_ref<FeatureSet>,
-        typename computation_at<Feature>::type
-    > cloak_for(Feature const&, FeatureSet&& fset) {
+    static cloaked<by_ref<FeatureSet>, typename computation_at<Feature>::type>
+    cloak_for(Feature const&, FeatureSet&& fset) {
         return {std::forward<FeatureSet>(fset)};
     }
 
 public:
     template <typename SemanticTag>
     void operator()(SemanticTag const& tag) {
-        return operator()(tag, feature_set<>{});
+        return operator()(tag, default_impl<>{});
     }
 
     template <typename Feature>
@@ -199,13 +197,13 @@ template <typename ...Computations>
 struct pseudo_root_computation : incremental_computation_archetype<> {
     using dependencies = mpl::set<typename feature_of<Computations>::type...>;
 };
-} // end namespace feature_set_detail
+} // end namespace default_detail
 
 template <typename ...Computations>
-using feature_set = detail::cloaked_feature_set<
-    feature_set_detail::feature_set<Computations...>,
-    feature_set_detail::pseudo_root_computation<Computations...>
+using default_ = cloaked<
+    default_detail::default_impl<Computations...>,
+    default_detail::pseudo_root_computation<Computations...>
 >;
-} // end namespace react
+}} // end namespace react::feature_sets
 
-#endif // !REACT_FEATURE_SET_HPP
+#endif // !REACT_FEATURE_SETS_DEFAULT_HPP

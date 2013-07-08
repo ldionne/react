@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::detail::cloaked_feature_set`.
+ * This file defines `react::feature_sets::cloaked`.
  */
 
-#ifndef REACT_DETAIL_CLOAKED_FEATURE_SET_HPP
-#define REACT_DETAIL_CLOAKED_FEATURE_SET_HPP
+#ifndef REACT_FEATURE_SETS_CLOAKED_HPP
+#define REACT_FEATURE_SETS_CLOAKED_HPP
 
 #include <react/traits.hpp>
 
@@ -13,9 +13,9 @@
 #include <utility>
 
 
-namespace react { namespace detail {
+namespace react { namespace feature_sets {
 template <typename FeatureSet, typename Computation>
-struct cloaked_feature_set : FeatureSet {
+struct cloaked : FeatureSet {
     using FeatureSet::FeatureSet;
     using FeatureSet::operator=;
 
@@ -29,6 +29,6 @@ struct cloaked_feature_set : FeatureSet {
         return static_cast<FeatureSet&>(*this)[feature];
     }
 };
-}} // end namespace react::detail
+}} // end namespace react::feature_sets
 
-#endif // !REACT_DETAIL_CLOAKED_FEATURE_SET_HPP
+#endif // !REACT_FEATURE_SETS_CLOAKED_HPP
