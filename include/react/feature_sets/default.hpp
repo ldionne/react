@@ -23,7 +23,6 @@
 #include <boost/mpl/graph_intrinsics.hpp>
 #include <boost/mpl/has_key.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
-#include <boost/mpl/insert.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
@@ -106,15 +105,6 @@ private:
         computation_of<mpl::_1>, mpl::vector<Computations...>
     >;
 
-public:
-    using computations = typename mpl::fold<
-        typename mpl::vertices_of<DependencyGraph>::type,
-        mpl::set<>,
-        mpl::insert<mpl::_1, computation_from_vertex<mpl::_2>>
-    >::type;
-
-
-private:
     using Storage = typename mpl::inherit_linearly<
         typename mpl::vertices_of<DependencyGraph>::type,
         storage_node<computation_from_vertex<mpl::_2>, mpl::_1>,
