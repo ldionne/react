@@ -199,6 +199,18 @@ struct pseudo_root_computation : incremental_computation_archetype<> {
 };
 } // end namespace default_detail
 
+/*!
+ * Default implementation of the `FeatureSet` concept.
+ *
+ * On construction, all the computations are constructed with an `ArgumentPack`
+ * containing a non-strict superset of the `ArgumentPack` passed to
+ * `default_`'s constructor.
+ *
+ * If a computation can't be constructed with the `ArgumentPack`, it is
+ * default-constructed instead. The `default_` feature set may also be
+ * default-constructed, in which case all of its computations are
+ * default-constructed.
+ */
 template <typename ...Computations>
 using default_ = cloaked<
     default_detail::default_impl<Computations...>,

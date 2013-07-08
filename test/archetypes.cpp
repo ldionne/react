@@ -9,8 +9,6 @@
 
 #include <boost/concept/assert.hpp>
 #include <boost/concept_archetype.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/vector.hpp>
 
 
 using namespace react;
@@ -28,23 +26,19 @@ template <typename ConstructionArgs>
 using check_incremental = IncrementalComputation<
     incremental_computation_archetype<>,
     ConstructionArgs,
-    boost::mpl::vector<boost::null_archetype<>>, // valid semantic tags
-    boost::mpl::map<>                            // dependencies
+    semantic_tags<boost::null_archetype<>>,
+    dependency_results<>
 >;
 BOOST_CONCEPT_ASSERT((check_incremental<detail::empty_arg_pack_type>));
 BOOST_CONCEPT_ASSERT((check_incremental<default_construct>));
 
 
 // FeatureSet
-template <typename ConstructionArgs>
-using check_feature_set = FeatureSet<
+BOOST_CONCEPT_ASSERT((FeatureSet<
     feature_set_archetype<>,
-    ConstructionArgs,
-    boost::mpl::vector<boost::null_archetype<>>, // valid semantic tags
-    boost::mpl::vector<boost::null_archetype<>>  // accessible features
->;
-BOOST_CONCEPT_ASSERT((check_feature_set<detail::empty_arg_pack_type>));
-BOOST_CONCEPT_ASSERT((check_feature_set<default_construct>));
+    semantic_tags<boost::null_archetype<>>,
+    accessible_features<boost::null_archetype<>>
+>));
 
 
 int main() { }

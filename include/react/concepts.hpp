@@ -204,25 +204,19 @@ private:
  * | `FS`       | A type modeling the `FeatureSet` concept
  * | `fs, ext`  | Arbitrary `FeatureSet`s
  * | `feature`  | An arbitrary `Feature`
- * | `args`     | An arbitrary Boost.Parameter `ArgumentPack`
  * | `tag`      | An arbitrary object
  *
  *
  * ## Valid expressions
- * | Expression               | Return type | Semantics
- * | ----------               | ----------- | ---------
- * | `FS x{args}` or `FS x{}` | None        | Create a feature set, constructing all of its computations with an `ArgumentPack` containing a non-strict superset of the arguments in `args`. If a computation can't be constructed with the `ArgumentPack`, it is default-constructed instead. A `FeatureSet` may also (or solely) be default-constructible.
- * | `fs[feature]`            | Any type    | Return the current result of the computation implementing `feature` in the set. If there is no such feature in the set, the expression shall be ill-formed.
- * | `fs(tag)`                | Any type    | Let `X` be the set of the computations of all the features in the `FeatureSet`, including those only present as a dependency. All of the computations `C` in `X` that are executable with `tag` as a semantic tag and `fs` as a feature set shall be executed in an order such that the computations implementing all of the dependencies of `C` are executed before `C`. Computations that are not executable for that combination of arguments shall not be executed.
- * | `fs(tag, ext)`           | Any type    | Same as `fs(tag)`, except that computations are executed with a feature set containing the union of `fs` and `ext`'s features.
+ * | Expression     | Return type | Semantics
+ * | ----------     | ----------- | ---------
+ * | `fs[feature]`  | Any type    | Return the current result of the computation implementing `feature` in the set. If there is no such feature in the set, the expression shall be ill-formed.
+ * | `fs(tag)`      | Any type    | Let `X` be the set of the computations of all the features in the `FeatureSet`, including those only present as a dependency. All of the computations `C` in `X` that are executable with `tag` as a semantic tag and `fs` as a feature set shall be executed in an order such that the computations implementing all of the dependencies of `C` are executed before `C`. Computations that are not executable for that combination of arguments shall not be executed.
+ * | `fs(tag, ext)` | Any type    | Same as `fs(tag)`, except that computations are executed with a feature set containing the union of `fs` and `ext`'s features.
  *
  *
  * @tparam FS
  *         The type to be tested for modeling of the `FeatureSet` concept.
- *
- * @tparam ConstructionArgs
- *         An `ArgumentPack` sufficient for constructing `FS`, or
- *         `default_construct` if it should be default-constructed.
  *
  * @tparam SemanticTags
  *         A Boost.MPL `ForwardSequence` of semantic tags with which it is
@@ -232,12 +226,9 @@ private:
  *         A Boost.MPL `ForwardSequence` of `Feature`s whose result may be
  *         extracted from `FS`.
  */
-template <typename FS, typename ConstructionArgs,
-          typename SemanticTags, typename AccessibleFeatures>
+template <typename FS, typename SemanticTags, typename AccessibleFeatures>
 struct FeatureSet {
     BOOST_CONCEPT_USAGE(FeatureSet) {
-        concept_detail::construct<FS, ConstructionArgs>{}();
-
         boost::mpl::for_each<
             typename detail::pointers_to<SemanticTags>::type
         >(call{});

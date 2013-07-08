@@ -66,11 +66,6 @@ namespace react {
     //! Archetype for the `FeatureSet` concept.
     template <typename Base>
     struct feature_set_archetype : Base {
-        feature_set_archetype();
-
-        template <typename Args>
-        explicit feature_set_archetype(Args&);
-
         template <typename Tag>
         boost::null_archetype<>& operator()(Tag const&);
 

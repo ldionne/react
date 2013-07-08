@@ -13,13 +13,8 @@
 
 using namespace react;
 
-struct default_constructible : feature_sets::by_ref<feature_set_archetype<>> {
-    default_constructible();
-};
-
 BOOST_CONCEPT_ASSERT((FeatureSet<
-    default_constructible,
-    default_construct,
+    feature_sets::by_ref<feature_set_archetype<>>,
     semantic_tags<boost::null_archetype<>>,
     dependency_results<>
 >));

@@ -35,7 +35,6 @@ namespace concept {
     template <typename ...Dependencies>
     using test_concept = FeatureSet<
         access_only<Dependencies...>,
-        default_construct,
         semantic_tags<boost::null_archetype<>>,
         accessible_features<Dependencies...>
     >;

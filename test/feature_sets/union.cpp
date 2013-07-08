@@ -12,15 +12,8 @@
 
 using namespace react;
 
-struct default_constructible
-    : feature_sets::union_<feature_set_archetype<>, feature_set_archetype<>>
-{
-    default_constructible();
-};
-
 BOOST_CONCEPT_ASSERT((FeatureSet<
-    default_constructible,
-    default_construct,
+    feature_sets::union_<feature_set_archetype<>, feature_set_archetype<>>,
     semantic_tags<>,
     accessible_features<>
 >));
