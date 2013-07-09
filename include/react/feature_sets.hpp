@@ -9,6 +9,7 @@
 #include <react/feature_sets/by_ref.hpp>
 #include <react/feature_sets/cloaked.hpp>
 #include <react/feature_sets/default.hpp>
+#include <react/feature_sets/empty.hpp>
 #include <react/feature_sets/from_argument_pack.hpp>
 #include <react/feature_sets/union.hpp>
 
