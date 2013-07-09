@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::factories::value`.
+ * This file contains unit tests for `react::computations::value`.
  */
 
-#include <react/factories/value.hpp>
+#include <react/computations/value.hpp>
 #include <react/concepts.hpp>
 #include <react/feature_sets/from_argument_pack.hpp>
 
@@ -26,9 +26,9 @@ struct null_concept { BOOST_CONCEPT_USAGE(null_concept) { } };
 
 template <typename T>
 struct test_concept {
-    using ValueComputation = typename factories::value<
+    using ValueComputation = computations::value<
         T, feature_archetype<>
-    >::type;
+    >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
         auto keyword = boost::parameter::keyword<feature_archetype<>>::get();
@@ -92,7 +92,7 @@ BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 
 // Small runtime test just to make sure the value is set alright.
 BOOST_PARAMETER_KEYWORD(tag, my_value)
-using MyValueFeature = factories::value<std::string, tag::my_value>::type;
+using MyValueFeature = computations::value<std::string, tag::my_value>;
 
 struct dont_care { };
 

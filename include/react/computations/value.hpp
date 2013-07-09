@@ -1,14 +1,14 @@
 /*!
  * @file
- * This file defines `react::factories::value`.
+ * This file defines `react::computations::value`.
  */
 
-#ifndef REACT_FACTORIES_VALUE_HPP
-#define REACT_FACTORIES_VALUE_HPP
+#ifndef REACT_COMPUTATIONS_VALUE_HPP
+#define REACT_COMPUTATIONS_VALUE_HPP
 
+#include <react/computations/typed.hpp>
 #include <react/depends_on.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/factories/typed.hpp>
 #include <react/implements.hpp>
 
 #include <boost/mpl/eval_if.hpp>
@@ -18,7 +18,7 @@
 #include <utility>
 
 
-namespace react { namespace factories {
+namespace react { namespace computations {
 namespace value_detail {
     template <typename T, typename Feature>
     struct store_value : implements<Feature>, depends_on<> {
@@ -35,12 +35,25 @@ namespace value_detail {
     private:
         T value_;
     };
+
+    template <typename T, typename Feature>
+    struct make_value_computation {
+        using AdjustedType = typename boost::mpl::eval_if<
+            boost::is_function<T>,
+            boost::add_pointer<T>,
+            boost::mpl::identity<T>
+        >::type;
+
+        using type = typed<
+            AdjustedType, store_value<AdjustedType, Feature>
+        >;
+    };
 } // end namespace value_detail
 
 /*!
- * Metafunction returning a computation implemented as a single value.
+ * Computation implemented as a single value.
  *
- * When creating the computation, its initial value must be provided in
+ * When constructing the computation, its initial value must be provided in
  * a `FeatureSet` implementing `Feature`. Otherwise, if the computation
  * is default-constructed, the value stored in the computation is
  * default-constructed.
@@ -56,16 +69,7 @@ namespace value_detail {
  * Computations created with this factory are implicitly `typed`.
  */
 template <typename T, typename Feature>
-class value {
-    using AdjustedType = typename boost::mpl::eval_if<
-        boost::is_function<T>, boost::add_pointer<T>, boost::mpl::identity<T>
-    >::type;
+using value = typename value_detail::make_value_computation<T, Feature>::type;
+}} // end namespace react::computations
 
-public:
-    using type = typename typed<
-        AdjustedType, value_detail::store_value<AdjustedType, Feature>
-    >::type;
-};
-}} // end namespace react::factories
-
-#endif // !REACT_FACTORIES_VALUE_HPP
+#endif // !REACT_COMPUTATIONS_VALUE_HPP

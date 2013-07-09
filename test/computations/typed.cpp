@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::factories::typed`.
+ * This file contains unit tests for `react::computations::typed`.
  */
 
-#include <react/factories/typed.hpp>
+#include <react/computations/typed.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
@@ -25,9 +25,9 @@ struct my_computation : incremental_computation_archetype<> {
 
 template <typename ComputationResult>
 struct test_concept {
-    using TypedComputation = typename factories::typed<
+    using TypedComputation = computations::typed<
         ComputationResult, my_computation<ComputationResult>
-    >::type;
+    >;
 
     template <typename ConstructPolicy>
     using check_incremental = IncrementalComputation<

@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::factories::reference`.
+ * This file contains unit tests for `react::computations::reference`.
  */
 
-#include <react/factories/reference.hpp>
+#include <react/computations/reference.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 #include <react/feature_sets/from_argument_pack.hpp>
@@ -21,9 +21,9 @@ using namespace react;
 
 template <typename T>
 struct test_concept {
-    using ReferenceComputation = typename factories::reference<
+    using ReferenceComputation = computations::reference<
         T, feature_archetype<>
-    >::type;
+    >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
         auto keyword = boost::parameter::keyword<feature_archetype<>>::get();
@@ -72,9 +72,9 @@ BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 
 // Small runtime test just to make sure the reference is taken alright.
 BOOST_PARAMETER_KEYWORD(tag, my_reference)
-using MyReferenceComputation = factories::reference<
+using MyReferenceComputation = computations::reference<
     std::string, tag::my_reference
->::type;
+>;
 
 struct dont_care { };
 

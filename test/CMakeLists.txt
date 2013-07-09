@@ -24,9 +24,9 @@ endfunction()
 
 
 react_add_test(archetypes                      archetypes.cpp)
-react_add_test(factories_reference             factories/reference.cpp)
-react_add_test(factories_typed                 factories/typed.cpp)
-react_add_test(factories_value                 factories/value.cpp)
+react_add_test(computations_reference          computations/reference.cpp)
+react_add_test(computations_typed              computations/typed.cpp)
+react_add_test(computations_value              computations/value.cpp)
 react_add_test(feature_sets_by_ref             feature_sets/by_ref.cpp)
 react_add_test(feature_sets_cloaked            feature_sets/cloaked.cpp)
 react_add_test(feature_sets_default            feature_sets/default.cpp)
