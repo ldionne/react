@@ -24,6 +24,7 @@ endfunction()
 
 
 react_add_test(archetypes                      archetypes.cpp)
+react_add_test(computations_implemented_by     computations/implemented_by.cpp)
 react_add_test(computations_reference          computations/reference.cpp)
 react_add_test(computations_typed              computations/typed.cpp)
 react_add_test(computations_value              computations/value.cpp)

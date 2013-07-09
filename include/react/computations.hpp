@@ -6,6 +6,7 @@
 #ifndef REACT_COMPUTATIONS_HPP
 #define REACT_COMPUTATIONS_HPP
 
+#include <react/computations/implemented_by.hpp>
 #include <react/computations/reference.hpp>
 #include <react/computations/typed.hpp>
 #include <react/computations/value.hpp>
