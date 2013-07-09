@@ -9,73 +9,110 @@
 #include <react/archetypes.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/call_computation.hpp>
+#include <react/detail/dont_care.hpp>
 #include <react/detail/feature_dependency_graph.hpp>
-#include <react/detail/pointers_to.hpp>
 #include <react/feature_sets/by_ref.hpp>
 #include <react/feature_sets/cloaked.hpp>
+#include <react/feature_sets/empty.hpp>
 #include <react/feature_sets/union.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/apply.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/for_each.hpp>
-#include <boost/mpl/graph_intrinsics.hpp>
 #include <boost/mpl/has_key.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/reverse.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/topological_sort.hpp>
-#include <boost/mpl/transform_view.hpp>
+#include <boost/mpl/transform.hpp>
 #include <boost/mpl/vector.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <type_traits>
-#include <utility>
 
 
 namespace react { namespace feature_sets {
 namespace default_detail {
 namespace mpl = boost::mpl;
 
-struct last_storage_node {
-    template <typename ...Args>
-    last_storage_node(Args&& ...) { }
+template <typename Computation, typename FeatureSet>
+cloaked<by_ref<FeatureSet>, Computation> cloak_for(FeatureSet& fset) {
+    return {fset};
+}
 
-    template <typename Anything, bool always_false = false>
-    void at(Anything&&) const {
+template <typename Derived>
+struct storage_node_base {
+protected:
+    Derived& all_features() { return static_cast<Derived&>(*this); }
+
+public:
+    storage_node_base() = default;
+
+    template <typename FeatureSet>
+    explicit storage_node_base(FeatureSet&&) { }
+
+    template <bool always_false = false>
+    void operator[](detail::dont_care) const {
         static_assert(always_false,
-        "could not find the requested feature in the graph");
+            "could not find the requested feature in the feature set");
     }
 };
 
-template <typename Computation, typename Next>
-struct storage_node : Next {
-    storage_node() = default;
-
-    template <typename Args>
-    explicit storage_node(Args const& args, typename boost::enable_if<
-        std::is_constructible<Computation, Args const&>
-    >::type* = 0)
-        : Next{args}, computation_{args}
-    { }
-
-    template <typename Args>
-    explicit storage_node(Args const& args, typename boost::disable_if<
-        std::is_constructible<Computation, Args const&>
-    >::type* = 0)
-        : Next{args}, computation_{}
-    { }
-
-    using Next::at;
-    Computation& at(typename feature_of<Computation>::type const&) {
-        return computation_;
-    }
-
+template <typename Computation, typename Dependencies>
+struct storage_node : Dependencies {
 private:
     Computation computation_;
+
+public:
+    storage_node() = default;
+
+    template <typename FeatureSet>
+    explicit storage_node(FeatureSet& ext, typename boost::enable_if<
+        std::is_constructible<Computation, FeatureSet&>
+    >::type* = 0)
+        : Dependencies{ext},
+          computation_{
+            make_union(
+                make_by_ref(static_cast<Dependencies&>(*this)),
+                make_by_ref(ext)
+            )
+          }
+    { }
+
+    template <typename FeatureSet>
+    explicit storage_node(FeatureSet& ext, typename boost::disable_if<
+        std::is_constructible<Computation, FeatureSet&>
+    >::type* = 0)
+        : Dependencies{ext}, computation_{}
+    { }
+
+    template <typename SemanticTag, typename FeatureSet>
+    void operator()(SemanticTag const& tag, FeatureSet& ext) {
+        Dependencies::operator()(tag, ext);
+        detail::call_computation<SemanticTag>(
+            computation_,
+            cloak_for<Computation>(
+                make_union(
+                    make_by_ref(this->all_features()),
+                    make_by_ref(ext)
+                )
+            )
+        );
+    }
+
+    template <typename SemanticTag>
+    void operator()(SemanticTag const& tag) {
+        return operator()(tag, empty{});
+    }
+
+    using Dependencies::operator[];
+    auto operator[](typename feature_of<Computation>::type const&)
+    REACT_AUTO_RETURN(
+        computation_.result(cloak_for<Computation>(this->all_features()))
+    )
 };
 
 template <typename Vertex>
@@ -84,10 +121,7 @@ struct computation_from_vertex {
 };
 
 template <typename ...Computations>
-class default_impl {
-private:
-    //! Map associating features whose implementation was explicitly
-    //! specified in the feature set to that implementation.
+struct make_default {
     using PredefinedComputations = mpl::map<
         mpl::pair<typename feature_of<Computations>::type, Computations>...
     >;
@@ -105,85 +139,23 @@ private:
         computation_of<mpl::_1>, mpl::vector<Computations...>
     >;
 
-    using Storage = typename mpl::inherit_linearly<
-        typename mpl::vertices_of<DependencyGraph>::type,
-        storage_node<computation_from_vertex<mpl::_2>, mpl::_1>,
-        last_storage_node
-    >::type;
-    Storage features_;
-
-public:
-    default_impl() = default;
-
-    template <typename Args>
-    explicit default_impl(Args const& args)
-        : features_{args}
-    { }
-
-
-private:
-    using FeaturesInVisitationOrder = mpl::transform_view<
+    using ComputationsInVisitationOrder = typename mpl::transform<
         typename mpl::topological_sort<DependencyGraph>::type,
-        feature_of<computation_from_vertex<mpl::_1>>
+        computation_from_vertex<mpl::_1>
+    >::type;
+
+    struct type;
+
+    using Storage = mpl::inherit_linearly<
+        typename mpl::reverse<ComputationsInVisitationOrder>::type,
+        storage_node<mpl::_2, mpl::_1>,
+        storage_node_base<type>
     >;
 
-    template <typename SemanticTag, typename Union>
-    struct computation_executer {
-        default_impl& self;
-        Union union_;
-        template <typename Feature>
-        void operator()(Feature* feature) {
-            detail::call_computation<SemanticTag>(
-                self.features_.at(*feature), cloak_for(*feature, union_)
-            );
-        }
+    struct type : Storage::type {
+        using Storage::type::type;
+        using Storage::type::operator=;
     };
-
-    template <typename SemanticTag, typename Union>
-    computation_executer<SemanticTag, Union> execute_computation(Union&& u) {
-        return {*this, u};
-    }
-
-public:
-    template <typename SemanticTag, typename FeatureSet>
-    void operator()(SemanticTag const& tag, FeatureSet&& ext) {
-        mpl::for_each<
-            typename detail::pointers_to<FeaturesInVisitationOrder>::type
-        >(
-            execute_computation<SemanticTag>(
-                make_union(
-                    make_by_ref(*this),
-                    make_by_ref(std::forward<FeatureSet>(ext))
-                )
-            )
-        );
-    }
-
-
-private:
-    template <typename Feature>
-    struct computation_at
-        : boost::remove_reference<decltype(
-            std::declval<Storage&>().at(std::declval<Feature const&>())
-        )>
-    { };
-
-    template <typename FeatureSet, typename Feature>
-    static cloaked<by_ref<FeatureSet>, typename computation_at<Feature>::type>
-    cloak_for(Feature const&, FeatureSet&& fset) {
-        return {std::forward<FeatureSet>(fset)};
-    }
-
-public:
-    template <typename SemanticTag>
-    void operator()(SemanticTag const& tag) {
-        return operator()(tag, default_impl<>{});
-    }
-
-    template <typename Feature>
-    auto operator[](Feature const& feature) REACT_AUTO_RETURN(
-        features_.at(feature).result(cloak_for(feature, *this))
-    )
 };
 
 template <typename ...Computations>
@@ -195,18 +167,15 @@ struct pseudo_root_computation : incremental_computation_archetype<> {
 /*!
  * Default implementation of the `FeatureSet` concept.
  *
- * On construction, all the computations are constructed with an `ArgumentPack`
- * containing a non-strict superset of the `ArgumentPack` passed to
- * `default_`'s constructor.
- *
- * If a computation can't be constructed with the `ArgumentPack`, it is
- * default-constructed instead. The `default_` feature set may also be
- * default-constructed, in which case all of its computations are
- * default-constructed.
+ * @note
+ * On construction, if a computation can't be constructed with some
+ * `FeatureSet`, it is default-constructed instead. The `default_` feature
+ * set may also be default-constructed, in which case all of its computations
+ * are default-constructed.
  */
 template <typename ...Computations>
 using default_ = cloaked<
-    default_detail::default_impl<Computations...>,
+    typename default_detail::make_default<Computations...>::type,
     default_detail::pseudo_root_computation<Computations...>
 >;
 }} // end namespace react::feature_sets
