@@ -24,6 +24,7 @@ endfunction()
 
 
 react_add_test(archetypes                      archetypes.cpp)
+react_add_test(computations_from_fusion_map    computations/from_fusion_map.cpp)
 react_add_test(computations_implemented_by     computations/implemented_by.cpp)
 react_add_test(computations_lazy               computations/lazy.cpp)
 react_add_test(computations_reference          computations/reference.cpp)
