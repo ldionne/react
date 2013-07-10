@@ -26,12 +26,13 @@ struct null_concept { BOOST_CONCEPT_USAGE(null_concept) { } };
 
 template <typename T>
 struct test_concept {
+    struct init_value : feature_archetype<> { };
     using ValueComputation = computations::value<
-        T, feature_archetype<>
+        T, feature_archetype<>, init_value
     >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
-        auto keyword = boost::parameter::keyword<feature_archetype<>>::get();
+        auto keyword = boost::parameter::keyword<init_value>::get();
 
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
             ValueComputation,
@@ -90,14 +91,18 @@ BOOST_CONCEPT_ASSERT((test_concept<std::string const&>));
 BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 
 
-// Small runtime test just to make sure the value is set alright.
-BOOST_PARAMETER_KEYWORD(tag, my_value)
-using MyValueFeature = computations::value<std::string, tag::my_value>;
+// Small runtime test to make sure the value is set correctly.
+struct init_my_value : feature_archetype<> { };
+using MyValueFeature = computations::value<
+    std::string, feature_archetype<>, init_my_value
+>;
 
 struct dont_care { };
 
 int main() {
-    MyValueFeature f{feature_sets::make_from_argument_pack(my_value = "abcd")};
+    MyValueFeature f{feature_sets::make_from_argument_pack(
+        boost::parameter::keyword<init_my_value>::get() = "abcd"
+    )};
 
     std::string abcd_value = f.result(dont_care{});
     BOOST_ASSERT(abcd_value == "abcd");

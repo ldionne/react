@@ -21,12 +21,13 @@ using namespace react;
 
 template <typename T>
 struct test_concept {
+    struct init_ref : feature_archetype<> { };
     using ReferenceComputation = computations::reference<
-        T, feature_archetype<>
+        T, feature_archetype<>, init_ref
     >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
-        auto keyword = boost::parameter::keyword<feature_archetype<>>::get();
+        auto keyword = boost::parameter::keyword<init_ref>::get();
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
             ReferenceComputation,
             // We must set the reference when we construct the computation.
@@ -70,19 +71,19 @@ BOOST_CONCEPT_ASSERT((test_concept<std::string const&>));
 BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 
 
-// Small runtime test just to make sure the reference is taken alright.
-BOOST_PARAMETER_KEYWORD(tag, my_reference)
+// Small runtime test to make sure the reference is taken correctly.
+struct init_my_ref : feature_archetype<> { };
 using MyReferenceComputation = computations::reference<
-    std::string, tag::my_reference
+    std::string, feature_archetype<>, init_my_ref
 >;
 
 struct dont_care { };
 
 int main() {
     std::string original = "abcd";
-    MyReferenceComputation ref{
-        feature_sets::make_from_argument_pack(my_reference = original)
-    };
+    MyReferenceComputation ref{feature_sets::make_from_argument_pack(
+        boost::parameter::keyword<init_my_ref>::get() = original
+    )};
 
     std::string& retrieved = ref.result(dont_care{});
     BOOST_ASSERT(&retrieved == &original);

@@ -20,13 +20,14 @@
 
 namespace react { namespace computations {
 namespace value_detail {
-    template <typename T, typename Feature>
-    struct store_value : implements<Feature>, depends_on<> {
-        store_value() = default;
+    template <typename T, typename Feature, typename InitializationFeature>
+    struct value_impl : implements<Feature>, depends_on<InitializationFeature>
+    {
+        value_impl() = default;
 
         template <typename FeatureSet>
-        explicit store_value(FeatureSet&& fset)
-            : value_(std::forward<FeatureSet>(fset)[Feature{}])
+        explicit value_impl(FeatureSet&& fset)
+            : value_(std::forward<FeatureSet>(fset)[InitializationFeature{}])
         { }
 
         T& result(detail::dont_care) { return value_; }
@@ -36,7 +37,7 @@ namespace value_detail {
         T value_;
     };
 
-    template <typename T, typename Feature>
+    template <typename T, typename Feature, typename InitializationFeature>
     struct make_value_computation {
         using AdjustedType = typename boost::mpl::eval_if<
             boost::is_function<T>,
@@ -45,7 +46,9 @@ namespace value_detail {
         >::type;
 
         using type = typed<
-            AdjustedType, store_value<AdjustedType, Feature>
+            AdjustedType, value_impl<
+                AdjustedType, Feature, InitializationFeature
+            >
         >;
     };
 } // end namespace value_detail
@@ -54,8 +57,8 @@ namespace value_detail {
  * Computation implemented as a single value.
  *
  * When constructing the computation, its initial value must be provided in
- * a `FeatureSet` implementing `Feature`. Otherwise, if the computation
- * is default-constructed, the value stored in the computation is
+ * a `FeatureSet` implementing an `InitializationFeature`. Otherwise, if the
+ * computation is default-constructed, the value stored in the computation is
  * default-constructed.
  *
  * A value computation can't be executed. When its result is retrieved,
@@ -68,8 +71,10 @@ namespace value_detail {
  *
  * Computations created with this factory are implicitly `typed`.
  */
-template <typename T, typename Feature>
-using value = typename value_detail::make_value_computation<T, Feature>::type;
+template <typename T, typename Feature, typename InitializationFeature>
+using value = typename value_detail::make_value_computation<
+    T, Feature, InitializationFeature
+>::type;
 }} // end namespace react::computations
 
 #endif // !REACT_COMPUTATIONS_VALUE_HPP

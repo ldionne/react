@@ -16,15 +16,17 @@ namespace react { namespace computations {
     /*!
      * Computation implemented as a reference to a single value.
      *
-     * This is equivalent to `value<boost::reference_wrapper<U>, Feature>`,
+     * This is equivalent to
+     * `value<boost::reference_wrapper<U>, Feature, InitializationFeature>`,
      * where `U` is `boost::remove_reference<T>::type`.
      */
-    template <typename T, typename Feature>
+    template <typename T, typename Feature, typename InitializationFeature>
     using reference = value<
         boost::reference_wrapper<
             typename boost::remove_reference<T>::type
         >,
-        Feature
+        Feature,
+        InitializationFeature
     >;
 }} // end namespace react::computations
 
