@@ -11,6 +11,6 @@
 #include <react/computations/lazy.hpp>
 #include <react/computations/reference.hpp>
 #include <react/computations/typed.hpp>
-#include <react/computations/value.hpp>
+#include <react/computations/variable.hpp>
 
 #endif // !REACT_COMPUTATIONS_HPP

@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::computations::value`.
+ * This file contains unit tests for `react::computations::variable`.
  */
 
-#include <react/computations/value.hpp>
+#include <react/computations/variable.hpp>
 #include <react/concepts.hpp>
 #include <react/feature_sets/from_argument_pack.hpp>
 
@@ -27,7 +27,7 @@ struct null_concept { BOOST_CONCEPT_USAGE(null_concept) { } };
 template <typename T>
 struct test_concept {
     struct init_value : feature_archetype<> { };
-    using ValueComputation = computations::value<
+    using Variable = computations::variable<
         T, feature_archetype<>, init_value
     >;
 
@@ -35,7 +35,7 @@ struct test_concept {
         auto keyword = boost::parameter::keyword<init_value>::get();
 
         BOOST_CONCEPT_ASSERT((IncrementalComputation<
-            ValueComputation,
+            Variable,
             decltype(feature_sets::make_from_argument_pack(
                 keyword = std::declval<T>()
             )),
@@ -46,7 +46,7 @@ struct test_concept {
         BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<
             std::is_default_constructible<T>,
             IncrementalComputation<
-                ValueComputation,
+                Variable,
                 default_construct,
                 semantic_tags<>,
                 dependency_results<>
@@ -55,14 +55,14 @@ struct test_concept {
         >::type));
 
         // If we want the
-        // `ValueComputation::result_type v = value_comp.result(env)`
+        // `Variable::result_type v = variable.result(feature_set)`
         // expression to be valid, we require `T` to be convertible
-        // to `ValueComputation::result_type`.
+        // to `Variable::result_type`.
         using AdjustedT = typename boost::mpl::if_<
             boost::is_function<T>, typename boost::add_pointer<T>::type, T
         >::type;
         static_assert(boost::is_convertible<
-            AdjustedT, typename ValueComputation::result_type
+            AdjustedT, typename Variable::result_type
         >::value, "");
     }
 };
@@ -93,23 +93,23 @@ BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 
 // Small runtime test to make sure the value is set correctly.
 struct init_my_value : feature_archetype<> { };
-using MyValueFeature = computations::value<
+using MyVariable = computations::variable<
     std::string, feature_archetype<>, init_my_value
 >;
 
 struct dont_care { };
 
 int main() {
-    MyValueFeature f{feature_sets::make_from_argument_pack(
+    MyVariable var{feature_sets::make_from_argument_pack(
         boost::parameter::keyword<init_my_value>::get() = "abcd"
     )};
 
-    std::string abcd_value = f.result(dont_care{});
+    std::string abcd_value = var.result(dont_care{});
     BOOST_ASSERT(abcd_value == "abcd");
 
-    std::string& abcd_ref = f.result(dont_care{});
+    std::string& abcd_ref = var.result(dont_care{});
     BOOST_ASSERT(abcd_ref == "abcd");
 
-    std::string const& abcd_cref = f.result(dont_care{});
+    std::string const& abcd_cref = var.result(dont_care{});
     BOOST_ASSERT(abcd_cref == "abcd");
 }
