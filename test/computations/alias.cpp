@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::computations::implemented_by`.
+ * This file contains unit tests for `react::computations::alias`.
  */
 
-#include <react/computations/implemented_by.hpp>
+#include <react/computations/alias.hpp>
 #include <react/archetypes.hpp>
 #include <react/concepts.hpp>
 
@@ -12,8 +12,10 @@
 
 using namespace react;
 
+struct implemented_feature : feature_archetype<> { };
+struct aliased_feature : feature_archetype<> { };
 BOOST_CONCEPT_ASSERT((IncrementalComputation<
-    computations::implemented_by<feature_archetype<>, feature_archetype<>>,
+    computations::alias<implemented_feature, aliased_feature>,
     default_construct,
     semantic_tags<>,
     dependency_results<>
