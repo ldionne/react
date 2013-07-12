@@ -21,8 +21,8 @@
 namespace react { namespace computations {
 namespace variable_detail {
     template <
-        typename Type,
         typename ImplementedFeature,
+        typename Type,
         typename InitializationFeature
     >
     struct variable_impl
@@ -44,8 +44,8 @@ namespace variable_detail {
     };
 
     template <
-        typename Type,
         typename ImplementedFeature,
+        typename Type,
         typename InitializationFeature
     >
     struct make_variable {
@@ -58,7 +58,7 @@ namespace variable_detail {
         using type = typed<
             AdjustedType,
             variable_impl<
-                AdjustedType, ImplementedFeature, InitializationFeature
+                ImplementedFeature, AdjustedType, InitializationFeature
             >
         >;
     };
@@ -83,12 +83,12 @@ namespace variable_detail {
  * Computations created with this factory are implicitly `typed`.
  */
 template <
-    typename Type,
     typename ImplementedFeature,
+    typename Type,
     typename InitializationFeature
 >
 using variable = typename variable_detail::make_variable<
-    Type, ImplementedFeature, InitializationFeature
+    ImplementedFeature, Type, InitializationFeature
 >::type;
 }} // end namespace react::computations
 

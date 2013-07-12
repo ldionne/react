@@ -19,23 +19,23 @@ namespace react { namespace computations {
  * This is equivalent to
  * @code
  *  variable<
- *      boost::reference_wrapper<U>,
  *      ImplementedFeature,
+ *      boost::reference_wrapper<U>,
  *      InitializationFeature
  *  >
  * @endcode
  * where `U` is `boost::remove_reference<Type>::type`.
  */
 template <
-    typename Type,
     typename ImplementedFeature,
+    typename Type,
     typename InitializationFeature
 >
 using reference = variable<
+    ImplementedFeature,
     boost::reference_wrapper<
         typename boost::remove_reference<Type>::type
     >,
-    ImplementedFeature,
     InitializationFeature
 >;
 }} // end namespace react::computations

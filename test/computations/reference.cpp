@@ -23,7 +23,7 @@ template <typename T>
 struct test_concept {
     struct init_ref : feature_archetype<> { };
     using ReferenceComputation = computations::reference<
-        T, feature_archetype<>, init_ref
+        feature_archetype<>, T, init_ref
     >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
@@ -74,7 +74,7 @@ BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 // Small runtime test to make sure the reference is taken correctly.
 struct init_my_ref : feature_archetype<> { };
 using MyReferenceComputation = computations::reference<
-    std::string, feature_archetype<>, init_my_ref
+    feature_archetype<>, std::string, init_my_ref
 >;
 
 struct dont_care { };

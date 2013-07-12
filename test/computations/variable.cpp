@@ -28,7 +28,7 @@ template <typename T>
 struct test_concept {
     struct init_value : feature_archetype<> { };
     using Variable = computations::variable<
-        T, feature_archetype<>, init_value
+        feature_archetype<>, T, init_value
     >;
 
     BOOST_CONCEPT_USAGE(test_concept) {
@@ -94,7 +94,7 @@ BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
 // Small runtime test to make sure the value is set correctly.
 struct init_my_value : feature_archetype<> { };
 using MyVariable = computations::variable<
-    std::string, feature_archetype<>, init_my_value
+    feature_archetype<>, std::string, init_my_value
 >;
 
 struct dont_care { };
