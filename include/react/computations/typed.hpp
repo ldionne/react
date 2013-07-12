@@ -6,6 +6,8 @@
 #ifndef REACT_COMPUTATIONS_TYPED_HPP
 #define REACT_COMPUTATIONS_TYPED_HPP
 
+#include <react/detail/auto_return.hpp>
+
 #include <boost/type_traits/is_convertible.hpp>
 #include <utility>
 
@@ -25,22 +27,39 @@ struct typed : Computation {
 
     using result_type = T;
 
+private:
     // note: we still use auto to allow proxy types, references and so on.
-    template <typename FeatureSet>
-    auto result(FeatureSet&& env) -> decltype(
-        std::declval<Computation>().result(std::forward<FeatureSet>(env))
+    template <typename Comp, typename FeatureSet>
+    static auto result_impl(Comp&& comp, FeatureSet&& fset) -> decltype(
+        std::forward<Comp>(comp).result(std::forward<FeatureSet>(fset))
     ) {
         using UnderlyingResult = decltype(
-            std::declval<Computation>().result(
-                std::forward<FeatureSet>(env))
+            std::forward<Comp>(comp).result(std::forward<FeatureSet>(fset))
         );
         static_assert(boost::is_convertible<
             UnderlyingResult, result_type
         >::value,
         "the result type of the underlying computation is not compatible "
         "with the type that is being enforced with `typed`");
-        return Computation::result(std::forward<FeatureSet>(env));
+        return std::forward<Comp>(comp).result(std::forward<FeatureSet>(fset));
     }
+
+public:
+    template <typename FeatureSet>
+    auto result(FeatureSet&& fset) REACT_AUTO_RETURN(
+        result_impl(
+            static_cast<Computation&>(*this),
+            std::forward<FeatureSet>(fset)
+        )
+    )
+
+    template <typename FeatureSet>
+    auto result(FeatureSet&& fset) const REACT_AUTO_RETURN(
+        result_impl(
+            static_cast<Computation const&>(*this),
+            std::forward<FeatureSet>(fset)
+        )
+    )
 };
 }} // end namespace react::computations
 
