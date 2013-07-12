@@ -9,12 +9,17 @@
 #include <react/traits.hpp>
 
 #include <boost/mpl/apply.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/insert.hpp>
+#include <boost/mpl/at.hpp>
+#include <boost/mpl/erase_key.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/has_key.hpp>
+#include <boost/mpl/has_xxx.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/map.hpp>
+#include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/reachable_set.hpp>
 #include <boost/mpl/set.hpp>
-#include <boost/mpl/set_insert_range.hpp>
 #include <boost/mpl/transform_view.hpp>
 
 
@@ -22,48 +27,77 @@ namespace react { namespace detail {
 namespace feature_dependency_graph_detail {
     namespace mpl = boost::mpl;
 
-    /*!
-     * Compile-time graph representing dependencies between the features
-     * of a `FeatureSet`.
-     */
-    template <typename ComputationOf, typename TopLevelComputations>
-    class feature_dependency_graph {
-        template <typename ...Args>
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
+
+    template <typename T>
+    struct is_composite_feature
+        : has_type<subfeatures_of<T>>
+    { };
+
+    template <typename ...Computations>
+    class make_feature_dependency_graph {
+        using PredefinedComputations = mpl::map<
+            mpl::pair<typename feature_of<Computations>::type, Computations>...
+        >;
+
+        template <typename Feature>
         struct computation_of
-            : mpl::apply<ComputationOf, Args...>
+            : mpl::eval_if<
+                mpl::has_key<PredefinedComputations, Feature>,
+                mpl::at<PredefinedComputations, Feature>,
+                mpl::apply<Feature>
+            >
         { };
 
-        //! A vertex in the feature dependency graph represents a computation
-        //! to be implemented in a feature set.
+        template <typename X> struct wrap_feature_or_composite;
+
+        template <typename CompositeFeature>
+        class graph : public CompositeFeature {
+            struct fake_root_vertex {
+                using open_neighborhood = mpl::transform_view<
+                    typename subfeatures_of<CompositeFeature>::type,
+                    wrap_feature_or_composite<mpl::_1>
+                >;
+            };
+
+        public:
+            using vertices = typename mpl::erase_key<
+                typename mpl::reachable_set<fake_root_vertex>::type,
+                fake_root_vertex
+            >::type;
+        };
+
         template <typename Feature>
-        struct vertex {
+        struct vertex : Feature {
             using computation = typename computation_of<Feature>::type;
 
             using open_neighborhood = mpl::transform_view<
                 typename dependencies_of<computation>::type,
-                vertex<mpl::_1>
+                wrap_feature_or_composite<mpl::_1>
             >;
         };
 
-        using TopLevelVertices = typename mpl::fold<
-            TopLevelComputations,
-            mpl::set<>,
-            mpl::insert<mpl::_1, vertex<feature_of<mpl::_2>>>
-        >::type;
+        template <typename X>
+        struct wrap_feature_or_composite {
+            using type = vertex<
+                typename mpl::if_<is_composite_feature<X>, graph<X>, X>::type
+            >;
+        };
+
+        struct root_composite_feature {
+            using subfeatures = mpl::set<
+                typename feature_of<Computations>::type...
+            >;
+        };
 
     public:
-        //! Set of all the vertices in the feature dependency graph.
-        using vertices = typename mpl::fold<
-            TopLevelVertices,
-            TopLevelVertices,
-            mpl::set_insert_range<
-                mpl::_1, mpl::reachable_set<mpl::_2>
-            >
-        >::type;
+        using type = graph<root_composite_feature>;
     };
 } // end namespace feature_dependency_graph_detail
 
-using feature_dependency_graph_detail::feature_dependency_graph;
+template <typename ...Computations>
+using feature_dependency_graph = typename feature_dependency_graph_detail::
+                        make_feature_dependency_graph<Computations...>::type;
 }} // end namespace react::detail
 
 #endif // !REACT_DETAIL_FEATURE_DEPENDENCY_GRAPH_HPP

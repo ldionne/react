@@ -17,19 +17,12 @@
 #include <react/feature_sets/union.hpp>
 #include <react/traits.hpp>
 
-#include <boost/mpl/apply.hpp>
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/eval_if.hpp>
-#include <boost/mpl/has_key.hpp>
 #include <boost/mpl/inherit_linearly.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/reverse.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/topological_sort.hpp>
 #include <boost/mpl/transform.hpp>
-#include <boost/mpl/vector.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <type_traits>
 
@@ -122,22 +115,7 @@ struct computation_from_vertex {
 
 template <typename ...Computations>
 struct make_default {
-    using PredefinedComputations = mpl::map<
-        mpl::pair<typename feature_of<Computations>::type, Computations>...
-    >;
-
-    template <typename Feature>
-    struct computation_of
-        : mpl::eval_if<
-            mpl::has_key<PredefinedComputations, Feature>,
-            mpl::at<PredefinedComputations, Feature>,
-            mpl::apply<Feature>
-        >
-    { };
-
-    using DependencyGraph = detail::feature_dependency_graph<
-        computation_of<mpl::_1>, mpl::vector<Computations...>
-    >;
+    using DependencyGraph = detail::feature_dependency_graph<Computations...>;
 
     using ComputationsInVisitationOrder = typename mpl::transform<
         typename mpl::topological_sort<DependencyGraph>::type,
