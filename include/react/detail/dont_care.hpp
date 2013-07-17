@@ -9,7 +9,7 @@
 namespace react { namespace detail {
     struct dont_care {
         template <typename ...Args>
-        dont_care(Args&& ...) { }
+        constexpr dont_care(Args&& ...) { }
     };
 }}
 

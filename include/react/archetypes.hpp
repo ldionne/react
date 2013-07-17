@@ -6,76 +6,64 @@
 #ifndef REACT_ARCHETYPES_HPP
 #define REACT_ARCHETYPES_HPP
 
+#include <react/detail/auto_return.hpp>
+#include <react/intrinsics.hpp>
+
 #include <boost/concept_archetype.hpp>
 #include <boost/mpl/set.hpp>
+#include <utility>
 
 
 namespace react {
-
+    //! Archetype for the `Environment` concept.
     template <typename Base = boost::null_archetype<>>
-    struct composite_feature_archetype;
+    struct environment_archetype : Base { };
 
-    template <typename Base = boost::null_archetype<>>
-    struct feature_archetype;
-
-    template <typename Base = boost::null_archetype<>>
-    struct incremental_computation_archetype;
-
-    template <typename Base = boost::null_archetype<>>
-    struct feature_set_archetype;
-
-//////////////////////////////////////////////////////////////////////////////
-
-    template <typename Base>
-    struct composite_feature_archetype : Base {
-        using subfeatures = boost::mpl::set<>;
-    };
-
-//////////////////////////////////////////////////////////////////////////////
-
-    //! Archetype for the `Feature` concept.
-    template <typename Base>
-    struct feature_archetype : boost::default_constructible_archetype<Base> {
-        struct apply {
-            using type = incremental_computation_archetype<>;
+    namespace extensions {
+        template <typename Base>
+        struct augment<environment_archetype<Base>> {
+            template <typename Env, typename ...Computations>
+            static auto call(Env&& env, Computations&& ...)
+            REACT_AUTO_RETURN(
+                std::forward<Env>(env)
+            )
         };
+
+        template <typename Base>
+        struct update<environment_archetype<Base>> {
+            template <typename Env>
+            static auto call(Env&& env)
+            REACT_AUTO_RETURN(
+                std::forward<Env>(env)
+            )
+        };
+
+        template <typename Base>
+        struct retrieve<environment_archetype<Base>> {
+            template <typename Name, typename Env>
+            static boost::null_archetype<>& call(Env&&) {
+                return *(boost::null_archetype<>*)0;
+            }
+        };
+    } // end namespace extensions
+
+
+    //! Archetype for the `Computation` concept.
+    template <typename Base = boost::null_archetype<>>
+    struct computation_archetype : Base {
+        template <typename Env>
+        environment_archetype<>& update(Env&&) {
+            return *(environment_archetype<>*)0;
+        }
+
+        template <typename Env>
+        boost::null_archetype<>& retrieve(Env&&) {
+            return *(boost::null_archetype<>*)0;
+        }
+
+        using dependencies = typename boost::mpl::set<>::type;
+        struct name;
     };
-
-//////////////////////////////////////////////////////////////////////////////
-
-    //! Archetype for the `IncrementalComputation` concept.
-    template <typename Base>
-    struct incremental_computation_archetype {
-        incremental_computation_archetype();
-
-        template <typename FeatureSet>
-        explicit incremental_computation_archetype(FeatureSet&);
-
-        template <typename Tag, typename FeatureSet>
-        boost::null_archetype<>& operator()(Tag const&, FeatureSet&);
-
-        template <typename FeatureSet>
-        boost::null_archetype<>& result(FeatureSet&);
-
-        using dependencies = boost::mpl::set<>;
-        using feature = feature_archetype<>;
-    };
-
-//////////////////////////////////////////////////////////////////////////////
-
-    //! Archetype for the `FeatureSet` concept.
-    template <typename Base>
-    struct feature_set_archetype : Base {
-        template <typename Tag>
-        boost::null_archetype<>& operator()(Tag const&);
-
-        template <typename Tag, typename FeatureSet>
-        boost::null_archetype<>& operator()(Tag const&, FeatureSet& ext);
-
-        template <typename Feature>
-        boost::null_archetype<>& operator[](Feature const&);
-    };
-
 } // end namespace react
 
 #endif // !REACT_ARCHETYPES_HPP

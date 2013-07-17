@@ -13,27 +13,24 @@ add_custom_target(check
 function(react_add_test name sources)
     add_executable(${name} EXCLUDE_FROM_ALL ${sources})
     set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/include
     )
     set_property(TARGET ${name}
         APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/ext/mpl_extensions/include
+    )
+    set_property(TARGET ${name}
+        APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
     )
     add_test(NAME ${name} COMMAND ${name})
     add_dependencies(unit ${name})
 endfunction()
 
 
-react_add_test(archetypes                      archetypes.cpp)
-react_add_test(computations_alias              computations/alias.cpp)
-react_add_test(computations_function           computations/function.cpp)
-react_add_test(computations_lazy               computations/lazy.cpp)
-react_add_test(computations_reference          computations/reference.cpp)
-react_add_test(computations_typed              computations/typed.cpp)
-react_add_test(computations_variable           computations/variable.cpp)
-react_add_test(feature_sets_by_ref             feature_sets/by_ref.cpp)
-react_add_test(feature_sets_cloaked            feature_sets/cloaked.cpp)
-react_add_test(feature_sets_default            feature_sets/default.cpp)
-react_add_test(feature_sets_empty              feature_sets/empty.cpp)
-react_add_test(feature_sets_from_argument_pack feature_sets/from_argument_pack.cpp)
-react_add_test(feature_sets_union              feature_sets/union.cpp)
-react_add_test(master_header                   master_header.cpp)
+react_add_test(archetypes                  archetypes.cpp)
+react_add_test(computations_reference      computations/reference.cpp)
+react_add_test(computations_static_counter computations/static_counter.cpp)
+react_add_test(computations_variable       computations/variable.cpp)
+react_add_test(detail_dependency_graph     detail/dependency_graph.cpp)
+react_add_test(detail_topological_indexing detail/topological_indexing.cpp)
+react_add_test(extensions_fusion           extensions/fusion.cpp)
+react_add_test(master_header               master_header.cpp)

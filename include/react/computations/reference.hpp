@@ -16,27 +16,12 @@ namespace react { namespace computations {
 /*!
  * Computation implemented as a reference to a single variable.
  *
- * This is equivalent to
- * @code
- *  variable<
- *      ImplementedFeature,
- *      boost::reference_wrapper<U>,
- *      InitializationFeature
- *  >
- * @endcode
- * where `U` is `boost::remove_reference<Type>::type`.
+ * This is equivalent to `variable<boost::reference_wrapper<U>>`, where `U`
+ * is `boost::remove_reference<Type>::type`.
  */
-template <
-    typename ImplementedFeature,
-    typename Type,
-    typename InitializationFeature
->
+template <typename Type>
 using reference = variable<
-    ImplementedFeature,
-    boost::reference_wrapper<
-        typename boost::remove_reference<Type>::type
-    >,
-    InitializationFeature
+    boost::reference_wrapper<typename boost::remove_reference<Type>::type>
 >;
 }} // end namespace react::computations
 

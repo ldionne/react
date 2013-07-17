@@ -6,22 +6,20 @@
 #ifndef REACT_COMPUTATIONS_ALIAS_HPP
 #define REACT_COMPUTATIONS_ALIAS_HPP
 
-#include <react/depends_on.hpp>
+#include <react/computations/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/implements.hpp>
+#include <react/intrinsics.hpp>
 
 #include <utility>
 
 
 namespace react { namespace computations {
-    //! Computation implemented by another feature.
-    template <typename ImplementedFeature, typename AliasedFeature>
-    struct alias : implements<ImplementedFeature>, depends_on<AliasedFeature> {
-        alias() = default;
-
-        template <typename FeatureSet>
-        auto result(FeatureSet&& deps) REACT_AUTO_RETURN(
-            std::forward<FeatureSet>(deps)[AliasedFeature{}]
+    //! Computation implemented by another computation.
+    template <typename AliasedComputation>
+    struct alias : depends_on<AliasedComputation> {
+        template <typename Env>
+        auto retrieve(Env&& env) const REACT_AUTO_RETURN(
+            react::retrieve<AliasedComputation>(std::forward<Env>(env))
         )
     };
 }} // end namespace react::computations
