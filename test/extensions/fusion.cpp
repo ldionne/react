@@ -6,6 +6,7 @@
 #include <react/extensions/fusion.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
+#include <react/intrinsics.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
@@ -60,20 +61,20 @@ int main() {
     BOOST_ASSERT(retrieve<computation<4>>(env3_4) == 4);
 
 
-    // update
+    // execute
 #define TYPE_OF(x) boost::remove_reference<decltype(x)>::type
-    update(env1);
+    execute(env1);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env1), TYPE_OF(update(env1))
+        TYPE_OF(env1), TYPE_OF(execute(env1))
     >::value, "");
 
-    update(env2);
+    execute(env2);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env2), TYPE_OF(update(env2))
+        TYPE_OF(env2), TYPE_OF(execute(env2))
     >::value, "");
 
-    update(env3_4);
+    execute(env3_4);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env3_4), TYPE_OF(update(env3_4))
+        TYPE_OF(env3_4), TYPE_OF(execute(env3_4))
     >::value, "");
 }

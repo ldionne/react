@@ -15,6 +15,9 @@
 namespace react {
 namespace extensions {
     template <typename Tag, typename Enable = void>
+    struct execute;
+
+    template <typename Tag, typename Enable = void>
     struct update;
 
     template <typename Tag, typename Enable = void>
@@ -28,9 +31,19 @@ static constexpr struct {
     template <typename Env>
     auto operator()(Env&& env) const
     REACT_AUTO_RETURN(
-        extensions::update<
+        extensions::execute<
             typename tag_of<Env>::type
         >::call(std::forward<Env>(env))
+    )
+} execute{};
+
+static constexpr struct {
+    template <typename Computation, typename Env>
+    auto operator()(Computation&& c, Env&& env) const
+    REACT_AUTO_RETURN(
+        extensions::update<
+            typename tag_of<Computation>::type
+        >::call(std::forward<Computation>(c), std::forward<Env>(env))
     )
 } update{};
 
@@ -52,5 +65,8 @@ REACT_AUTO_RETURN(
     >::template call<Name>(std::forward<Env>(env))
 )
 } // end namespace react
+
+// Always provide the default implementation for `react::update`.
+#include <react/detail/default_update.hpp>
 
 #endif // !REACT_INTRINSICS_HPP

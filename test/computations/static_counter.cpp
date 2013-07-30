@@ -31,10 +31,10 @@ int main() {
             computations::static_counter<unsigned, 0>
         >
     > env0{};
-    auto env1 = update(env0);
-    auto env2 = update(env1);
-    auto env3 = update(env2);
-    auto env4 = update(env3);
+    auto env1 = execute(env0);
+    auto env2 = execute(env1);
+    auto env3 = execute(env2);
+    auto env4 = execute(env3);
 
 
     BOOST_ASSERT(retrieve<number_of_updates>(env0) == 0);

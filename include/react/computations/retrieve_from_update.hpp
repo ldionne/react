@@ -33,14 +33,9 @@ namespace react { namespace computations {
         using Computation::Computation;
         using Computation::operator=;
 
-        template <typename Env>
-        auto update(Env const& env) REACT_AUTO_RETURN(
-            augment(env, *this, make_temp(Computation::update(env)))
-        )
-
-        template <typename Env>
-        auto update(Env const& env) const REACT_AUTO_RETURN(
-            augment(env, *this, make_temp(Computation::update(env)))
+        template <typename Self, typename Env>
+        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            augment(env, self, make_temp(Computation::update(self, env)))
         )
 
         template <typename Env>

@@ -1,9 +1,10 @@
 /*!
  * @file
- * This file contains unit tests for `react::detail::update_computation`.
+ * This file contains unit tests for the default implementation of
+ * `react::update`.
  */
 
-#include <react/detail/update_computation.hpp>
+#include <react/detail/default_update.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/extensions/fusion.hpp>
 #include <react/intrinsics.hpp>
@@ -22,13 +23,13 @@
 using namespace react;
 
 struct update_as_void {
-    template <typename Env>
-    void update(Env&&) const { }
+    template <typename Self, typename Env>
+    static void update(Self&&, Env&&) { }
 };
 
 struct update_as_identity {
-    template <typename Env>
-    auto update(Env&& env) const
+    template <typename Self, typename Env>
+    static auto update(Self&&, Env&& env)
     REACT_AUTO_RETURN(
         std::forward<Env>(env)
     )
@@ -36,8 +37,8 @@ struct update_as_identity {
 
 template <typename Computation>
 struct update_with {
-    template <typename Env>
-    auto update(Env&& env) const
+    template <typename Self, typename Env>
+    static auto update(Self&&, Env&& env)
     REACT_AUTO_RETURN(
         augment(std::forward<Env>(env), Computation{})
     )
@@ -60,8 +61,7 @@ struct updating {
     static void should_yield() {
         using namespace boost;
         fusion::vector<Computation> env{};
-        auto updated = react::detail::update_computation(
-                                    fusion::clear(env), fusion::front(env));
+        auto updated = update(fusion::front(env), fusion::clear(env));
 
         using UpdatedEnv = decltype(updated);
         static_assert(mpl::set_equal<

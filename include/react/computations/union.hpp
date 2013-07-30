@@ -49,6 +49,17 @@ namespace react { namespace computations {
             typename dependencies_of<Y>::type
         >::type;
 
+        template <typename Self, typename Env>
+        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            X::update(std::forward<Self>(self), std::forward<Env>(env))
+        )
+
+        template <typename Self, typename Env>
+        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            Y::update(std::forward<Self>(self), std::forward<Env>(env))
+        )
+
+
         template <typename Env>
         auto retrieve(Env&& env) REACT_AUTO_RETURN(
             X::retrieve(std::forward<Env>(env))
@@ -59,17 +70,6 @@ namespace react { namespace computations {
             Y::retrieve(std::forward<Env>(env))
         )
 
-        template <typename Semantics, typename Env>
-        auto update(Env&& env) REACT_AUTO_RETURN(
-            X::update(std::forward<Env>(env))
-        )
-
-        template <typename Env>
-        auto update(Env&& env) REACT_AUTO_RETURN(
-            Y::update(std::forward<Env>(env))
-        )
-
-        // const counterparts
         template <typename Env>
         auto retrieve(Env&& env) const REACT_AUTO_RETURN(
             X::retrieve(std::forward<Env>(env))
@@ -78,16 +78,6 @@ namespace react { namespace computations {
         template <typename Env>
         auto retrieve(Env&& env) const REACT_AUTO_RETURN(
             Y::retrieve(std::forward<Env>(env))
-        )
-
-        template <typename Env>
-        auto update(Env&& env) const REACT_AUTO_RETURN(
-            X::update(std::forward<Env>(env))
-        )
-
-        template <typename Env>
-        auto update(Env&& env) const REACT_AUTO_RETURN(
-            Y::update(std::forward<Env>(env))
         )
     };
 }} // end namespace react::computations

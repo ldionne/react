@@ -7,6 +7,7 @@
 #define REACT_COMPUTATIONS_SERIALIZE_HPP
 
 #include <react/computations/depends_on.hpp>
+#include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
 
@@ -14,7 +15,7 @@ namespace react { namespace computations {
     template <typename Value, typename Archive>
     struct serialize : depends_on<Value, Archive> {
         template <typename Env>
-        void update(Env const& env) const {
+        static void update(detail::dont_care, Env&& env) {
             retrieve<Archive>(env) & retrieve<Value>(env);
         }
     };

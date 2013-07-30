@@ -21,7 +21,7 @@
 
 namespace react { namespace computations {
 namespace ephemeral_detail {
-    template <typename Computation, typename Counter>
+    template <typename Computation, typename Counter, unsigned long Delay>
     struct impl : Computation {
         using Computation::Computation;
         using Computation::operator=;
@@ -30,34 +30,37 @@ namespace ephemeral_detail {
             typename dependencies_of<Computation>::type, Counter
         >::type;
 
-        // When the counter hits 0, we remove this
-        // computation from the environment.
-        template <typename Env, typename = typename boost::enable_if_c<
-            retrieve<Counter>(std::declval<Env const&>()) == 0
+        // We remove this computation from the environment when
+        // the time is elapsed.
+        template <typename Self, typename Env, typename = typename boost::enable_if_c<
+            retrieve<Counter>(std::declval<Env&&>()) == Delay
         >::type>
-        auto update(Env const& env) REACT_AUTO_RETURN(
-            Computation::update(env), env
+        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            Computation::update(std::forward<Self>(self), env),
+            std::forward<Env>(env)
         )
 
-        template <typename Env, typename = typename boost::disable_if_c<
-            retrieve<Counter>(std::declval<Env&&>()) == 0
+        template <typename Self, typename Env, typename = typename boost::disable_if_c<
+            retrieve<Counter>(std::declval<Env&&>()) == Delay
         >::type>
-        auto update(Env&& env) REACT_AUTO_RETURN(
-            Computation::update(std::forward<Env>(env))
+        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            Computation::update(
+                std::forward<Self>(self), std::forward<Env>(env)
+            )
         )
     };
 
-    template <typename Computation, unsigned Delay>
+    template <typename Computation, unsigned long Delay>
     struct make_ephemeral {
         struct counter;
-        using Counter = named<counter, static_counter<signed long, -Delay>>;
-        using Impl = impl<Computation, counter>;
+        using Counter = named<counter, static_counter<unsigned long, 0>>;
+        using Impl = impl<Computation, counter, Delay>;
 
         using type = depends_on<Impl, Counter>;
     };
 } // end namespace ephemeral_detail
 
-template <typename Computation, unsigned Delay>
+template <typename Computation, unsigned long Delay>
 using ephemeral = typename ephemeral_detail::make_ephemeral<
     Computation, Delay
 >::type;

@@ -9,7 +9,6 @@
 #include <react/detail/auto_return.hpp>
 #include <react/detail/fusion_fold.hpp>
 #include <react/detail/topological_indexing.hpp>
-#include <react/detail/update_computation.hpp>
 #include <react/intrinsics.hpp>
 #include <react/traits.hpp>
 
@@ -29,8 +28,18 @@
 
 
 namespace react { namespace extensions {
+namespace fusion_detail {
+    static constexpr struct {
+        template <typename Env, typename Computation>
+        auto operator()(Env&& env, Computation&& c) const
+        REACT_AUTO_RETURN(
+            react::update(std::forward<Computation>(c), std::forward<Env>(env))
+        )
+    } inverted_update{};
+}
+
 template <typename T>
-struct update<
+struct execute<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
@@ -65,7 +74,7 @@ public:
         detail::fusion_fold(
             in_visitation_order(computations),
             boost::fusion::clear(computations),
-            detail::update_computation
+            fusion_detail::inverted_update
         )
     )
 };

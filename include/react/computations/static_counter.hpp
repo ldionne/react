@@ -10,37 +10,43 @@
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
+#include <boost/mpl/empty_base.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <utility>
 
 
 namespace react { namespace computations {
-template <typename Integer, Integer InitialValue = static_cast<Integer>(0)>
-class static_counter {
-    template <typename DependentType, typename T>
-    struct make_dependent_on {
-        using type = T;
-    };
+namespace static_counter_detail {
+    template <typename Computation, typename Integer, Integer Value>
+    struct counter_wrapper : Computation {
+        using Computation::Computation;
+        using Computation::operator=;
 
-public:
-    template <typename Env>
-    auto update(Env&& env) const
-    REACT_AUTO_RETURN(
-        augment(
-            std::forward<Env>(env),
-            // We need to make the next counter's type dependent in order to
-            // avoid instantiating the next template, which would create
-            // infinite recursion.
-            static_counter<
-                typename make_dependent_on<Env, Integer>::type,
-                InitialValue + 1
-            >{}
+        template <typename Self, typename Env>
+        static auto update(Self&& self, Env&& env)
+        REACT_AUTO_RETURN(
+            augment(
+                std::forward<Env>(env),
+                counter_wrapper<
+                    typename boost::remove_reference<Self>::type,
+                    Integer,
+                    Value + 1
+                >{}
+            )
         )
-    )
 
-    constexpr Integer retrieve(detail::dont_care) const {
-        return InitialValue;
-    }
-};
+        constexpr Integer retrieve(detail::dont_care) const {
+            return Value;
+        }
+    };
+} // end namespace static_counter_detail
+
+template <typename Integer, Integer InitialValue = static_cast<Integer>(0)>
+using static_counter = static_counter_detail::counter_wrapper<
+    boost::mpl::empty_base,
+    Integer,
+    InitialValue
+>;
 }} // end namespace react::computations
 
 #endif // !REACT_COMPUTATIONS_STATIC_COUNTER_HPP
