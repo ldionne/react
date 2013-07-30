@@ -42,7 +42,7 @@ private:
 public:
     template <typename ...Args>
     explicit variable(Args&& ...args)
-        : var_{std::forward<Args>(args)...}
+        : var_(std::forward<Args>(args)...)
     { }
 
     static auto retrieve(variable& self, detail::dont_care)

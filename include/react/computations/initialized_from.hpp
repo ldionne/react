@@ -16,7 +16,7 @@ template <typename Computation, typename Initializer>
 struct initialized_from : Computation {
     template <typename Env>
     explicit initialized_from(Env&& env)
-        : Computation{retrieve<Initializer>(std::forward<Env>(env))}
+        : Computation(retrieve<Initializer>(std::forward<Env>(env)))
     { }
 
     using Computation::operator=;
