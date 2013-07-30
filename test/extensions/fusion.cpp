@@ -61,20 +61,20 @@ int main() {
     BOOST_ASSERT(retrieve<computation<4>>(env3_4) == 4);
 
 
-    // execute
+    // update
 #define TYPE_OF(x) boost::remove_reference<decltype(x)>::type
-    execute(env1);
+    update(env1);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env1), TYPE_OF(execute(env1))
+        TYPE_OF(env1), TYPE_OF(update(env1))
     >::value, "");
 
-    execute(env2);
+    update(env2);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env2), TYPE_OF(execute(env2))
+        TYPE_OF(env2), TYPE_OF(update(env2))
     >::value, "");
 
-    execute(env3_4);
+    update(env3_4);
     static_assert(boost::mpl::set_equal<
-        TYPE_OF(env3_4), TYPE_OF(execute(env3_4))
+        TYPE_OF(env3_4), TYPE_OF(update(env3_4))
     >::value, "");
 }

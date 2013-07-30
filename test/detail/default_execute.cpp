@@ -1,10 +1,10 @@
 /*!
  * @file
  * This file contains unit tests for the default implementation of
- * `react::update`.
+ * `react::execute`.
  */
 
-#include <react/detail/default_update.hpp>
+#include <react/detail/default_execute.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/extensions/fusion.hpp>
 #include <react/intrinsics.hpp>
@@ -22,29 +22,29 @@
 
 using namespace react;
 
-struct update_as_void {
+struct exec_as_void {
     template <typename Self, typename Env>
-    static void update(Self&&, Env&&) { }
+    static void execute(Self&&, Env&&) { }
 };
 
-struct update_as_identity {
+struct exec_as_identity {
     template <typename Self, typename Env>
-    static auto update(Self&&, Env&& env)
+    static auto execute(Self&&, Env&& env)
     REACT_AUTO_RETURN(
         std::forward<Env>(env)
     )
 };
 
 template <typename Computation>
-struct update_with {
+struct exec_with {
     template <typename Self, typename Env>
-    static auto update(Self&&, Env&& env)
+    static auto execute(Self&&, Env&& env)
     REACT_AUTO_RETURN(
         augment(std::forward<Env>(env), Computation{})
     )
 };
 
-struct no_update { };
+struct no_execute { };
 
 template <typename Sequence>
 struct as_mpl_set
@@ -56,12 +56,12 @@ struct as_mpl_set
 { };
 
 template <typename Computation>
-struct updating {
+struct executing {
     template <typename ...ComputationsAfterUpdate>
     static void should_yield() {
         using namespace boost;
         fusion::vector<Computation> env{};
-        auto updated = update(fusion::front(env), fusion::clear(env));
+        auto updated = execute(fusion::front(env), fusion::clear(env));
 
         using UpdatedEnv = decltype(updated);
         static_assert(mpl::set_equal<
@@ -74,8 +74,8 @@ struct updating {
 struct dummy_computation { };
 
 int main() {
-    updating<update_as_void>::should_yield<update_as_void>();
-    updating<update_as_identity>::should_yield<>();
-    updating<update_with<dummy_computation>>::should_yield<dummy_computation>();
-    updating<no_update>::should_yield<no_update>();
+    executing<exec_as_void>::should_yield<exec_as_void>();
+    executing<exec_as_identity>::should_yield<>();
+    executing<exec_with<dummy_computation>>::should_yield<dummy_computation>();
+    executing<no_execute>::should_yield<no_execute>();
 }

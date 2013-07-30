@@ -15,7 +15,7 @@ namespace react { namespace computations {
     template <typename Value, typename Archive>
     struct serialize : depends_on<Value, Archive> {
         template <typename Env>
-        static void update(detail::dont_care, Env&& env) {
+        static void execute(detail::dont_care, Env&& env) {
             retrieve<Archive>(env) & retrieve<Value>(env);
         }
     };

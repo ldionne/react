@@ -50,13 +50,13 @@ namespace react { namespace computations {
         >::type;
 
         template <typename Self, typename Env>
-        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
-            X::update(std::forward<Self>(self), std::forward<Env>(env))
+        static auto execute(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            X::execute(std::forward<Self>(self), std::forward<Env>(env))
         )
 
         template <typename Self, typename Env>
-        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
-            Y::update(std::forward<Self>(self), std::forward<Env>(env))
+        static auto execute(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            Y::execute(std::forward<Self>(self), std::forward<Env>(env))
         )
 
 

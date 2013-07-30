@@ -23,7 +23,7 @@ namespace static_counter_detail {
         using Computation::operator=;
 
         template <typename Self, typename Env>
-        static auto update(Self&& self, Env&& env)
+        static auto execute(Self&& self, Env&& env)
         REACT_AUTO_RETURN(
             augment(
                 std::forward<Env>(env),

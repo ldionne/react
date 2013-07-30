@@ -31,15 +31,16 @@ namespace react { namespace extensions {
 namespace fusion_detail {
     static constexpr struct {
         template <typename Env, typename Computation>
-        auto operator()(Env&& env, Computation&& c) const
-        REACT_AUTO_RETURN(
-            react::update(std::forward<Computation>(c), std::forward<Env>(env))
+        auto operator()(Env&& env, Computation&& c) const REACT_AUTO_RETURN(
+            react::execute(
+                std::forward<Computation>(c), std::forward<Env>(env)
+            )
         )
-    } inverted_update{};
+    } inverted_execute{};
 }
 
 template <typename T>
-struct execute<
+struct update<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
@@ -74,7 +75,7 @@ public:
         detail::fusion_fold(
             in_visitation_order(computations),
             boost::fusion::clear(computations),
-            fusion_detail::inverted_update
+            fusion_detail::inverted_execute
         )
     )
 };
@@ -84,7 +85,7 @@ struct augment<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
     template <typename Env, typename Computation, typename ...Rest>
-    static constexpr auto call(Env&& env, Computation&& c, Rest&& ...rest)
+    static auto call(Env&& env, Computation&& c, Rest&& ...rest)
     REACT_AUTO_RETURN(
         react::augment(
             // We use push_front instead of push_back because using push_back
@@ -99,7 +100,7 @@ struct augment<
     )
 
     template <typename Env>
-    static constexpr auto call(Env&& env)
+    static auto call(Env&& env)
     REACT_AUTO_RETURN(
         std::forward<Env>(env)
     )

@@ -30,7 +30,7 @@ namespace react {
         };
 
         template <typename Base>
-        struct execute<environment_archetype<Base>> {
+        struct update<environment_archetype<Base>> {
             template <typename Env>
             static auto call(Env&& env)
             REACT_AUTO_RETURN(
@@ -52,7 +52,7 @@ namespace react {
     template <typename Base = boost::null_archetype<>>
     struct computation_archetype : Base {
         template <typename Self, typename Env>
-        static environment_archetype<>& update(Self&&, Env&&) {
+        static environment_archetype<>& execute(Self&&, Env&&) {
             return *(environment_archetype<>*)0;
         }
 

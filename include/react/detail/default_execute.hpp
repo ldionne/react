@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines a default implementation for `react::update`.
+ * This file defines a default implementation for `react::execute`.
  */
 
-#ifndef REACT_DETAIL_DEFAULT_UPDATE_HPP
-#define REACT_DETAIL_DEFAULT_UPDATE_HPP
+#ifndef REACT_DETAIL_DEFAULT_EXECUTE_HPP
+#define REACT_DETAIL_DEFAULT_EXECUTE_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsics.hpp>
@@ -17,15 +17,15 @@
 
 namespace react { namespace extensions {
 template <typename Tag, typename Enable>
-struct update {
+struct execute {
 private:
     template <typename RawComp, typename Comp, typename Env>
     static auto impl(Comp&& c, Env&& env, int)
     REACT_AUTO_RETURN(
         typename boost::enable_if<boost::is_void<decltype(
-            RawComp::update(c, env)
+            RawComp::execute(c, env)
         )>>::type(),
-        RawComp::update(c, env),
+        RawComp::execute(c, env),
         react::augment(std::forward<Env>(env), std::forward<Comp>(c))
     )
 
@@ -33,9 +33,9 @@ private:
     static auto impl(Comp&& c, Env&& env, int)
     REACT_AUTO_RETURN(
         typename boost::disable_if<boost::is_void<decltype(
-            RawComp::update(std::forward<Comp>(c), std::forward<Env>(env))
+            RawComp::execute(std::forward<Comp>(c), std::forward<Env>(env))
         )>>::type(),
-        RawComp::update(std::forward<Comp>(c), std::forward<Env>(env))
+        RawComp::execute(std::forward<Comp>(c), std::forward<Env>(env))
     )
 
     // This overload is picked if both overloads with int are invalid.
@@ -56,4 +56,4 @@ public:
 };
 }} // end namespace react::extensions
 
-#endif // !REACT_DETAIL_DEFAULT_UPDATE_HPP
+#endif // !REACT_DETAIL_DEFAULT_EXECUTE_HPP

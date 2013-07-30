@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::retrieve_from_update`.
+ * This file defines `react::computations::retrieve_from_execution`.
  */
 
-#ifndef REACT_COMPUTATIONS_RETRIEVE_FROM_UPDATE_HPP
-#define REACT_COMPUTATIONS_RETRIEVE_FROM_UPDATE_HPP
+#ifndef REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP
+#define REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP
 
 #include <react/computations/named.hpp>
 #include <react/computations/temporary.hpp>
@@ -18,7 +18,7 @@
 
 namespace react { namespace computations {
     template <typename Computation>
-    struct retrieve_from_update : Computation {
+    struct retrieve_from_execution : Computation {
     private:
         struct anonymous;
         template <typename T>
@@ -34,8 +34,8 @@ namespace react { namespace computations {
         using Computation::operator=;
 
         template <typename Self, typename Env>
-        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
-            augment(env, self, make_temp(Computation::update(self, env)))
+        static auto execute(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            augment(env, self, make_temp(Computation::execute(self, env)))
         )
 
         template <typename Env>
@@ -45,4 +45,4 @@ namespace react { namespace computations {
     };
 }} // end namespace react::computations
 
-#endif // !REACT_COMPUTATIONS_RETRIEVE_FROM_UPDATE_HPP
+#endif // !REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP

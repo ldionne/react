@@ -32,19 +32,23 @@ namespace ephemeral_detail {
 
         // We remove this computation from the environment when
         // the time is elapsed.
-        template <typename Self, typename Env, typename = typename boost::enable_if_c<
-            retrieve<Counter>(std::declval<Env&&>()) == Delay
-        >::type>
-        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
-            Computation::update(std::forward<Self>(self), env),
+        template <typename Self, typename Env,
+            typename = typename boost::enable_if_c<
+                retrieve<Counter>(std::declval<Env&&>()) == Delay
+            >::type>
+        static auto execute(Self&& self, Env&& env)
+        REACT_AUTO_RETURN(
+            Computation::execute(std::forward<Self>(self), env),
             std::forward<Env>(env)
         )
 
-        template <typename Self, typename Env, typename = typename boost::disable_if_c<
-            retrieve<Counter>(std::declval<Env&&>()) == Delay
-        >::type>
-        static auto update(Self&& self, Env&& env) REACT_AUTO_RETURN(
-            Computation::update(
+        template <typename Self, typename Env,
+            typename = typename boost::disable_if_c<
+                retrieve<Counter>(std::declval<Env&&>()) == Delay
+            >::type>
+        static auto execute(Self&& self, Env&& env)
+        REACT_AUTO_RETURN(
+            Computation::execute(
                 std::forward<Self>(self), std::forward<Env>(env)
             )
         )

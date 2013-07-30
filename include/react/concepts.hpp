@@ -52,7 +52,7 @@ using implemented_computations = typename boost::mpl::vector<
  * | Expression                      | Return type      | Semantics
  * | ----------                      | -----------      | ---------
  * | `retrieve<Name>(env)`           | Any type         | Return the result of the computation associated to the name `Name` in `env`. If there is no such computation in the environment, the expression shall be ill-formed.
- * | `execute(env)`                  | An `Environment` | Update all of the computations in `env` in an order such that all the dependencies of a computations are updated before it. The result of updating the computations is folded into a new environment, which is returned. For any computation `c`, if `update(c, env)` returns `void` or is ill-formed, the result is folded as if `update(c, env)` had returned `augment(env, c)`.
+ * | `update(env)`                   | An `Environment` | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. The result of executing the computations is folded into a new environment, which is returned. For any computation `c`, if `execute(c, env)` returns `void` or is ill-formed, the result is folded as if `execute(c, env)` had returned `augment(env, c)`.
  * | `augment(env, computations...)` | An `Environment` | Return `env` with `computations...` available in it.
  *
  *
@@ -82,7 +82,7 @@ class Environment {
     template <typename E>
     struct basic_env_check {
         BOOST_CONCEPT_USAGE(basic_env_check) {
-            execute(e);
+            update(e);
             augment(e, ComputationArchetype{});
         }
         static E& e;
@@ -97,9 +97,9 @@ public:
             >
         >(do_retrieve);
 
-        execute(env);
+        update(env);
         BOOST_CONCEPT_ASSERT((basic_env_check<
-            decltype(execute(env))
+            decltype(update(env))
         >));
 
         augment(env, ComputationArchetype{});
@@ -123,8 +123,8 @@ namespace extensions {
     };
 
     template <typename DependenciesResults>
-    struct execute<computation_detail::environment<DependenciesResults>>
-        : execute<environment_archetype<>>
+    struct update<computation_detail::environment<DependenciesResults>>
+        : update<environment_archetype<>>
     { };
 
     template <typename DependenciesResults>
@@ -148,7 +148,7 @@ namespace extensions {
  * ## Valid expressions
  * | Expression                      | Return type                       | Semantics
  * | ----------                      | -----------                       | ---------
- * | `update(c, env)`<sub>opt</sub>  | `void` or an `Environment`        | Update the environment. If `void` is returned, the environment is left as is.
+ * | `execute(c, env)`               | `void` or an `Environment`        | Execute the computation with an environment and return an updated environment. See `execute` for details.
  * | `c.retrieve(env)`<sub>opt</sub> | Any type                          | Return the result of the computation.
  * | `dependencies_of<C>::type`      | A Boost.MPL `AssociativeSequence` | The names of the computations required in an `Environment` in order for this computation to be available. See `dependencies_of` for details.
  * | `name_of<C>::type`              | Any type                          | The name associated to `C`. See `name_of` for details.
@@ -175,25 +175,17 @@ class Computation {
     template <typename C_, typename Env>
     static void try_retrieve(...) { }
 
-    template <typename C_, typename Env>
-    static auto try_update(int) REACT_AUTO_RETURN(
-        update(get<C_>(), get<Env>())
-    )
-
-    template <typename C_, typename Env>
-    static void try_update(...) { }
-
     using GoodEnoughEnv = computation_detail::environment<DependenciesResults>;
 
 public:
     BOOST_CONCEPT_USAGE(Computation) {
-        try_update<C, GoodEnoughEnv>(0);
+        execute(get<C>(), get<GoodEnoughEnv>());
 
-        using UpdateResult = decltype(try_update<C, GoodEnoughEnv>(0));
+        using ExecuteResult = decltype(execute(get<C>(), get<GoodEnoughEnv>()));
         BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<
-            boost::is_void<UpdateResult>,
+            boost::is_void<ExecuteResult>,
             null_concept,
-            Environment<UpdateResult, implemented_computations<>>
+            Environment<ExecuteResult, implemented_computations<>>
         >::type));
 
         try_retrieve<C, GoodEnoughEnv>(0);

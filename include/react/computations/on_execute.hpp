@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::on_update`.
+ * This file defines `react::computations::on_execute`.
  */
 
-#ifndef REACT_COMPUTATIONS_ON_UPDATE_HPP
-#define REACT_COMPUTATIONS_ON_UPDATE_HPP
+#ifndef REACT_COMPUTATIONS_ON_EXECUTE_HPP
+#define REACT_COMPUTATIONS_ON_EXECUTE_HPP
 
 #include <react/computations/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
@@ -14,12 +14,13 @@
 
 namespace react { namespace computations {
     template <typename Function, typename ...Args>
-    struct on_update : depends_on<Function, Args...> {
+    struct on_execute : depends_on<Function, Args...> {
         template <typename Env>
-        static auto update(detail::dont_care, Env&& env) REACT_AUTO_RETURN(
+        static auto execute(detail::dont_care, Env&& env)
+        REACT_AUTO_RETURN(
             retrieve<Function>(env)(retrieve<Args>(env)...)
         )
     };
 }} // end namespace react::computations
 
-#endif // !REACT_COMPUTATIONS_ON_UPDATE_HPP
+#endif // !REACT_COMPUTATIONS_ON_EXECUTE_HPP
