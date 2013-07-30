@@ -30,6 +30,11 @@ namespace traits_detail {
         using type = typename Computation::name;
     };
 
+    template <typename Computation>
+    struct anonymous_name {
+        struct type;
+    };
+
     template <typename T>
     struct nested_react_tag {
         using type = typename T::react_tag;
@@ -68,7 +73,7 @@ struct name_of
     : boost::mpl::eval_if<
         traits_detail::has_name<Computation>,
         traits_detail::nested_name<Computation>,
-        boost::mpl::identity<Computation>
+        traits_detail::anonymous_name<Computation>
     >
 { };
 } // end namespace react

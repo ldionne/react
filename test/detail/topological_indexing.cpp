@@ -6,6 +6,7 @@
 #include <react/detail/topological_indexing.hpp>
 #include <react/archetypes.hpp>
 #include <react/computations/depends_on.hpp>
+#include <react/traits.hpp>
 
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/copy.hpp>
@@ -46,8 +47,8 @@ static_assert(mpl::equal<
 
 namespace test_ordering_with_3_linear_computations {
     struct a { };
-    struct b : computations::depends_on<a> { };
-    struct c : computations::depends_on<b> { };
+    struct b : computations::depends_on<name_of<a>::type> { };
+    struct c : computations::depends_on<name_of<b>::type> { };
 
     static_assert(mpl::equal<
         indexing_of<a, b, c>, indices<0, 1, 2>
