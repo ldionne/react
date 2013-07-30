@@ -25,12 +25,12 @@ namespace extensions {
 }
 
 static constexpr struct {
-    template <typename Computations>
-    auto operator()(Computations&& computations) const
+    template <typename Env>
+    auto operator()(Env&& env) const
     REACT_AUTO_RETURN(
         extensions::update<
-            typename tag_of<Computations>::type
-        >::call(std::forward<Computations>(computations))
+            typename tag_of<Env>::type
+        >::call(std::forward<Env>(env))
     )
 } update{};
 
@@ -44,12 +44,12 @@ static constexpr struct {
     )
 } augment{};
 
-template <typename Name, typename Computations>
-auto retrieve(Computations&& computations)
+template <typename Name, typename Env>
+auto retrieve(Env&& env)
 REACT_AUTO_RETURN(
     extensions::retrieve<
-        typename tag_of<Computations>::type
-    >::template call<Name>(std::forward<Computations>(computations))
+        typename tag_of<Env>::type
+    >::template call<Name>(std::forward<Env>(env))
 )
 } // end namespace react
 
