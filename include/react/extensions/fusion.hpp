@@ -110,14 +110,17 @@ template <typename T>
 struct retrieve<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
-    template <typename Name, typename Computations>
-    static auto call(Computations const& computations)
+    template <typename Name, typename Env>
+    static auto call(Env&& env)
     REACT_AUTO_RETURN(
-        boost::fusion::deref(
-            boost::fusion::find_if<
-                boost::is_same<Name, name_of<boost::mpl::_1>>
-            >(computations)
-        ).retrieve(computations)
+        react::retrieve(
+            boost::fusion::deref(
+                boost::fusion::find_if<
+                    boost::is_same<Name, name_of<boost::mpl::_1>>
+                >(env)
+            ),
+            env
+        )
     )
 };
 }} // end namespace react::extensions

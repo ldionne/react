@@ -35,7 +35,8 @@ namespace static_counter_detail {
             )
         )
 
-        constexpr Integer retrieve(detail::dont_care) const {
+        static constexpr Integer
+        retrieve(detail::dont_care, detail::dont_care) {
             return Value;
         }
     };

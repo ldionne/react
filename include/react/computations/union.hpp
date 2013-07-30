@@ -59,25 +59,14 @@ namespace react { namespace computations {
             Y::execute(std::forward<Self>(self), std::forward<Env>(env))
         )
 
-
-        template <typename Env>
-        auto retrieve(Env&& env) REACT_AUTO_RETURN(
-            X::retrieve(std::forward<Env>(env))
+        template <typename Self, typename Env>
+        static auto retrieve(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            X::retrieve(std::forward<Self>(self), std::forward<Env>(env))
         )
 
-        template <typename Env>
-        auto retrieve(Env&& env) REACT_AUTO_RETURN(
-            Y::retrieve(std::forward<Env>(env))
-        )
-
-        template <typename Env>
-        auto retrieve(Env&& env) const REACT_AUTO_RETURN(
-            X::retrieve(std::forward<Env>(env))
-        )
-
-        template <typename Env>
-        auto retrieve(Env&& env) const REACT_AUTO_RETURN(
-            Y::retrieve(std::forward<Env>(env))
+        template <typename Self, typename Env>
+        static auto retrieve(Self&& self, Env&& env) REACT_AUTO_RETURN(
+            Y::retrieve(std::forward<Self>(self), std::forward<Env>(env))
         )
     };
 }} // end namespace react::computations

@@ -4,7 +4,7 @@
  * `react::execute`.
  */
 
-#include <react/detail/default_execute.hpp>
+#include <react/detail/default_intrinsics.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/extensions/fusion.hpp>
 #include <react/intrinsics.hpp>

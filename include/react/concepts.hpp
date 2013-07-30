@@ -146,12 +146,12 @@ namespace extensions {
  *
  *
  * ## Valid expressions
- * | Expression                      | Return type                       | Semantics
- * | ----------                      | -----------                       | ---------
- * | `execute(c, env)`               | `void` or an `Environment`        | Execute the computation with an environment and return an updated environment. See `execute` for details.
- * | `c.retrieve(env)`<sub>opt</sub> | Any type                          | Return the result of the computation.
- * | `dependencies_of<C>::type`      | A Boost.MPL `AssociativeSequence` | The names of the computations required in an `Environment` in order for this computation to be available. See `dependencies_of` for details.
- * | `name_of<C>::type`              | Any type                          | The name associated to `C`. See `name_of` for details.
+ * | Expression                       | Return type                       | Semantics
+ * | ----------                       | -----------                       | ---------
+ * | `execute(c, env)`                | `void` or an `Environment`        | Execute the computation with an environment and return an updated environment. See `execute` for details.
+ * | `retrieve(c, env)<sub>opt</sub>` | Any type                          | Return the result of the computation.
+ * | `dependencies_of<C>::type`       | A Boost.MPL `AssociativeSequence` | The names of the computations required in an `Environment` in order for this computation to be available. See `dependencies_of` for details.
+ * | `name_of<C>::type`               | Any type                          | The name associated to `C`. See `name_of` for details.
  *
  *
  * @tparam C
@@ -169,7 +169,7 @@ class Computation {
 
     template <typename C_, typename Env>
     static auto try_retrieve(int) REACT_AUTO_RETURN(
-        get<C_>().retrieve(get<Env>())
+        retrieve(get<C_>(), get<Env>())
     )
 
     template <typename C_, typename Env>

@@ -64,9 +64,17 @@ REACT_AUTO_RETURN(
         typename tag_of<Env>::type
     >::template call<Name>(std::forward<Env>(env))
 )
+
+template <typename Computation, typename Env>
+auto retrieve(Computation&& c, Env&& env)
+REACT_AUTO_RETURN(
+    extensions::retrieve<
+        typename tag_of<Computation>::type
+    >::call(std::forward<Computation>(c), std::forward<Env>(env))
+)
 } // end namespace react
 
-// Always provide the default implementation for `react::execute`.
-#include <react/detail/default_execute.hpp>
+// Always provide the default implementations of the intrinsics.
+#include <react/detail/default_intrinsics.hpp>
 
 #endif // !REACT_INTRINSICS_HPP

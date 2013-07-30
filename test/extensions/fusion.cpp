@@ -20,10 +20,12 @@ using namespace react;
 
 template <int i>
 struct computation {
-    constexpr int retrieve(detail::dont_care) const { return i; }
+    static constexpr int retrieve(detail::dont_care, detail::dont_care) {
+        return i;
+    }
 
     template <typename Other>
-    constexpr friend bool operator==(computation const&, Other const&) {
+    friend constexpr bool operator==(computation const&, Other const&) {
         return boost::is_same<computation, Other>::value;
     }
 };

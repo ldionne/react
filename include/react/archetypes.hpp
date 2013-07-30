@@ -56,8 +56,8 @@ namespace react {
             return *(environment_archetype<>*)0;
         }
 
-        template <typename Env>
-        boost::null_archetype<>& retrieve(Env&&) {
+        template <typename Self, typename Env>
+        static boost::null_archetype<>& retrieve(Self&&, Env&&) {
             return *(boost::null_archetype<>*)0;
         }
 

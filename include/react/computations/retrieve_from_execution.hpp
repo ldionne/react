@@ -10,6 +10,7 @@
 #include <react/computations/temporary.hpp>
 #include <react/computations/variable.hpp>
 #include <react/detail/auto_return.hpp>
+#include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
 #include <boost/type_traits/remove_reference.hpp>
@@ -39,7 +40,7 @@ namespace react { namespace computations {
         )
 
         template <typename Env>
-        auto retrieve(Env&& env) const REACT_AUTO_RETURN(
+        static auto retrieve(detail::dont_care, Env&& env) REACT_AUTO_RETURN(
             react::retrieve<anonymous>(std::forward<Env>(env))
         )
     };

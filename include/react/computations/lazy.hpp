@@ -7,29 +7,32 @@
 #define REACT_COMPUTATIONS_LAZY_HPP
 
 #include <react/detail/auto_return.hpp>
+#include <react/intrinsics.hpp>
 
 #include <utility>
 
 
 namespace react { namespace computations {
 namespace lazy_detail {
-    template <typename DefaultEnv, typename Computation>
+    template <typename Computation, typename Self, typename DefaultEnv>
     class defer_retrieval {
-        DefaultEnv& default_env_;
-        Computation& computation_;
+        Self self_;
+        DefaultEnv default_env_;
 
     public:
-        explicit defer_retrieval(DefaultEnv& env, Computation& c)
-            : default_env_{env}, computation_{c}
+        template <typename S, typename E>
+        explicit defer_retrieval(S&& self, E&& env)
+            : self_{std::forward<S>(self)},
+              default_env_{std::forward<E>(env)}
         { }
 
         template <typename Env>
-        auto operator()(Env&& env) REACT_AUTO_RETURN(
-            computation_.retrieve(std::forward<Env>(env))
+        auto operator()(Env&& env) const REACT_AUTO_RETURN(
+            Computation::retrieve(self_, std::forward<Env>(env))
         )
 
-        auto operator()() REACT_AUTO_RETURN(
-            computation_.retrieve(default_env_)
+        auto operator()() const REACT_AUTO_RETURN(
+            Computation::retrieve(self_, default_env_)
         )
     };
 } // end namespace lazy_detail
@@ -39,17 +42,12 @@ struct lazy : Computation {
     using Computation::Computation;
     using Computation::operator=;
 
-    template <typename Env>
-    lazy_detail::defer_retrieval<Env const, Computation>
-    retrieve(Env const& env) {
-        return {env, *this};
-    }
-
-    template <typename Env>
-    lazy_detail::defer_retrieval<Env const, Computation const>
-    retrieve(Env const& env) const {
-        return {env, *this};
-    }
+    template <typename Self, typename Env>
+    static auto retrieve(Self&& self, Env&& env) REACT_AUTO_RETURN(
+        lazy_detail::defer_retrieval<Computation, Self, Env>{
+            std::forward<Self>(self), std::forward<Env>(env)
+        }
+    )
 };
 }} // end namespace react::computations
 

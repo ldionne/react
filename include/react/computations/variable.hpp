@@ -45,8 +45,15 @@ public:
         : var_{std::forward<Args>(args)...}
     { }
 
-    auto retrieve(detail::dont_care) REACT_AUTO_RETURN(var_)
-    auto retrieve(detail::dont_care) const REACT_AUTO_RETURN(var_)
+    static auto retrieve(variable& self, detail::dont_care)
+    REACT_AUTO_RETURN(
+        self.var_
+    )
+
+    static auto retrieve(variable const& self, detail::dont_care)
+    REACT_AUTO_RETURN(
+        self.var_
+    )
 };
 }} // end namespace react::computations
 

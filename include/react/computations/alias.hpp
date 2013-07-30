@@ -8,6 +8,7 @@
 
 #include <react/computations/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
+#include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
 #include <utility>
@@ -18,7 +19,7 @@ namespace react { namespace computations {
     template <typename AliasedComputation>
     struct alias : depends_on<AliasedComputation> {
         template <typename Env>
-        auto retrieve(Env&& env) const REACT_AUTO_RETURN(
+        static auto retrieve(detail::dont_care, Env&& env) REACT_AUTO_RETURN(
             react::retrieve<AliasedComputation>(std::forward<Env>(env))
         )
     };
