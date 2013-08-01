@@ -8,7 +8,6 @@
 
 #include <react/detail/dependency_graph.hpp>
 
-#include <boost/mpl/at.hpp>
 #include <boost/mpl/begin.hpp>
 #include <boost/mpl/distance.hpp>
 #include <boost/mpl/find.hpp>
@@ -29,23 +28,6 @@ namespace topological_indexing_detail {
             typename mpl::find<ForwardSequence, Element>::type
         >
     { };
-
-    template <typename Computations>
-    struct impl {
-        using Graph = dependency_graph<Computations>;
-
-        using OrderedVertices = typename mpl::topological_sort<Graph>::type;
-
-        using OrderedComputations = mpl::transform_view<
-            OrderedVertices,
-            mpl::at<Graph, mpl::_1>
-        >;
-
-        using Indices = mpl::transform_view<
-            OrderedComputations,
-            index_of<Computations, mpl::_1>
-        >;
-    };
 } // end namespace topological_indexing_detail
 
 /*!
@@ -57,9 +39,12 @@ namespace topological_indexing_detail {
  */
 template <typename Computations>
 struct topological_indexing {
-    using type = typename topological_indexing_detail::impl<
-        Computations
-    >::Indices;
+    using type = boost::mpl::transform_view<
+        typename boost::mpl::topological_sort<
+            dependency_graph<Computations>
+        >::type,
+        topological_indexing_detail::index_of<Computations, boost::mpl::_1>
+    >;
 };
 }} // end namespace react::detail
 

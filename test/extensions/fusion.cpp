@@ -20,14 +20,14 @@
 using namespace react;
 
 template <int i>
-struct computation : computations::named<computation<i>> {
+struct Comp : computations::named<Comp<i>> {
     static constexpr int retrieve(detail::dont_care, detail::dont_care) {
         return i;
     }
 
     template <typename Other>
-    friend constexpr bool operator==(computation const&, Other const&) {
-        return boost::is_same<computation, Other>::value;
+    friend constexpr bool operator==(Comp const&, Other const&) {
+        return boost::is_same<Comp, Other>::value;
     }
 };
 
@@ -36,32 +36,32 @@ BOOST_CONCEPT_ASSERT((Environment<
     implemented_computations<>
 >));
 BOOST_CONCEPT_ASSERT((Environment<
-    boost::fusion::vector<computation<0>>,
-    implemented_computations<computation<0>>
+    boost::fusion::vector<Comp<0>>,
+    implemented_computations<Comp<0>>
 >));
 BOOST_CONCEPT_ASSERT((Environment<
-    boost::fusion::vector<computation<0>, computation<1>>,
-    implemented_computations<computation<0>, computation<1>>
+    boost::fusion::vector<Comp<0>, Comp<1>>,
+    implemented_computations<Comp<0>, Comp<1>>
 >));
 
 
 int main() {
     // augment
-    boost::fusion::vector<computation<1>> env1;
-    auto env2 = augment(env1, computation<2>{});
-    auto env3_4 = augment(env2, computation<3>{}, computation<4>{});
+    boost::fusion::vector<Comp<1>> env1;
+    auto env2 = augment(env1, Comp<2>{});
+    auto env3_4 = augment(env2, Comp<3>{}, Comp<4>{});
 
 
     // retrieve
-    BOOST_ASSERT(retrieve<computation<1>>(env1) == 1);
+    BOOST_ASSERT(retrieve<Comp<1>>(env1) == 1);
 
-    BOOST_ASSERT(retrieve<computation<1>>(env2) == 1);
-    BOOST_ASSERT(retrieve<computation<2>>(env2) == 2);
+    BOOST_ASSERT(retrieve<Comp<1>>(env2) == 1);
+    BOOST_ASSERT(retrieve<Comp<2>>(env2) == 2);
 
-    BOOST_ASSERT(retrieve<computation<1>>(env3_4) == 1);
-    BOOST_ASSERT(retrieve<computation<2>>(env3_4) == 2);
-    BOOST_ASSERT(retrieve<computation<3>>(env3_4) == 3);
-    BOOST_ASSERT(retrieve<computation<4>>(env3_4) == 4);
+    BOOST_ASSERT(retrieve<Comp<1>>(env3_4) == 1);
+    BOOST_ASSERT(retrieve<Comp<2>>(env3_4) == 2);
+    BOOST_ASSERT(retrieve<Comp<3>>(env3_4) == 3);
+    BOOST_ASSERT(retrieve<Comp<4>>(env3_4) == 4);
 
 
     // update

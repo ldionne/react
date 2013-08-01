@@ -8,13 +8,10 @@
 #include <react/computations/depends_on.hpp>
 #include <react/traits.hpp>
 
-#include <boost/mpl/at.hpp>
-#include <boost/mpl/fold.hpp>
 #include <boost/mpl/graph_intrinsics.hpp>
-#include <boost/mpl/insert.hpp>
-#include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/set_equal.hpp>
+#include <boost/mpl/set_insert_range.hpp>
 #include <boost/mpl/vector.hpp>
 
 
@@ -27,10 +24,8 @@ using graph = detail::dependency_graph<
 >;
 
 template <typename Graph>
-using computations_in = typename mpl::fold<
-    typename mpl::vertices_of<Graph>::type,
-    mpl::set<>,
-    mpl::insert<mpl::_1, mpl::at<Graph, mpl::_2>>
+using computations_in = typename mpl::set_insert_range<
+    mpl::set<>, typename mpl::vertices_of<Graph>::type
 >::type;
 
 static_assert(mpl::set_equal<
