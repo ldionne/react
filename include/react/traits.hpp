@@ -6,6 +6,7 @@
 #ifndef REACT_TRAITS_HPP
 #define REACT_TRAITS_HPP
 
+#include <boost/mpl/assert.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/identity.hpp>
@@ -19,6 +20,7 @@ namespace traits_detail {
     BOOST_MPL_HAS_XXX_TRAIT_DEF(dependencies)
     BOOST_MPL_HAS_XXX_TRAIT_DEF(name)
     BOOST_MPL_HAS_XXX_TRAIT_DEF(react_tag)
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(default_computation)
 
     template <typename Computation>
     struct nested_dependencies {
@@ -28,6 +30,11 @@ namespace traits_detail {
     template <typename Computation>
     struct nested_name {
         using type = typename Computation::name;
+    };
+
+    template <typename ComputationName>
+    struct nested_default_computation {
+        using type = typename ComputationName::default_computation;
     };
 
     template <typename Computation>
@@ -48,6 +55,19 @@ namespace traits_detail {
             boost::mpl::identity<T>
         >
     { };
+
+    template <typename ComputationName, bool always_false = false>
+    struct trigger_failure {
+        BOOST_MPL_ASSERT_MSG(always_false,
+            missing_a_default_computation_for_some_computation_name,
+            (ComputationName)
+        );
+
+        static_assert(always_false,
+            "missing a default computation for some computation name");
+
+        struct type;
+    };
 } // end namespace traits_detail
 
 template <typename T>
@@ -74,6 +94,15 @@ struct name_of
         traits_detail::has_name<Computation>,
         traits_detail::nested_name<Computation>,
         traits_detail::anonymous_name<Computation>
+    >
+{ };
+
+template <typename ComputationName>
+struct default_computation
+    : boost::mpl::eval_if<
+        traits_detail::has_default_computation<ComputationName>,
+        traits_detail::nested_default_computation<ComputationName>,
+        traits_detail::trigger_failure<ComputationName>
     >
 { };
 } // end namespace react
