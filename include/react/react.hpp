@@ -11,6 +11,7 @@
 #include <react/concepts.hpp>
 #include <react/extensions.hpp>
 #include <react/intrinsics.hpp>
+#include <react/placeholders.hpp>
 #include <react/traits.hpp>
 
 #endif // !REACT_REACT_HPP
