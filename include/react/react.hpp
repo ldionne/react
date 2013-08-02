@@ -7,6 +7,7 @@
 #define REACT_REACT_HPP
 
 #include <react/archetypes.hpp>
+#include <react/computation_set.hpp>
 #include <react/computations.hpp>
 #include <react/concepts.hpp>
 #include <react/extensions.hpp>
