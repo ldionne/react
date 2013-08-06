@@ -11,9 +11,9 @@
 #include <react/detail/topological_indexing.hpp>
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/name_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 #include <react/intrinsic/update.hpp>
-#include <react/traits.hpp>
 
 #include <boost/fusion/include/clear.hpp>
 #include <boost/fusion/include/deref.hpp>
@@ -35,7 +35,7 @@ namespace fusion_detail {
     static constexpr struct {
         template <typename Env, typename Computation>
         auto operator()(Env&& env, Computation&& c) const REACT_AUTO_RETURN(
-            react::execute(
+            execute(
                 std::forward<Computation>(c), std::forward<Env>(env)
             )
         )
@@ -43,7 +43,7 @@ namespace fusion_detail {
 }
 
 template <typename T>
-struct update<
+struct update_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
@@ -84,13 +84,13 @@ public:
 };
 
 template <typename T>
-struct augment<
+struct augment_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
     template <typename Env, typename Computation, typename ...Rest>
     static auto call(Env&& env, Computation&& c, Rest&& ...rest)
     REACT_AUTO_RETURN(
-        react::augment(
+        augment(
             // We use push_front instead of push_back because using push_back
             // creates a type of view causing problems with retrieve. This is
             // due to a bug in Fusion. Using push_front does not change
@@ -110,13 +110,13 @@ struct augment<
 };
 
 template <typename T>
-struct retrieve<
+struct retrieve_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
     template <typename Name, typename Env>
     static auto call(Env&& env)
     REACT_AUTO_RETURN(
-        react::retrieve(
+        retrieve(
             boost::fusion::deref(
                 boost::fusion::find_if<
                     boost::is_same<Name, name_of<boost::mpl::_1>>

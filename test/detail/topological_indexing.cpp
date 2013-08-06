@@ -6,7 +6,7 @@
 #include <react/detail/topological_indexing.hpp>
 #include <react/archetypes.hpp>
 #include <react/computation/depends_on.hpp>
-#include <react/traits.hpp>
+#include <react/intrinsic/name_of.hpp>
 
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/copy.hpp>

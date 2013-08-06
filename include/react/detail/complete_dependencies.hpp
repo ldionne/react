@@ -8,7 +8,7 @@
 
 #include <react/detail/dependency_graph.hpp>
 #include <react/intrinsic/default_implementation_of.hpp>
-#include <react/traits.hpp>
+#include <react/intrinsic/name_of.hpp>
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/eval_if.hpp>

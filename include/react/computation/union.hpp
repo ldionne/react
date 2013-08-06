@@ -7,7 +7,7 @@
 #define REACT_COMPUTATION_UNION_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/traits.hpp>
+#include <react/intrinsic/dependencies_of.hpp>
 
 #include <boost/mpl/set_union.hpp>
 #include <boost/utility/enable_if.hpp>

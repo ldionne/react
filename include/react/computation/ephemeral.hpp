@@ -11,8 +11,8 @@
 #include <react/computation/static_counter.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
+#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
-#include <react/traits.hpp>
 
 #include <boost/mpl/insert.hpp>
 #include <boost/utility/enable_if.hpp>

@@ -9,7 +9,6 @@
 #include <react/archetypes.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsics.hpp>
-#include <react/traits.hpp>
 
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
@@ -145,20 +144,21 @@ namespace computation_detail {
 
 namespace extension {
     template <typename DependenciesResults>
-    struct retrieve<computation_detail::environment<DependenciesResults>> {
+    struct retrieve_impl<computation_detail::environment<DependenciesResults>>
+    {
         template <typename Name, typename Env>
         static typename boost::mpl::at<DependenciesResults, Name>::type
         call(Env&&);
     };
 
     template <typename DependenciesResults>
-    struct update<computation_detail::environment<DependenciesResults>>
-        : update<environment_archetype<>>
+    struct update_impl<computation_detail::environment<DependenciesResults>>
+        : update_impl<environment_archetype<>>
     { };
 
     template <typename DependenciesResults>
-    struct augment<computation_detail::environment<DependenciesResults>>
-        : augment<environment_archetype<>>
+    struct augment_impl<computation_detail::environment<DependenciesResults>>
+        : augment_impl<environment_archetype<>>
     { };
 } // end namespace extension
 

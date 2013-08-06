@@ -7,7 +7,7 @@
 #define REACT_INTRINSIC_UPDATE_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/traits.hpp>
+#include <react/tag_of.hpp>
 
 #include <utility>
 
@@ -15,7 +15,7 @@
 namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
-    struct update {
+    struct update_impl {
         template <typename Env, bool always_false = false>
         static void call(Env&&) {
             static_assert(always_false,
@@ -29,7 +29,7 @@ static constexpr struct {
     template <typename Env>
     auto operator()(Env&& env) const
     REACT_AUTO_RETURN(
-        extension::update<
+        extension::update_impl<
             typename tag_of<Env>::type
         >::call(std::forward<Env>(env))
     )

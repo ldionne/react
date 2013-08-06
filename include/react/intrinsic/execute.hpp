@@ -8,7 +8,7 @@
 
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsic/augment.hpp>
-#include <react/traits.hpp>
+#include <react/tag_of.hpp>
 
 #include <boost/type_traits/is_void.hpp>
 #include <boost/type_traits/remove_reference.hpp>
@@ -19,7 +19,7 @@
 namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
-    struct execute {
+    struct execute_impl {
     private:
         template <typename RawComp, typename Comp, typename Env>
         static auto impl(Comp&& c, Env&& env, int)
@@ -28,7 +28,7 @@ namespace extension {
                 RawComp::execute(c, env)
             )>>::type(),
             RawComp::execute(c, env),
-            react::augment(std::forward<Env>(env), std::forward<Comp>(c))
+            augment(std::forward<Env>(env), std::forward<Comp>(c))
         )
 
         template <typename RawComp, typename Comp, typename Env>
@@ -44,7 +44,7 @@ namespace extension {
         template <typename RawComp, typename Comp, typename Env>
         static auto impl(Comp&& c, Env&& env, void*)
         REACT_AUTO_RETURN(
-            react::augment(std::forward<Env>(env), std::forward<Comp>(c))
+            augment(std::forward<Env>(env), std::forward<Comp>(c))
         )
 
     public:
@@ -62,7 +62,7 @@ static constexpr struct {
     template <typename Computation, typename Env>
     auto operator()(Computation&& c, Env&& env) const
     REACT_AUTO_RETURN(
-        extension::execute<
+        extension::execute_impl<
             typename tag_of<Computation>::type
         >::call(std::forward<Computation>(c), std::forward<Env>(env))
     )

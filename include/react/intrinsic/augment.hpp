@@ -6,7 +6,7 @@
 #ifndef REACT_INTRINSIC_AUGMENT_HPP
 #define REACT_INTRINSIC_AUGMENT_HPP
 
-#include <react/traits.hpp>
+#include <react/tag_of.hpp>
 
 #include <utility>
 
@@ -14,7 +14,7 @@
 namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
-    struct augment {
+    struct augment_impl {
         template <typename Env, typename ...Computations,
                   bool always_false = false>
         static void call(Env&&, Computations&& ...) {
@@ -29,7 +29,7 @@ static constexpr struct {
     template <typename Env, typename ...Computations>
     auto operator()(Env&& env, Computations&& ...c) const
     REACT_AUTO_RETURN(
-        extension::augment<
+        extension::augment_impl<
             typename tag_of<Env>::type
         >::call(std::forward<Env>(env), std::forward<Computations>(c)...)
     )

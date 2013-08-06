@@ -6,7 +6,7 @@
 #include <react/detail/dependency_graph.hpp>
 #include <react/archetypes.hpp>
 #include <react/computation/depends_on.hpp>
-#include <react/traits.hpp>
+#include <react/intrinsic/name_of.hpp>
 
 #include <boost/mpl/graph_intrinsics.hpp>
 #include <boost/mpl/set.hpp>

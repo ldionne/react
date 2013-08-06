@@ -6,8 +6,8 @@
 #include <react/detail/bind.hpp>
 #include <react/computation/depends_on.hpp>
 #include <react/computation/named.hpp>
+#include <react/intrinsic/name_of.hpp>
 #include <react/placeholders.hpp>
-#include <react/traits.hpp>
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/make_index_of.hpp>

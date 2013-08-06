@@ -23,7 +23,7 @@ namespace react {
 
     namespace extension {
         template <typename Base>
-        struct augment<environment_archetype<Base>> {
+        struct augment_impl<environment_archetype<Base>> {
             template <typename Env, typename ...Computations>
             static auto call(Env&& env, Computations&& ...)
             REACT_AUTO_RETURN(
@@ -32,7 +32,7 @@ namespace react {
         };
 
         template <typename Base>
-        struct update<environment_archetype<Base>> {
+        struct update_impl<environment_archetype<Base>> {
             template <typename Env>
             static auto call(Env&& env)
             REACT_AUTO_RETURN(
@@ -41,7 +41,7 @@ namespace react {
         };
 
         template <typename Base>
-        struct retrieve<environment_archetype<Base>> {
+        struct retrieve_impl<environment_archetype<Base>> {
             template <typename Name, typename Env>
             static boost::null_archetype<>& call(Env&&) {
                 return *(boost::null_archetype<>*)0;

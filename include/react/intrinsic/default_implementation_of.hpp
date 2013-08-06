@@ -6,7 +6,7 @@
 #ifndef REACT_INTRINSIC_DEFAULT_IMPLEMENTATION_OF_HPP
 #define REACT_INTRINSIC_DEFAULT_IMPLEMENTATION_OF_HPP
 
-#include <react/traits.hpp>
+#include <react/tag_of.hpp>
 
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/utility/enable_if.hpp>
@@ -32,7 +32,7 @@ namespace default_implementation_of_detail {
 
 namespace extension {
     template <typename Tag, typename Enable = void>
-    struct default_implementation_of {
+    struct default_implementation_of_impl {
         template <typename ComputationName>
         struct apply
             : default_implementation_of_detail::default_impl<ComputationName>
@@ -42,7 +42,7 @@ namespace extension {
 
 template <typename ComputationName>
 struct default_implementation_of
-    : extension::default_implementation_of<
+    : extension::default_implementation_of_impl<
         typename tag_of<ComputationName>::type
     >::template apply<ComputationName>
 { };

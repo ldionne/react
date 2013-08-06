@@ -7,7 +7,7 @@
 #define REACT_INTRINSIC_RETRIEVE_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/traits.hpp>
+#include <react/tag_of.hpp>
 
 #include <boost/type_traits/remove_reference.hpp>
 #include <utility>
@@ -16,7 +16,7 @@
 namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
-    struct retrieve {
+    struct retrieve_impl {
         template <typename Computation, typename Env>
         static auto call(Computation&& c, Env&& env)
         REACT_AUTO_RETURN(
@@ -37,7 +37,7 @@ namespace extension {
 template <typename Name, typename Env>
 auto retrieve(Env&& env)
 REACT_AUTO_RETURN(
-    extension::retrieve<
+    extension::retrieve_impl<
         typename tag_of<Env>::type
     >::template call<Name>(std::forward<Env>(env))
 )
@@ -45,7 +45,7 @@ REACT_AUTO_RETURN(
 template <typename Computation, typename Env>
 auto retrieve(Computation&& c, Env&& env)
 REACT_AUTO_RETURN(
-    extension::retrieve<
+    extension::retrieve_impl<
         typename tag_of<Computation>::type
     >::call(std::forward<Computation>(c), std::forward<Env>(env))
 )

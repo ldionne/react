@@ -7,8 +7,8 @@
 #define REACT_DETAIL_BIND_HPP
 
 #include <react/detail/dependency_graph.hpp>
+#include <react/intrinsic/name_of.hpp>
 #include <react/placeholders.hpp>
-#include <react/traits.hpp>
 
 #include <boost/mpl/fold.hpp>
 #include <boost/mpl/if.hpp>

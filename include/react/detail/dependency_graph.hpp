@@ -7,7 +7,8 @@
 #define REACT_DETAIL_DEPENDENCY_GRAPH_HPP
 
 #include <react/computation/depends_on.hpp>
-#include <react/traits.hpp>
+#include <react/intrinsic/dependencies_of.hpp>
+#include <react/intrinsic/name_of.hpp>
 
 #include <boost/mpl/apply_wrap.hpp>
 #include <boost/mpl/assert.hpp>

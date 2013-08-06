@@ -8,7 +8,9 @@
 
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/default_implementation_of.hpp>
+#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/name_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 #include <react/intrinsic/update.hpp>
 
