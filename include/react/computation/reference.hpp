@@ -1,18 +1,18 @@
 /*!
  * @file
- * This file defines `react::computations::reference`.
+ * This file defines `react::computation::reference`.
  */
 
-#ifndef REACT_COMPUTATIONS_REFERENCE_HPP
-#define REACT_COMPUTATIONS_REFERENCE_HPP
+#ifndef REACT_COMPUTATION_REFERENCE_HPP
+#define REACT_COMPUTATION_REFERENCE_HPP
 
-#include <react/computations/variable.hpp>
+#include <react/computation/variable.hpp>
 
 #include <boost/ref.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 /*!
  * Computation implemented as a reference to a single variable.
  *
@@ -23,6 +23,6 @@ template <typename Type>
 using reference = variable<
     boost::reference_wrapper<typename boost::remove_reference<Type>::type>
 >;
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_REFERENCE_HPP
+#endif // !REACT_COMPUTATION_REFERENCE_HPP

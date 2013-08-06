@@ -1,12 +1,12 @@
 /*!
  * @file
- * This file defines `react::computations::alias`.
+ * This file defines `react::computation::alias`.
  */
 
-#ifndef REACT_COMPUTATIONS_ALIAS_HPP
-#define REACT_COMPUTATIONS_ALIAS_HPP
+#ifndef REACT_COMPUTATION_ALIAS_HPP
+#define REACT_COMPUTATION_ALIAS_HPP
 
-#include <react/computations/depends_on.hpp>
+#include <react/computation/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
@@ -14,7 +14,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     //! Computation implemented by another computation.
     template <typename AliasedComputation>
     struct alias : depends_on<AliasedComputation> {
@@ -23,6 +23,6 @@ namespace react { namespace computations {
             react::retrieve<AliasedComputation>(std::forward<Env>(env))
         )
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_ALIAS_HPP
+#endif // !REACT_COMPUTATION_ALIAS_HPP

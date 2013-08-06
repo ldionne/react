@@ -6,20 +6,20 @@
 #ifndef REACT_COMPUTATIONS_HPP
 #define REACT_COMPUTATIONS_HPP
 
-#include <react/computations/alias.hpp>
-#include <react/computations/depends_on.hpp>
-#include <react/computations/ephemeral.hpp>
-#include <react/computations/initialized_from.hpp>
-#include <react/computations/lazy.hpp>
-#include <react/computations/named.hpp>
-#include <react/computations/on_execute.hpp>
-#include <react/computations/on_retrieve.hpp>
-#include <react/computations/reference.hpp>
-#include <react/computations/retrieve_from_execution.hpp>
-#include <react/computations/serialize.hpp>
-#include <react/computations/static_counter.hpp>
-#include <react/computations/temporary.hpp>
-#include <react/computations/union.hpp>
-#include <react/computations/variable.hpp>
+#include <react/computation/alias.hpp>
+#include <react/computation/depends_on.hpp>
+#include <react/computation/ephemeral.hpp>
+#include <react/computation/initialized_from.hpp>
+#include <react/computation/lazy.hpp>
+#include <react/computation/named.hpp>
+#include <react/computation/on_execute.hpp>
+#include <react/computation/on_retrieve.hpp>
+#include <react/computation/reference.hpp>
+#include <react/computation/retrieve_from_execution.hpp>
+#include <react/computation/serialize.hpp>
+#include <react/computation/static_counter.hpp>
+#include <react/computation/temporary.hpp>
+#include <react/computation/union.hpp>
+#include <react/computation/variable.hpp>
 
 #endif // !REACT_COMPUTATIONS_HPP

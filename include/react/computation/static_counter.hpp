@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::static_counter`.
+ * This file defines `react::computation::static_counter`.
  */
 
-#ifndef REACT_COMPUTATIONS_STATIC_COUNTER_HPP
-#define REACT_COMPUTATIONS_STATIC_COUNTER_HPP
+#ifndef REACT_COMPUTATION_STATIC_COUNTER_HPP
+#define REACT_COMPUTATION_STATIC_COUNTER_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
@@ -15,7 +15,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 namespace static_counter_detail {
     template <typename Computation, typename Integer, Integer Value>
     struct counter_wrapper : Computation {
@@ -48,6 +48,6 @@ using static_counter = static_counter_detail::counter_wrapper<
     Integer,
     InitialValue
 >;
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_STATIC_COUNTER_HPP
+#endif // !REACT_COMPUTATION_STATIC_COUNTER_HPP

@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::depends_on`.
+ * This file defines `react::computation::depends_on`.
  */
 
-#ifndef REACT_COMPUTATIONS_DEPENDS_ON_HPP
-#define REACT_COMPUTATIONS_DEPENDS_ON_HPP
+#ifndef REACT_COMPUTATION_DEPENDS_ON_HPP
+#define REACT_COMPUTATION_DEPENDS_ON_HPP
 
 #include <boost/mpl/copy.hpp>
 #include <boost/mpl/eval_if.hpp>
@@ -15,7 +15,7 @@
 #include <boost/mpl/set.hpp>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     namespace depends_on_detail {
         using namespace boost;
 
@@ -41,6 +41,6 @@ namespace react { namespace computations {
             boost::mpl::set<Dependencies>
         >::type;
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_DEPENDS_ON_HPP
+#endif // !REACT_COMPUTATION_DEPENDS_ON_HPP

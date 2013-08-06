@@ -6,7 +6,7 @@
 
 #include <react/detail/default_intrinsics.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/extensions/fusion.hpp>
+#include <react/extension/fusion.hpp>
 #include <react/intrinsics.hpp>
 
 #include <boost/fusion/include/clear.hpp>

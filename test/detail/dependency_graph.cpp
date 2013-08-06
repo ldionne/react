@@ -5,7 +5,7 @@
 
 #include <react/detail/dependency_graph.hpp>
 #include <react/archetypes.hpp>
-#include <react/computations/depends_on.hpp>
+#include <react/computation/depends_on.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/graph_intrinsics.hpp>
@@ -47,11 +47,11 @@ static_assert(mpl::set_equal<
 // Dependencies are handled by name.
 static_assert(mpl::set_equal<
     computations_in<graph<
-        computations::depends_on<name_of<computation_archetype<>>::type>,
+        computation::depends_on<name_of<computation_archetype<>>::type>,
         computation_archetype<>
     >>,
     mpl::set<
-        computations::depends_on<name_of<computation_archetype<>>::type>,
+        computation::depends_on<name_of<computation_archetype<>>::type>,
         computation_archetype<>
     >
 >::value, "");
@@ -59,14 +59,14 @@ static_assert(mpl::set_equal<
 // Duplicate dependencies should not wreak havoc.
 static_assert(mpl::set_equal<
     computations_in<graph<
-        computations::depends_on<
+        computation::depends_on<
             name_of<computation_archetype<>>::type,
             name_of<computation_archetype<>>::type
         >,
         computation_archetype<>
     >>,
     mpl::set<
-        computations::depends_on<
+        computation::depends_on<
             name_of<computation_archetype<>>::type,
             name_of<computation_archetype<>>::type
         >,

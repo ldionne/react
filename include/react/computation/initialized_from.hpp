@@ -1,17 +1,17 @@
 /*!
  * @file
- * This file defines `react::computations::initialized_from`.
+ * This file defines `react::computation::initialized_from`.
  */
 
-#ifndef REACT_COMPUTATIONS_INITIALIZED_FROM_HPP
-#define REACT_COMPUTATIONS_INITIALIZED_FROM_HPP
+#ifndef REACT_COMPUTATION_INITIALIZED_FROM_HPP
+#define REACT_COMPUTATION_INITIALIZED_FROM_HPP
 
 #include <react/intrinsics.hpp>
 
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 template <typename Computation, typename Initializer>
 struct initialized_from : Computation {
     template <typename Env>
@@ -21,6 +21,6 @@ struct initialized_from : Computation {
 
     using Computation::operator=;
 };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_INITIALIZED_FROM_HPP
+#endif // !REACT_COMPUTATION_INITIALIZED_FROM_HPP

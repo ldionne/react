@@ -4,8 +4,8 @@
  */
 
 #include <react/detail/complete_dependencies.hpp>
-#include <react/computations/depends_on.hpp>
-#include <react/computations/named.hpp>
+#include <react/computation/depends_on.hpp>
+#include <react/computation/named.hpp>
 
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/set_equal.hpp>
@@ -24,8 +24,8 @@ using completed = typename mpl::set_insert_range<
     >::type
 >::type;
 
-using computations::depends_on;
-using computations::named;
+using computation::depends_on;
+using computation::named;
 
 namespace with_redundancy {
     struct c1 : named<c1>, depends_on<> { using default_computation = c1; };

@@ -1,17 +1,17 @@
 /*!
  * @file
- * This file defines `react::computations::serialize`.
+ * This file defines `react::computation::serialize`.
  */
 
-#ifndef REACT_COMPUTATIONS_SERIALIZE_HPP
-#define REACT_COMPUTATIONS_SERIALIZE_HPP
+#ifndef REACT_COMPUTATION_SERIALIZE_HPP
+#define REACT_COMPUTATION_SERIALIZE_HPP
 
-#include <react/computations/depends_on.hpp>
+#include <react/computation/depends_on.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     template <typename Value, typename Archive>
     struct serialize : depends_on<Value, Archive> {
         template <typename Env>
@@ -19,6 +19,6 @@ namespace react { namespace computations {
             retrieve<Archive>(env) & retrieve<Value>(env);
         }
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_SERIALIZE_HPP
+#endif // !REACT_COMPUTATION_SERIALIZE_HPP

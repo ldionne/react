@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::variable`.
+ * This file defines `react::computation::variable`.
  */
 
-#ifndef REACT_COMPUTATIONS_VARIABLE_HPP
-#define REACT_COMPUTATIONS_VARIABLE_HPP
+#ifndef REACT_COMPUTATION_VARIABLE_HPP
+#define REACT_COMPUTATION_VARIABLE_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
@@ -16,7 +16,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 /*!
  * Computation representing a single variable.
  *
@@ -55,6 +55,6 @@ public:
         self.var_
     )
 };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_VARIABLE_HPP
+#endif // !REACT_COMPUTATION_VARIABLE_HPP

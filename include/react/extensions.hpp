@@ -6,6 +6,6 @@
 #ifndef REACT_EXTENSIONS_HPP
 #define REACT_EXTENSIONS_HPP
 
-#include <react/extensions/fusion.hpp>
+#include <react/extension/fusion.hpp>
 
 #endif // !REACT_EXTENSIONS_HPP

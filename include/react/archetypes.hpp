@@ -19,7 +19,7 @@ namespace react {
     template <typename Base = boost::null_archetype<>>
     struct environment_archetype : Base { };
 
-    namespace extensions {
+    namespace extension {
         template <typename Base>
         struct augment<environment_archetype<Base>> {
             template <typename Env, typename ...Computations>
@@ -45,7 +45,7 @@ namespace react {
                 return *(boost::null_archetype<>*)0;
             }
         };
-    } // end namespace extensions
+    } // end namespace extension
 
 
     //! Archetype for the `Computation` concept.

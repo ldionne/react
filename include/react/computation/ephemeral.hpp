@@ -1,14 +1,14 @@
 /*!
  * @file
- * This file defines `react::computations::ephemeral`.
+ * This file defines `react::computation::ephemeral`.
  */
 
-#ifndef REACT_COMPUTATIONS_EPHEMERAL_HPP
-#define REACT_COMPUTATIONS_EPHEMERAL_HPP
+#ifndef REACT_COMPUTATION_EPHEMERAL_HPP
+#define REACT_COMPUTATION_EPHEMERAL_HPP
 
-#include <react/computations/depends_on.hpp>
-#include <react/computations/named.hpp>
-#include <react/computations/static_counter.hpp>
+#include <react/computation/depends_on.hpp>
+#include <react/computation/named.hpp>
+#include <react/computation/static_counter.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
@@ -19,7 +19,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 namespace ephemeral_detail {
     template <typename Computation, typename Counter, unsigned long Delay>
     struct impl : Computation {
@@ -68,6 +68,6 @@ template <typename Computation, unsigned long Delay>
 using ephemeral = typename ephemeral_detail::make_ephemeral<
     Computation, Delay
 >::type;
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_EPHEMERAL_HPP
+#endif // !REACT_COMPUTATION_EPHEMERAL_HPP

@@ -4,8 +4,8 @@
  */
 
 #include <react/detail/bind.hpp>
-#include <react/computations/depends_on.hpp>
-#include <react/computations/named.hpp>
+#include <react/computation/depends_on.hpp>
+#include <react/computation/named.hpp>
 #include <react/placeholders.hpp>
 #include <react/traits.hpp>
 
@@ -19,8 +19,8 @@
 using namespace react;
 namespace mpl = boost::mpl;
 
-using computations::named;
-using computations::depends_on;
+using computation::named;
+using computation::depends_on;
 
 template <typename ...Computations>
 using bound = typename mpl::make_index_of<

@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::union_`.
+ * This file defines `react::computation::union_`.
  */
 
-#ifndef REACT_COMPUTATIONS_UNION_HPP
-#define REACT_COMPUTATIONS_UNION_HPP
+#ifndef REACT_COMPUTATION_UNION_HPP
+#define REACT_COMPUTATION_UNION_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/traits.hpp>
@@ -15,7 +15,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     template <typename X, typename Y>
     struct union_ : private X, private Y {
         union_() = default;
@@ -69,6 +69,6 @@ namespace react { namespace computations {
             Y::retrieve(std::forward<Self>(self), std::forward<Env>(env))
         )
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_UNION_HPP
+#endif // !REACT_COMPUTATION_UNION_HPP

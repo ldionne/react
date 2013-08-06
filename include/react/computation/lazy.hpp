@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computations::lazy`.
+ * This file defines `react::computation::lazy`.
  */
 
-#ifndef REACT_COMPUTATIONS_LAZY_HPP
-#define REACT_COMPUTATIONS_LAZY_HPP
+#ifndef REACT_COMPUTATION_LAZY_HPP
+#define REACT_COMPUTATION_LAZY_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsics.hpp>
@@ -12,7 +12,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
 namespace lazy_detail {
     template <typename Computation, typename Self, typename DefaultEnv>
     class defer_retrieval {
@@ -49,6 +49,6 @@ struct lazy : Computation {
         }
     )
 };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_LAZY_HPP
+#endif // !REACT_COMPUTATION_LAZY_HPP

@@ -13,7 +13,7 @@
 
 
 namespace react {
-namespace extensions {
+namespace extension {
     template <typename Tag, typename Enable = void>
     struct execute;
 
@@ -31,7 +31,7 @@ static constexpr struct {
     template <typename Computation, typename Env>
     auto operator()(Computation&& c, Env&& env) const
     REACT_AUTO_RETURN(
-        extensions::execute<
+        extension::execute<
             typename tag_of<Computation>::type
         >::call(std::forward<Computation>(c), std::forward<Env>(env))
     )
@@ -41,7 +41,7 @@ static constexpr struct {
     template <typename Env>
     auto operator()(Env&& env) const
     REACT_AUTO_RETURN(
-        extensions::update<
+        extension::update<
             typename tag_of<Env>::type
         >::call(std::forward<Env>(env))
     )
@@ -51,7 +51,7 @@ static constexpr struct {
     template <typename Env, typename ...Computations>
     auto operator()(Env&& env, Computations&& ...c) const
     REACT_AUTO_RETURN(
-        extensions::augment<
+        extension::augment<
             typename tag_of<Env>::type
         >::call(std::forward<Env>(env), std::forward<Computations>(c)...)
     )
@@ -60,7 +60,7 @@ static constexpr struct {
 template <typename Name, typename Env>
 auto retrieve(Env&& env)
 REACT_AUTO_RETURN(
-    extensions::retrieve<
+    extension::retrieve<
         typename tag_of<Env>::type
     >::template call<Name>(std::forward<Env>(env))
 )
@@ -68,7 +68,7 @@ REACT_AUTO_RETURN(
 template <typename Computation, typename Env>
 auto retrieve(Computation&& c, Env&& env)
 REACT_AUTO_RETURN(
-    extensions::retrieve<
+    extension::retrieve<
         typename tag_of<Computation>::type
     >::call(std::forward<Computation>(c), std::forward<Env>(env))
 )

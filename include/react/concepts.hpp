@@ -114,7 +114,7 @@ namespace computation_detail {
     struct environment : environment_archetype<> { };
 }
 
-namespace extensions {
+namespace extension {
     template <typename DependenciesResults>
     struct retrieve<computation_detail::environment<DependenciesResults>> {
         template <typename Name, typename Env>
@@ -131,7 +131,7 @@ namespace extensions {
     struct augment<computation_detail::environment<DependenciesResults>>
         : augment<environment_archetype<>>
     { };
-} // end namespace extensions
+} // end namespace extension
 
 /*!
  * Specification of the `Computation` concept.

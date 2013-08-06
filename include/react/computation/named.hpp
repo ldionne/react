@@ -1,12 +1,12 @@
 /*!
  * @file
- * This file defines `react::computations::named`.
+ * This file defines `react::computation::named`.
  */
 
-#ifndef REACT_COMPUTATIONS_NAMED_HPP
-#define REACT_COMPUTATIONS_NAMED_HPP
+#ifndef REACT_COMPUTATION_NAMED_HPP
+#define REACT_COMPUTATION_NAMED_HPP
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     namespace named_detail {
         struct as_base;
     }
@@ -22,6 +22,6 @@ namespace react { namespace computations {
     struct named<Name, named_detail::as_base> {
         using name = Name;
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_NAMED_HPP
+#endif // !REACT_COMPUTATION_NAMED_HPP

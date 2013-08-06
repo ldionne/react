@@ -1,12 +1,12 @@
 /*!
  * @file
- * This file contains unit tests for `react::computations::static_counter`.
+ * This file contains unit tests for `react::computation::static_counter`.
  */
 
-#include <react/computations/static_counter.hpp>
-#include <react/computations/named.hpp>
+#include <react/computation/static_counter.hpp>
+#include <react/computation/named.hpp>
 #include <react/concepts.hpp>
-#include <react/extensions/fusion.hpp>
+#include <react/extension/fusion.hpp>
 #include <react/intrinsics.hpp>
 
 #include <boost/assert.hpp>
@@ -17,7 +17,7 @@
 using namespace react;
 
 BOOST_CONCEPT_ASSERT((Computation<
-    computations::static_counter<unsigned, 0>,
+    computation::static_counter<unsigned, 0>,
     dependency_results<>
 >));
 
@@ -26,9 +26,9 @@ struct number_of_updates;
 
 int main() {
     boost::fusion::vector<
-        computations::named<
+        computation::named<
             number_of_updates,
-            computations::static_counter<unsigned, 0>
+            computation::static_counter<unsigned, 0>
         >
     > env0{};
     auto env1 = update(env0);

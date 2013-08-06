@@ -1,14 +1,14 @@
 /*!
  * @file
- * This file defines `react::computations::retrieve_from_execution`.
+ * This file defines `react::computation::retrieve_from_execution`.
  */
 
-#ifndef REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP
-#define REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP
+#ifndef REACT_COMPUTATION_RETRIEVE_FROM_EXECUTION_HPP
+#define REACT_COMPUTATION_RETRIEVE_FROM_EXECUTION_HPP
 
-#include <react/computations/named.hpp>
-#include <react/computations/temporary.hpp>
-#include <react/computations/variable.hpp>
+#include <react/computation/named.hpp>
+#include <react/computation/temporary.hpp>
+#include <react/computation/variable.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
@@ -17,7 +17,7 @@
 #include <utility>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     template <typename Computation>
     struct retrieve_from_execution : Computation {
     private:
@@ -44,6 +44,6 @@ namespace react { namespace computations {
             react::retrieve<anonymous>(std::forward<Env>(env))
         )
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_RETRIEVE_FROM_EXECUTION_HPP
+#endif // !REACT_COMPUTATION_RETRIEVE_FROM_EXECUTION_HPP

@@ -6,7 +6,7 @@
 #ifndef REACT_DETAIL_DEPENDENCY_GRAPH_HPP
 #define REACT_DETAIL_DEPENDENCY_GRAPH_HPP
 
-#include <react/computations/depends_on.hpp>
+#include <react/computation/depends_on.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/apply_wrap.hpp>
@@ -73,7 +73,7 @@ class dependency_graph {
     using ComputationNames = boost::mpl::transform_view<
         Computations, name_of<boost::mpl::_1>
     >;
-    using FakeRoot = computations::depends_on<ComputationNames>;
+    using FakeRoot = computation::depends_on<ComputationNames>;
 
 public:
     using vertices = typename boost::mpl::erase_key<

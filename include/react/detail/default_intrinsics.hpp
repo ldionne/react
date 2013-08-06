@@ -15,7 +15,7 @@
 #include <utility>
 
 
-namespace react { namespace extensions {
+namespace react { namespace extension {
 template <typename Tag, typename Enable>
 struct execute {
 private:
@@ -92,6 +92,6 @@ struct retrieve {
             "`react::retrieve<ComputationName>(Environment)`.");
     }
 };
-}} // end namespace react::extensions
+}} // end namespace react::extension
 
 #endif // !REACT_DETAIL_DEFAULT_INTRINSICS_HPP

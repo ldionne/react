@@ -3,8 +3,8 @@
  * This file contains unit tests for the intrinsics for Boost.Fusion sequences.
  */
 
-#include <react/extensions/fusion.hpp>
-#include <react/computations/named.hpp>
+#include <react/extension/fusion.hpp>
+#include <react/computation/named.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
@@ -20,7 +20,7 @@
 using namespace react;
 
 template <int i>
-struct Comp : computations::named<Comp<i>> {
+struct Comp : computation::named<Comp<i>> {
     static constexpr int retrieve(detail::dont_care, detail::dont_care) {
         return i;
     }

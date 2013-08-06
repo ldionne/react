@@ -3,8 +3,8 @@
  * This file defines intrinsic operations for Boost.Fusion sequences.
  */
 
-#ifndef REACT_EXTENSIONS_FUSION_HPP
-#define REACT_EXTENSIONS_FUSION_HPP
+#ifndef REACT_EXTENSION_FUSION_HPP
+#define REACT_EXTENSION_FUSION_HPP
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/fusion_fold.hpp>
@@ -27,7 +27,7 @@
 #include <utility>
 
 
-namespace react { namespace extensions {
+namespace react { namespace extension {
 namespace fusion_detail {
     static constexpr struct {
         template <typename Env, typename Computation>
@@ -123,6 +123,6 @@ struct retrieve<
         )
     )
 };
-}} // end namespace react::extensions
+}} // end namespace react::extension
 
-#endif // !REACT_EXTENSIONS_FUSION_HPP
+#endif // !REACT_EXTENSION_FUSION_HPP

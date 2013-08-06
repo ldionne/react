@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::computations::variable`.
+ * This file contains unit tests for `react::computation::reference`.
  */
 
-#include <react/computations/variable.hpp>
+#include <react/computation/reference.hpp>
 #include <react/concepts.hpp>
 
 #include <boost/concept/assert.hpp>
@@ -14,21 +14,23 @@ using namespace react;
 
 template <typename T>
 using test_concept = Computation<
-    computations::variable<T>, dependency_results<>
+    computation::reference<T>, dependency_results<>
 >;
 
-// Check with primitive types, user-defined types and function types.
+// Check with primitive types, user-defined types and function/array types.
 BOOST_CONCEPT_ASSERT((test_concept<int>));
 BOOST_CONCEPT_ASSERT((test_concept<std::string>));
 BOOST_CONCEPT_ASSERT((test_concept<int*>));
 BOOST_CONCEPT_ASSERT((test_concept<void()>));
+BOOST_CONCEPT_ASSERT((test_concept<int[2]>));
 
 BOOST_CONCEPT_ASSERT((test_concept<int const>));
 BOOST_CONCEPT_ASSERT((test_concept<std::string const>));
 BOOST_CONCEPT_ASSERT((test_concept<int* const>));
 
 
-// Check with [const] references.
+// Check with [const] references. It should handle references to references
+// gracefully.
 BOOST_CONCEPT_ASSERT((test_concept<int&>));
 BOOST_CONCEPT_ASSERT((test_concept<std::string&>));
 BOOST_CONCEPT_ASSERT((test_concept<int* &>));

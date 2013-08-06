@@ -1,18 +1,18 @@
 /*!
  * @file
- * This file defines `react::computations::on_retrieve`.
+ * This file defines `react::computation::on_retrieve`.
  */
 
-#ifndef REACT_COMPUTATIONS_ON_RETRIEVE_HPP
-#define REACT_COMPUTATIONS_ON_RETRIEVE_HPP
+#ifndef REACT_COMPUTATION_ON_RETRIEVE_HPP
+#define REACT_COMPUTATION_ON_RETRIEVE_HPP
 
-#include <react/computations/depends_on.hpp>
+#include <react/computation/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsics.hpp>
 
 
-namespace react { namespace computations {
+namespace react { namespace computation {
     template <typename Function, typename ...Args>
     struct on_retrieve : depends_on<Function, Args...> {
         template <typename Env>
@@ -20,6 +20,6 @@ namespace react { namespace computations {
             react::retrieve<Function>(env)(react::retrieve<Args>(env)...)
         )
     };
-}} // end namespace react::computations
+}} // end namespace react::computation
 
-#endif // !REACT_COMPUTATIONS_ON_RETRIEVE_HPP
+#endif // !REACT_COMPUTATION_ON_RETRIEVE_HPP
