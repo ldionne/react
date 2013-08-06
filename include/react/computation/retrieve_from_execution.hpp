@@ -11,7 +11,8 @@
 #include <react/computation/variable.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/retrieve.hpp>
 
 #include <boost/type_traits/remove_reference.hpp>
 #include <utility>

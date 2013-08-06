@@ -7,7 +7,9 @@
 #include <react/computation/named.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/update.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>

@@ -6,7 +6,7 @@
 #ifndef REACT_COMPUTATION_INITIALIZED_FROM_HPP
 #define REACT_COMPUTATION_INITIALIZED_FROM_HPP
 
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/retrieve.hpp>
 
 #include <utility>
 

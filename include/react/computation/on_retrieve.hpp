@@ -9,7 +9,7 @@
 #include <react/computation/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/retrieve.hpp>
 
 
 namespace react { namespace computation {

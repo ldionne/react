@@ -7,7 +7,6 @@
 #define REACT_COMPUTATION_LAZY_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsics.hpp>
 
 #include <utility>
 

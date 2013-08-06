@@ -7,7 +7,9 @@
 #define REACT_ARCHETYPES_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/update.hpp>
 
 #include <boost/concept_archetype.hpp>
 #include <boost/mpl/set.hpp>
@@ -48,6 +50,9 @@ namespace react {
     } // end namespace extension
 
 
+    template <typename Base = boost::null_archetype<>>
+    struct computation_name_archetype;
+
     //! Archetype for the `Computation` concept.
     template <typename Base = boost::null_archetype<>>
     struct computation_archetype : Base {
@@ -62,7 +67,13 @@ namespace react {
         }
 
         using dependencies = typename boost::mpl::set<>::type;
-        struct name;
+        using name = computation_name_archetype<>;
+    };
+
+    //! Archetype for the `ComputationName` concept.
+    template <typename Base>
+    struct computation_name_archetype : Base {
+        using default_implementation = computation_archetype<>;
     };
 } // end namespace react
 

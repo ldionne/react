@@ -17,6 +17,10 @@ BOOST_CONCEPT_ASSERT((Computation<
     dependency_results<>
 >));
 
+BOOST_CONCEPT_ASSERT((ComputationName<
+    computation_name_archetype<>
+>));
+
 BOOST_CONCEPT_ASSERT((Environment<
     environment_archetype<>,
     implemented_computations<boost::null_archetype<>>

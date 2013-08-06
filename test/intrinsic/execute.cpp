@@ -4,10 +4,10 @@
  * `react::execute`.
  */
 
-#include <react/detail/default_intrinsics.hpp>
+#include <react/intrinsic/execute.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/extension/fusion.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
 
 #include <boost/fusion/include/clear.hpp>
 #include <boost/fusion/include/front.hpp>

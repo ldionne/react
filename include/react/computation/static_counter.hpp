@@ -8,7 +8,7 @@
 
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
 
 #include <boost/mpl/empty_base.hpp>
 #include <boost/type_traits/remove_reference.hpp>

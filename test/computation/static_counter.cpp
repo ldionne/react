@@ -7,7 +7,8 @@
 #include <react/computation/named.hpp>
 #include <react/concepts.hpp>
 #include <react/extension/fusion.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/update.hpp>
 
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>

@@ -28,9 +28,9 @@ using computation::depends_on;
 using computation::named;
 
 namespace with_redundancy {
-    struct c1 : named<c1>, depends_on<> { using default_computation = c1; };
-    struct c2 : named<c2>, depends_on<c1> { using default_computation = c2; };
-    struct c3 : named<c3>, depends_on<c1> { using default_computation = c3; };
+    struct c1 : named<c1>, depends_on<> { using default_implementation = c1; };
+    struct c2 : named<c2>, depends_on<c1> { using default_implementation = c2; };
+    struct c3 : named<c3>, depends_on<c1> { using default_implementation = c3; };
 
     static_assert(mpl::set_equal<
         completed<c1>, mpl::set<c1>
@@ -54,8 +54,8 @@ namespace with_redundancy {
 }
 
 namespace with_linear_dependency_chain {
-    struct c1 : named<c1>, depends_on<> { using default_computation = c1; };
-    struct c2 : named<c2>, depends_on<c1> { using default_computation = c2; };
+    struct c1 : named<c1>, depends_on<> { using default_implementation = c1; };
+    struct c2 : named<c2>, depends_on<c1> { using default_implementation = c2; };
     struct c3 : named<c3>, depends_on<c2> { };
 
     static_assert(mpl::set_equal<
@@ -65,8 +65,8 @@ namespace with_linear_dependency_chain {
 
 namespace with_cyclic_dependency {
     struct c3;
-    struct c1 : named<c1>, depends_on<c3> { using default_computation = c1; };
-    struct c2 : named<c2>, depends_on<c1> { using default_computation = c2; };
+    struct c1 : named<c1>, depends_on<c3> { using default_implementation = c1; };
+    struct c2 : named<c2>, depends_on<c1> { using default_implementation = c2; };
     struct c3 : named<c3>, depends_on<c2> { };
 
     static_assert(mpl::set_equal<

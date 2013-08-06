@@ -11,7 +11,7 @@
 #include <react/computation/static_counter.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/retrieve.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/insert.hpp>

@@ -109,6 +109,35 @@ public:
     }
 };
 
+/*!
+ * Specification of the `ComputationName` concept.
+ *
+ * A `ComputationName` is an arbitrary type used to represent a `Computation`.
+ *
+ *
+ * ## Notation
+ * | Expression | Description
+ * | ---------- | -----------
+ * | `CN`       | A type modeling the `ComputationName` concept
+ *
+ *
+ * ## Valid expressions
+ * | Expression                                          | Return type     | Semantics
+ * | ----------                                          | -----------     | ---------
+ * | `default_implementation_of<CN>::type<sub>opt</sub>` | A `Computation` | Return the default implementation of the computation represented by `CN`. See `default_implementation_of` for details.
+ *
+ *
+ * @tparam CN
+ *         The type to be tested for modeling of the `ComputationName` concept.
+ */
+template <typename CN>
+struct ComputationName {
+    BOOST_CONCEPT_USAGE(ComputationName) {
+        // Optional requirement:
+        // using Default = typename default_implementation_of<CN>::type;
+    }
+};
+
 namespace computation_detail {
     template <typename DependenciesResults>
     struct environment : environment_archetype<> { };
@@ -151,7 +180,7 @@ namespace extension {
  * | `execute(c, env)`                | `void` or an `Environment`        | Execute the computation with an environment and return an updated environment. See `execute` for details.
  * | `retrieve(c, env)<sub>opt</sub>` | Any type                          | Return the result of the computation.
  * | `dependencies_of<C>::type`       | A Boost.MPL `AssociativeSequence` | The names of the computations required in an `Environment` in order for this computation to be available. See `dependencies_of` for details.
- * | `name_of<C>::type`               | Any type                          | The name associated to `C`. See `name_of` for details.
+ * | `name_of<C>::type`               | A `ComputationName`               | The name associated to `C`. See `name_of` for details.
  *
  *
  * @tparam C
@@ -194,6 +223,7 @@ public:
         static_assert(boost::mpl::is_sequence<Dependencies>::value, "");
 
         using Name = typename name_of<C>::type;
+        BOOST_CONCEPT_ASSERT((ComputationName<Name>));
     }
 };
 } // end namespace react

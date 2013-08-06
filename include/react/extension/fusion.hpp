@@ -9,7 +9,10 @@
 #include <react/detail/auto_return.hpp>
 #include <react/detail/fusion_fold.hpp>
 #include <react/detail/topological_indexing.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/update.hpp>
 #include <react/traits.hpp>
 
 #include <boost/fusion/include/clear.hpp>

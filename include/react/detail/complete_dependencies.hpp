@@ -7,6 +7,7 @@
 #define REACT_DETAIL_COMPLETE_DEPENDENCIES_HPP
 
 #include <react/detail/dependency_graph.hpp>
+#include <react/intrinsic/default_implementation_of.hpp>
 #include <react/traits.hpp>
 
 #include <boost/mpl/at.hpp>
@@ -24,7 +25,7 @@ namespace react { namespace detail {
      *
      * If a computation is required to complete the set but is not specified
      * in `Computations`, the default implementation of the computation is
-     * generated using the `default_computation` trait.
+     * generated using the `default_implementation_of` intrinsic.
      *
      * @tparam Computations
      *         A Boost.MPL `ForwardSequence` of `Computation`s representing
@@ -43,7 +44,7 @@ namespace react { namespace detail {
             : boost::mpl::eval_if<
                 boost::mpl::has_key<ProvidedComputations, Name>,
                 boost::mpl::at<ProvidedComputations, Name>,
-                default_computation<Name>
+                default_implementation_of<Name>
             >
         { };
 
