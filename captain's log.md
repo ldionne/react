@@ -1,6 +1,8 @@
 ## Captain's log: side effects of the design process
 
 ### To consider
+* the tag dispatching is kinda broken because it does not work as expected when we mix it with inheritance
+* fix the implementation of `computation::union_`: it should use `react::execute` instead of `X::execute` and `Y::execute`.
 * pour implémenter des bundles de computations, il devrait être possible de modifier le cloaking dépendant de la computation qui est retrievée de l'env. on pourrait ensuite implémenter un bundle comme une computation vide qui dépend d'autres computations et qui modifie le cloaking pour que les computations du bundle soient accessibles aussi.
 * add cloaking when updating computations on update_retrieve branch
 * avec le travail sur la branche update_retrieve: on a un feature_set spécial qui utilise une default value pour les computations qui ne sont aps spécifiées, sauf si la computation est marquée comme extern. <<<<<<<<<  dans le fond, je pense qu'on a juste rien à faire avec les computations qui sont extern. lors de l'update, si une computation n'est pas implémentée dans le set ça va chier parce qu'une dependency n'est pas satisfaite, ce qui est correct.
