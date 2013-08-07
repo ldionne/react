@@ -7,6 +7,7 @@
 #define REACT_COMPUTATIONS_HPP
 
 #include <react/computation/alias.hpp>
+#include <react/computation/checked.hpp>
 #include <react/computation/depends_on.hpp>
 #include <react/computation/ephemeral.hpp>
 #include <react/computation/extern.hpp>
