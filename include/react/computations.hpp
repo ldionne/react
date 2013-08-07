@@ -9,6 +9,7 @@
 #include <react/computation/alias.hpp>
 #include <react/computation/depends_on.hpp>
 #include <react/computation/ephemeral.hpp>
+#include <react/computation/extern.hpp>
 #include <react/computation/initialized_from.hpp>
 #include <react/computation/lazy.hpp>
 #include <react/computation/named.hpp>
