@@ -74,5 +74,15 @@ static_assert(mpl::set_equal<
     >
 >::value, "");
 
+// Missing dependencies should not appear in the graph.
+static_assert(mpl::set_equal<
+    computations_in<graph<
+        computation::depends_on<struct some_name>
+    >>,
+    mpl::set<
+        computation::depends_on<struct some_name>
+    >
+>::value, "");
+
 
 int main() { }

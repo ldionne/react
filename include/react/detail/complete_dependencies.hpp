@@ -10,10 +10,11 @@
 #include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/name_of.hpp>
 
-#include <boost/mpl/at.hpp>
+#include <boost/mpl/assert.hpp>
+#include <boost/mpl/at_default.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/graph_intrinsics.hpp>
-#include <boost/mpl/has_key.hpp>
+#include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/make_index_of.hpp>
 #include <boost/mpl/placeholders.hpp>
 
@@ -39,17 +40,40 @@ namespace react { namespace detail {
             Computations, name_of<boost::mpl::_1>
         >::type;
 
+        BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
+
+        template <typename Name, bool always_false = false>
+        struct helpful_failure {
+            BOOST_MPL_ASSERT_MSG(
+                always_false,
+        MISSING_A_DEFAULT_IMPLEMENTATION_FOR_THE_FOLLOWING_COMPUTATION_NAME,
+                (Name)
+            );
+
+            static_assert(always_false,
+            "Missing a default implementation for some computation name. "
+            "The implementation for that computation name must be provided "
+            "explicitly or the computation name must define a default "
+            "implementation using the `react::default_implementation_of` "
+            "intrinsic.");
+
+            struct type;
+        };
+
         template <typename Name>
-        struct get_computation
-            : boost::mpl::eval_if<
-                boost::mpl::has_key<ProvidedComputations, Name>,
-                boost::mpl::at<ProvidedComputations, Name>,
-                default_implementation_of<Name>
+        struct GetOrGenerateComputation
+            : boost::mpl::lazy_at_default<
+                ProvidedComputations, Name,
+                boost::mpl::eval_if<has_type<default_implementation_of<Name>>,
+                    default_implementation_of<Name>,
+                    helpful_failure<Name>
+                >
             >
         { };
 
         using SpannedDependencyGraph = dependency_graph<
-            Computations, get_computation<boost::mpl::_1>
+            Computations,
+            GetOrGenerateComputation<boost::mpl::_1>
         >;
 
     public:

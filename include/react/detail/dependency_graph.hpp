@@ -10,12 +10,10 @@
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/name_of.hpp>
 
-#include <boost/mpl/apply_wrap.hpp>
-#include <boost/mpl/assert.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/erase_key.hpp>
+#include <boost/mpl/filter_view.hpp>
 #include <boost/mpl/has_key.hpp>
-#include <boost/mpl/lambda.hpp>
 #include <boost/mpl/make_index_of.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/reachable_set.hpp>
@@ -24,35 +22,15 @@
 
 
 namespace react { namespace detail {
-namespace dependency_graph_detail {
-    template <typename Computations>
-    struct default_getter {
-        using IndexedByName = typename boost::mpl::make_index_of<
-            Computations, name_of<boost::mpl::_1>
-        >::type;
-
-        template <typename Name>
-        struct apply : boost::mpl::at<IndexedByName, Name> {
-            static constexpr bool found = boost::mpl::has_key<
-                IndexedByName, Name
-            >::value;
-
-            BOOST_MPL_ASSERT_MSG(
-                found,
-unable_to_find_the_computation_associated_to_some_name_in_the_dependency_graph,
-                (Name, IndexedByName)
-            );
-
-            static_assert(found,
-            "unable to find the computation associated to "
-            "some name in the dependency graph ");
-        };
-    };
-} // end namespace dependency_graph_detail
+namespace dependency_graph_detail { struct default_; }
 
 /*!
  * Type representing a compile-time graph of the dependencies between
  * computations.
+ *
+ * When `GetComputation` is not specified, the generated graph is such that
+ * it contains only computations in `Computations`. Otherwise, it contains
+ * all of `Computations` and their dependencies, as mapped by `GetComputation`.
  *
  * @tparam Computations
  *         A Boost.MPL `ForwardSequence` of computations whose
@@ -60,15 +38,12 @@ unable_to_find_the_computation_associated_to_some_name_in_the_dependency_graph,
  *
  * @tparam GetComputation
  *         A Boost.MPL `LambdaExpression` returning the computation
- *         associated to the computation name (an arbitrary type) it is
- *         invoked with. It defaults to fetching the result in a map `M`
- *         such that `boost::mpl::at<M, name_of<C>::type>::type` is `C`
- *         for every `C` in `Computations`.
+ *         associated to the computation name (an arbitrary type) it
+ *         is invoked with.
  */
 template <
     typename Computations,
-    typename GetComputation =
-                        dependency_graph_detail::default_getter<Computations>
+    typename GetComputation = dependency_graph_detail::default_
 >
 class dependency_graph {
     using ComputationNames = boost::mpl::transform_view<
@@ -102,7 +77,29 @@ namespace extension {
         struct apply {
             using type = transform_view<
                 typename react::dependencies_of<Computation>::type,
-                apply_wrap1<typename lambda<GetComputation>::type, _1>
+                GetComputation
+            >;
+        };
+    };
+
+    template <typename Computations>
+    struct open_neighborhood_of_impl<
+        react::detail::dependency_graph<
+            Computations, react::detail::dependency_graph_detail::default_
+        >
+    > {
+        using IndexedByName = typename make_index_of<
+            Computations, react::name_of<_1>
+        >::type;
+
+        template <typename Graph, typename Computation>
+        struct apply {
+            using type = transform_view<
+                filter_view<
+                    typename react::dependencies_of<Computation>::type,
+                    has_key<IndexedByName, _1>
+                >,
+                at<IndexedByName, _1>
             >;
         };
     };
