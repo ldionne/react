@@ -7,9 +7,9 @@
 #define REACT_ARCHETYPES_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
-#include <react/intrinsic/update.hpp>
 
 #include <boost/concept_archetype.hpp>
 #include <boost/mpl/set.hpp>
@@ -23,21 +23,19 @@ namespace react {
 
     namespace extension {
         template <typename Base>
-        struct augment_impl<environment_archetype<Base>> {
-            template <typename Env, typename ...Computations>
-            static auto call(Env&& env, Computations&& ...)
-            REACT_AUTO_RETURN(
+        struct bind_impl<environment_archetype<Base>> {
+            template <typename Name, typename Env, typename Computation>
+            static auto call(Env&& env, Computation&&) REACT_AUTO_RETURN(
                 std::forward<Env>(env)
             )
         };
 
         template <typename Base>
-        struct update_impl<environment_archetype<Base>> {
+        struct execute_impl<environment_archetype<Base>> {
             template <typename Env>
-            static auto call(Env&& env)
-            REACT_AUTO_RETURN(
-                std::forward<Env>(env)
-            )
+            static boost::null_archetype<>& call(Env&& env) {
+                return *(boost::null_archetype<>*)0;
+            }
         };
 
         template <typename Base>
@@ -57,8 +55,8 @@ namespace react {
     template <typename Base = boost::null_archetype<>>
     struct computation_archetype : Base {
         template <typename Self, typename Env>
-        static environment_archetype<>& execute(Self&&, Env&&) {
-            return *(environment_archetype<>*)0;
+        static boost::null_archetype<>& execute(Self&&, Env&&) {
+            return *(boost::null_archetype<>*)0;
         }
 
         template <typename Self, typename Env>

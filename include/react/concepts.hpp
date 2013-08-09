@@ -8,31 +8,69 @@
 
 #include <react/archetypes.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsics.hpp>
+#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/dependencies_of.hpp>
+#include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/retrieve.hpp>
 
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
 #include <boost/concept_archetype.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/for_each.hpp>
-#include <boost/mpl/if.hpp>
 #include <boost/mpl/is_sequence.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/push_back.hpp>
 #include <boost/mpl/transform_view.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/is_void.hpp>
 #include <utility>
 
 
 namespace react {
-template <typename ...Pairs>
-using dependency_results = typename boost::mpl::map<Pairs...>::type;
+namespace environment_detail {
+    template <typename Sequence>
+    using pointers_to = boost::mpl::transform_view<
+        Sequence,
+        boost::add_pointer<boost::mpl::_1>
+    >;
 
-template <typename ...Computations>
-using implemented_computations = typename boost::mpl::vector<
-    Computations...
+    template <typename Env, typename AvailableNames>
+    class BasicEnvironmentCheck {
+    protected:
+        using ComputationArchetype = computation_archetype<
+            boost::copy_constructible_archetype<
+                boost::default_constructible_archetype<>>
+        >;
+
+        using ComputationArchetypeName = typename name_of<
+            ComputationArchetype
+        >::type;
+
+        static Env& env;
+
+        static constexpr struct {
+            template <typename Name>
+            void operator()(Name*) const {
+                retrieve<Name>(env);
+            }
+        } do_retrieve{};
+
+    public:
+        BOOST_CONCEPT_USAGE(BasicEnvironmentCheck) {
+            execute(env);
+            bind<ComputationArchetypeName>(env, ComputationArchetype{});
+            bind(env, ComputationArchetype{});
+            boost::mpl::for_each<pointers_to<AvailableNames>>(do_retrieve);
+        }
+    };
+} // end namespace environment_detail
+
+template <typename ...ComputationNames>
+using available_names = typename boost::mpl::vector<
+    ComputationNames...
 >::type;
 
 /*!
@@ -40,70 +78,53 @@ using implemented_computations = typename boost::mpl::vector<
  *
  *
  * ## Notation
- * | Expression        | Description
- * | ----------        | -----------
- * | `env`             | An arbitrary `Environment`
- * | `Name`            | An arbitrary type
- * | `computations...` | An arbitrary sequence of `Computation`s
+ * | Expression    | Description
+ * | ----------    | -----------
+ * | `env`         | An arbitrary `Environment`
+ * | `Name`        | A type modeling `ComputationName`
+ * | `computation` | An arbitrary `Computation`
  *
  *
  * ## Valid expressions
- * | Expression                      | Return type      | Semantics
- * | ----------                      | -----------      | ---------
- * | `retrieve<Name>(env)`           | Any type         | Return the result of the computation associated to the name `Name` in `env`. If there is no such computation in the environment, the expression shall be ill-formed.
- * | `update(env)`                   | An `Environment` | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. The result of executing the computations is folded into a new environment, which is returned. For any computation `c`, if `execute(c, env)` returns `void` or is ill-formed, the result is folded as if `execute(c, env)` had returned `augment(env, c)`.
- * | `augment(env, computations...)` | An `Environment` | Return `env` with `computations...` available in it.
+ * | Expression                     | Return type      | Semantics
+ * | ----------                     | -----------      | ---------
+ * | `retrieve<Name>(env)`          | Any type         | Return the result of the computation associated to the name `Name` in `env`. If there is no such computation in the environment, the expression shall be ill-formed. See `retrieve` for details.
+ * | `execute(env)`                 | Any type         | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. See `execute` for details.
+ * | `bind<Name>(env, computation)` | An `Environment` | Return `env` with the name `Name` associated to `computation`. See `bind` for details.
+ * | `bind(env, computation)`       | An `Environment` | Equivalent to `bind<name_of<decltype(computation)>::type>(env, computation)`.
  *
  *
  * @tparam Env
  *         The type to be tested for modeling of the `Environment` concept.
  *
- * @tparam ImplementedComputations
- *         A Boost.MPL `ForwardSequence` of computation or computation names
- *         that can be retrieved from `Env`.
+ * @tparam AvailableNames
+ *         A Boost.MPL `ForwardSequence` of `ComputationName`s that can be
+ *         retrieved from `Env`.
  */
-template <typename Env, typename ImplementedComputations>
-class Environment {
-    static Env& env;
-
-    using ComputationArchetype = computation_archetype<
-        boost::copy_constructible_archetype<
-            boost::default_constructible_archetype<>>
-    >;
-
-    static constexpr struct {
-        template <typename Name>
-        void operator()(Name*) const {
-            retrieve<Name>(env);
-        }
-    } do_retrieve{};
-
-    template <typename E>
-    struct basic_env_check {
-        BOOST_CONCEPT_USAGE(basic_env_check) {
-            update(e);
-            augment(e, ComputationArchetype{});
-        }
-        static E& e;
-    };
+template <typename Env, typename AvailableNames>
+class Environment
+    : environment_detail::BasicEnvironmentCheck<Env, AvailableNames>
+{
+    using Base = environment_detail::BasicEnvironmentCheck<Env, AvailableNames>;
 
 public:
     BOOST_CONCEPT_USAGE(Environment) {
-        boost::mpl::for_each<
-            boost::mpl::transform_view<
-                ImplementedComputations,
-                boost::add_pointer<name_of<boost::mpl::_1>>
-            >
-        >(do_retrieve);
+        using NewAvailableNames = typename boost::mpl::push_back<
+            AvailableNames, typename Base::ComputationArchetypeName
+        >::type;
 
-        update(env);
-        BOOST_CONCEPT_ASSERT((basic_env_check<
-            decltype(update(env))
+        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
+            decltype(bind(Base::env, typename Base::ComputationArchetype{})),
+            NewAvailableNames
         >));
 
-        augment(env, ComputationArchetype{});
-        BOOST_CONCEPT_ASSERT((basic_env_check<
-            decltype(augment(env, ComputationArchetype{}))
+        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
+            decltype(
+                bind<typename Base::ComputationArchetypeName>(
+                    Base::env, typename Base::ComputationArchetype{}
+                )
+            ),
+            NewAvailableNames
         >));
     }
 };
@@ -140,7 +161,7 @@ struct ComputationName {
 namespace computation_detail {
     template <typename DependenciesResults>
     struct environment : environment_archetype<> { };
-}
+} // end namespace computation_detail
 
 namespace extension {
     template <typename DependenciesResults>
@@ -151,16 +172,45 @@ namespace extension {
         call(Env&&);
     };
 
-    template <typename DependenciesResults>
-    struct update_impl<computation_detail::environment<DependenciesResults>>
-        : update_impl<environment_archetype<>>
-    { };
+    template <typename _>
+    struct execute_impl<computation_detail::environment<_>> {
+        static auto call(computation_detail::environment<_> const& env)
+        REACT_AUTO_RETURN(
+            execute(static_cast<environment_archetype<> const&>(env))
+        )
 
-    template <typename DependenciesResults>
-    struct augment_impl<computation_detail::environment<DependenciesResults>>
-        : augment_impl<environment_archetype<>>
-    { };
+        static auto call(computation_detail::environment<_>& env)
+        REACT_AUTO_RETURN(
+            execute(static_cast<environment_archetype<>&>(env))
+        )
+    };
+
+    template <typename _>
+    struct bind_impl<computation_detail::environment<_>> {
+        template <typename Name, typename Computation>
+        static auto
+        call(computation_detail::environment<_>& env, Computation&& c)
+        REACT_AUTO_RETURN(
+            bind<Name>(
+                static_cast<environment_archetype<>&>(env),
+                std::forward<Computation>(c)
+            )
+        )
+
+        template <typename Name, typename Computation>
+        static auto
+        call(computation_detail::environment<_> const& env, Computation&& c)
+        REACT_AUTO_RETURN(
+            bind<Name>(
+                static_cast<environment_archetype<> const&>(env),
+                std::forward<Computation>(c)
+            )
+        )
+    };
 } // end namespace extension
+
+template <typename ...Pairs>
+using dependencies_results = typename boost::mpl::map<Pairs...>::type;
 
 /*!
  * Specification of the `Computation` concept.
@@ -177,8 +227,8 @@ namespace extension {
  * ## Valid expressions
  * | Expression                       | Return type                       | Semantics
  * | ----------                       | -----------                       | ---------
- * | `execute(c, env)`                | `void` or an `Environment`        | Execute the computation with an environment and return an updated environment. See `execute` for details.
- * | `retrieve(c, env)<sub>opt</sub>` | Any type                          | Return the result of the computation.
+ * | `execute(c, env)`                | Any type                          | Execute the computation with an environment. See `execute` for details.
+ * | `retrieve(c, env)<sub>opt</sub>` | Any type                          | Return the result of the computation. See `retrieve` for details.
  * | `dependencies_of<C>::type`       | A Boost.MPL `AssociativeSequence` | The names of the computations required in an `Environment` in order for this computation to be available. See `dependencies_of` for details.
  * | `name_of<C>::type`               | A `ComputationName`               | The name associated to `C`. See `name_of` for details.
  *
@@ -209,14 +259,6 @@ class Computation {
 public:
     BOOST_CONCEPT_USAGE(Computation) {
         execute(get<C>(), get<GoodEnoughEnv>());
-
-        using ExecuteResult = decltype(execute(get<C>(), get<GoodEnoughEnv>()));
-        BOOST_CONCEPT_ASSERT((typename boost::mpl::if_<
-            boost::is_void<ExecuteResult>,
-            null_concept,
-            Environment<ExecuteResult, implemented_computations<>>
-        >::type));
-
         try_retrieve<C, GoodEnoughEnv>(0);
 
         using Dependencies = typename dependencies_of<C>::type;

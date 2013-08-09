@@ -6,44 +6,36 @@
 #ifndef REACT_EXTENSION_FUSION_HPP
 #define REACT_EXTENSION_FUSION_HPP
 
+#include <react/computation/named.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/detail/fusion_fold.hpp>
 #include <react/detail/topological_indexing.hpp>
-#include <react/intrinsic/augment.hpp>
+#include <react/intrinsic/bind.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/name_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
-#include <react/intrinsic/update.hpp>
 
-#include <boost/fusion/include/clear.hpp>
 #include <boost/fusion/include/deref.hpp>
 #include <boost/fusion/include/find_if.hpp>
+#include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/fusion/include/nview.hpp>
 #include <boost/fusion/include/push_front.hpp>
+#include <boost/fusion/include/remove_if.hpp>
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/copy.hpp>
+#include <boost/mpl/if.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
+#include <functional>
 #include <utility>
 
 
 namespace react { namespace extension {
-namespace fusion_detail {
-    static constexpr struct {
-        template <typename Env, typename Computation>
-        auto operator()(Env&& env, Computation&& c) const REACT_AUTO_RETURN(
-            execute(
-                std::forward<Computation>(c), std::forward<Env>(env)
-            )
-        )
-    } inverted_execute{};
-}
-
 template <typename T>
-struct update_impl<
+struct execute_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
@@ -73,39 +65,42 @@ private:
 
 public:
     template <typename Computations>
-    static auto call(Computations const& computations)
-    REACT_AUTO_RETURN(
-        detail::fusion_fold(
+    static void call(Computations const& computations) {
+        boost::fusion::for_each(
             in_visitation_order(computations),
-            boost::fusion::clear(computations),
-            fusion_detail::inverted_execute
-        )
-    )
+            std::bind(execute, std::placeholders::_1, std::cref(computations))
+        );
+    }
 };
 
 template <typename T>
-struct augment_impl<
+struct bind_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
-    template <typename Env, typename Computation, typename ...Rest>
-    static auto call(Env&& env, Computation&& c, Rest&& ...rest)
-    REACT_AUTO_RETURN(
-        augment(
-            // We use push_front instead of push_back because using push_back
-            // creates a type of view causing problems with retrieve. This is
-            // due to a bug in Fusion. Using push_front does not change
-            // anything else.
-            boost::fusion::push_front(
-                std::forward<Env>(env), std::forward<Computation>(c)
-            ),
-            std::forward<Rest>(rest)...
-        )
-    )
+    template <typename Name, typename Computation>
+    using named = typename boost::mpl::if_<
+        boost::is_same<typename name_of<Computation>::type, Name>,
+        Computation,
+        computation::named<Name, Computation>
+    >::type;
 
-    template <typename Env>
-    static auto call(Env&& env)
+    template <typename Name, typename Env, typename Computation>
+    static auto call(Env&& env, Computation&& c)
     REACT_AUTO_RETURN(
-        std::forward<Env>(env)
+        // We use push_front instead of push_back because using push_back
+        // creates a type of view causing problems with retrieve. This is
+        // due to a bug in Fusion. Using push_front does not change
+        // anything else.
+        boost::fusion::push_front(
+            boost::fusion::remove_if<
+                boost::is_same<
+                    name_of<boost::mpl::_1>, Name
+                >
+            >(std::forward<Env>(env)),
+            named<
+                Name, typename boost::remove_reference<Computation>::type
+            >(std::forward<Computation>(c))
+        )
     )
 };
 

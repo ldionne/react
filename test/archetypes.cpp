@@ -7,14 +7,13 @@
 #include <react/concepts.hpp>
 
 #include <boost/concept/assert.hpp>
-#include <boost/concept_archetype.hpp>
 
 
 using namespace react;
 
 BOOST_CONCEPT_ASSERT((Computation<
     computation_archetype<>,
-    dependency_results<>
+    dependencies_results<>
 >));
 
 BOOST_CONCEPT_ASSERT((ComputationName<
@@ -23,7 +22,7 @@ BOOST_CONCEPT_ASSERT((ComputationName<
 
 BOOST_CONCEPT_ASSERT((Environment<
     environment_archetype<>,
-    implemented_computations<boost::null_archetype<>>
+    available_names<>
 >));
 
 

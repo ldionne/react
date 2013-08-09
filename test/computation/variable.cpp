@@ -14,7 +14,7 @@ using namespace react;
 
 template <typename T>
 using test_concept = Computation<
-    computation::variable<T>, dependency_results<>
+    computation::variable<T>, dependencies_results<>
 >;
 
 // Check with primitive types, user-defined types and function types.
