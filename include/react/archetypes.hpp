@@ -7,7 +7,7 @@
 #define REACT_ARCHETYPES_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
@@ -23,9 +23,9 @@ namespace react {
 
     namespace extension {
         template <typename Base>
-        struct bind_impl<environment_archetype<Base>> {
-            template <typename Name, typename Env, typename Computation>
-            static auto call(Env&& env, Computation&&) REACT_AUTO_RETURN(
+        struct augment_impl<environment_archetype<Base>> {
+            template <typename Env, typename ...Computations>
+            static auto call(Env&& env, Computations&& ...) REACT_AUTO_RETURN(
                 std::forward<Env>(env)
             )
         };

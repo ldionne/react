@@ -9,7 +9,7 @@
 #include <react/computation/named.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/topological_indexing.hpp>
-#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/name_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
@@ -27,6 +27,7 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <functional>
@@ -74,9 +75,10 @@ public:
 };
 
 template <typename T>
-struct bind_impl<
+struct augment_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
+private:
     template <typename Name, typename Computation>
     using named = typename boost::mpl::if_<
         boost::is_same<typename name_of<Computation>::type, Name>,
@@ -84,8 +86,13 @@ struct bind_impl<
         computation::named<Name, Computation>
     >::type;
 
+    template <typename U>
+    using raw = typename boost::remove_cv<
+        typename boost::remove_reference<U>::type
+    >::type;
+
     template <typename Name, typename Env, typename Computation>
-    static auto call(Env&& env, Computation&& c)
+    static auto insert_one(Env&& env, Computation&& c)
     REACT_AUTO_RETURN(
         // We use push_front instead of push_back because using push_back
         // creates a type of view causing problems with retrieve. This is
@@ -101,6 +108,24 @@ struct bind_impl<
                 Name, typename boost::remove_reference<Computation>::type
             >(std::forward<Computation>(c))
         )
+    )
+
+public:
+    template <typename Env, typename Head, typename ...Tail>
+    static auto call(Env&& env, Head&& head, Tail&& ...tail)
+    REACT_AUTO_RETURN(
+        augment(
+            insert_one<
+                typename name_of<raw<Head>>::type
+            >(std::forward<Env>(env), std::forward<Head>(head)),
+            std::forward<Tail>(tail)...
+        )
+    )
+
+    template <typename Env>
+    static auto call(Env&& env)
+    REACT_AUTO_RETURN(
+        std::forward<Env>(env)
     )
 };
 

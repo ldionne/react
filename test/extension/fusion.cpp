@@ -7,7 +7,7 @@
 #include <react/computation/named.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
-#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
@@ -48,8 +48,8 @@ BOOST_CONCEPT_ASSERT((Environment<
 int main() {
     // bind
     boost::fusion::vector<Comp<1>> env1;
-    auto env2 = bind(env1, Comp<2>{});
-    auto env3_4 = bind(bind(env2, Comp<3>{}), Comp<4>{});
+    auto env2 = augment(env1, Comp<2>{});
+    auto env3_4 = augment(env2, Comp<3>{}, Comp<4>{});
 
 
     // retrieve

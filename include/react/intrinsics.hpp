@@ -6,7 +6,7 @@
 #ifndef REACT_INTRINSICS_HPP
 #define REACT_INTRINSICS_HPP
 
-#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>

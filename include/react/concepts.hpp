@@ -8,7 +8,7 @@
 
 #include <react/archetypes.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/bind.hpp>
+#include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/name_of.hpp>
@@ -40,14 +40,16 @@ namespace environment_detail {
     template <typename Env, typename AvailableNames>
     class BasicEnvironmentCheck {
     protected:
-        using ComputationArchetype = computation_archetype<
-            boost::copy_constructible_archetype<
-                boost::default_constructible_archetype<>>
-        >;
-
-        using ComputationArchetypeName = typename name_of<
-            ComputationArchetype
-        >::type;
+        template <int>
+        struct self_named_computation
+            : computation_archetype<
+                boost::copy_constructible_archetype<
+                    boost::default_constructible_archetype<>
+                >
+            >
+        {
+            using name = self_named_computation;
+        };
 
         static Env& env;
 
@@ -61,8 +63,11 @@ namespace environment_detail {
     public:
         BOOST_CONCEPT_USAGE(BasicEnvironmentCheck) {
             execute(env);
-            bind<ComputationArchetypeName>(env, ComputationArchetype{});
-            bind(env, ComputationArchetype{});
+            augment(env, self_named_computation<0>{});
+            augment(env, self_named_computation<0>{},
+                         self_named_computation<1>{});
+            augment(env, self_named_computation<0>{},
+                         self_named_computation<0>{});
             boost::mpl::for_each<pointers_to<AvailableNames>>(do_retrieve);
         }
     };
@@ -78,20 +83,19 @@ using available_names = typename boost::mpl::vector<
  *
  *
  * ## Notation
- * | Expression    | Description
- * | ----------    | -----------
- * | `env`         | An arbitrary `Environment`
- * | `Name`        | A type modeling `ComputationName`
- * | `computation` | An arbitrary `Computation`
+ * | Expression        | Description
+ * | ----------        | -----------
+ * | `env`             | An arbitrary `Environment`
+ * | `Name`            | A type modeling `ComputationName`
+ * | `computations...` | An arbitrary sequence of `Computation`s
  *
  *
  * ## Valid expressions
- * | Expression                     | Return type      | Semantics
- * | ----------                     | -----------      | ---------
- * | `retrieve<Name>(env)`          | Any type         | Return the result of the computation associated to the name `Name` in `env`. If there is no such computation in the environment, the expression shall be ill-formed. See `retrieve` for details.
- * | `execute(env)`                 | Any type         | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. See `execute` for details.
- * | `bind<Name>(env, computation)` | An `Environment` | Return `env` with the name `Name` associated to `computation`. See `bind` for details.
- * | `bind(env, computation)`       | An `Environment` | Equivalent to `bind<name_of<decltype(computation)>::type>(env, computation)`.
+ * | Expression                      | Return type      | Semantics
+ * | ----------                      | -----------      | ---------
+ * | `retrieve<Name>(env)`           | Any type         | Return the result of the computation associated to the name `Name` in `env`. If there is no such computation in the environment, the expression shall be ill-formed. See `retrieve` for details.
+ * | `execute(env)`                  | Any type         | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. See `execute` for details.
+ * | `augment(env, computations...)` | An `Environment` | Return `env` with `name_of<C>::type` implemented by `C` for all `C` in `computations...`. See `augment` for details.
  *
  *
  * @tparam Env
@@ -107,24 +111,33 @@ class Environment
 {
     using Base = environment_detail::BasicEnvironmentCheck<Env, AvailableNames>;
 
+    template <int i>
+    using self_named_computation =
+                            typename Base::template self_named_computation<i>;
+
+    template <typename Sequence, typename T>
+    using push_back = typename boost::mpl::push_back<Sequence, T>::type;
+
 public:
     BOOST_CONCEPT_USAGE(Environment) {
-        using NewAvailableNames = typename boost::mpl::push_back<
-            AvailableNames, typename Base::ComputationArchetypeName
-        >::type;
-
         BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
-            decltype(bind(Base::env, typename Base::ComputationArchetype{})),
-            NewAvailableNames
+            decltype(augment(Base::env, self_named_computation<0>{})),
+            push_back<AvailableNames, self_named_computation<0>>
         >));
 
         BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
-            decltype(
-                bind<typename Base::ComputationArchetypeName>(
-                    Base::env, typename Base::ComputationArchetype{}
-                )
-            ),
-            NewAvailableNames
+            decltype(augment(Base::env, self_named_computation<0>{},
+                                        self_named_computation<1>{})),
+            push_back<
+                push_back<AvailableNames, self_named_computation<0>>,
+                self_named_computation<1>
+            >
+        >));
+
+        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
+            decltype(augment(Base::env, self_named_computation<0>{},
+                                        self_named_computation<0>{})),
+            push_back<AvailableNames, self_named_computation<0>>
         >));
     }
 };
@@ -186,25 +199,21 @@ namespace extension {
     };
 
     template <typename _>
-    struct bind_impl<computation_detail::environment<_>> {
-        template <typename Name, typename Computation>
+    struct augment_impl<computation_detail::environment<_>> {
+        template <typename ...Computations>
         static auto
-        call(computation_detail::environment<_>& env, Computation&& c)
+        call(computation_detail::environment<_>& env, Computations&& ...c)
         REACT_AUTO_RETURN(
-            bind<Name>(
-                static_cast<environment_archetype<>&>(env),
-                std::forward<Computation>(c)
-            )
+            augment(static_cast<environment_archetype<>&>(env),
+                    std::forward<Computations>(c)...)
         )
 
-        template <typename Name, typename Computation>
-        static auto
-        call(computation_detail::environment<_> const& env, Computation&& c)
+        template <typename ...Computations>
+        static auto call(computation_detail::environment<_> const& env,
+                         Computations&& ...c)
         REACT_AUTO_RETURN(
-            bind<Name>(
-                static_cast<environment_archetype<> const&>(env),
-                std::forward<Computation>(c)
-            )
+            augment(static_cast<environment_archetype<> const&>(env),
+                    std::forward<Computations>(c)...)
         )
     };
 } // end namespace extension
