@@ -51,7 +51,7 @@ namespace bind_detail {
     struct bound_computation_map
         : mpl::fold<
             in_topological_order<UnboundComputations>,
-            mpl::map<>,
+            typename mpl::map<>::type,
             mpl::insert<mpl::_1,
                 mpl::pair<
                     name_of<substitute_dependencies<mpl::_2, mpl::_1>>,
