@@ -11,6 +11,7 @@
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/set.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 
 
 namespace react {
@@ -27,13 +28,16 @@ namespace extension {
     template <typename Tag, typename Enable = void>
     struct dependencies_of_impl {
         template <typename Computation>
-        struct apply
-            : boost::mpl::eval_if<
-                dependencies_of_detail::has_dependencies<Computation>,
-                dependencies_of_detail::nested_dependencies<Computation>,
+        class apply {
+            using Noref = typename boost::remove_reference<Computation>::type;
+
+        public:
+            using type = typename boost::mpl::eval_if<
+                dependencies_of_detail::has_dependencies<Noref>,
+                dependencies_of_detail::nested_dependencies<Noref>,
                 boost::mpl::set<>
-            >
-        { };
+            >::type;
+        };
     };
 } // end namespace extension
 

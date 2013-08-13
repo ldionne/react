@@ -9,6 +9,7 @@
 #include <react/tag_of.hpp>
 
 #include <boost/mpl/has_xxx.hpp>
+#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
 
@@ -35,7 +36,9 @@ namespace extension {
     struct default_implementation_of_impl {
         template <typename ComputationName>
         struct apply
-            : default_implementation_of_detail::default_impl<ComputationName>
+            : default_implementation_of_detail::default_impl<
+                typename boost::remove_reference<ComputationName>::type
+            >
         { };
     };
 } // end namespace extension
