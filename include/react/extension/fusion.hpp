@@ -15,15 +15,15 @@
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/fusion/include/deref.hpp>
+#include <boost/fusion/include/filter_view.hpp>
 #include <boost/fusion/include/find_if.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
 #include <boost/fusion/include/nview.hpp>
 #include <boost/fusion/include/push_front.hpp>
-#include <boost/fusion/include/remove_if.hpp>
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/copy.hpp>
-#include <boost/mpl/if.hpp>
+#include <boost/mpl/not.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -56,21 +56,31 @@ private:
     >;
 
     template <typename Computations>
-    static auto in_visitation_order(Computations const& computations)
+    static auto in_visitation_order(Computations& computations)
     REACT_AUTO_RETURN(
         boost::fusion::nview<
-            Computations const,
+            Computations,
             typename topological_indexing<Computations>::type
         >{computations}
     )
 
+    template <typename Computations>
+    static void call_impl(Computations& computations) {
+        boost::fusion::for_each(
+            in_visitation_order(computations),
+            std::bind(execute, std::placeholders::_1, std::ref(computations))
+        );
+    }
+
 public:
     template <typename Computations>
     static void call(Computations const& computations) {
-        boost::fusion::for_each(
-            in_visitation_order(computations),
-            std::bind(execute, std::placeholders::_1, std::cref(computations))
-        );
+        call_impl(computations);
+    }
+
+    template <typename Computations>
+    static void call(Computations& computations) {
+        call_impl(computations);
     }
 };
 
@@ -79,34 +89,53 @@ struct augment_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
-    template <typename Name, typename Computation>
-    using named = typename boost::mpl::if_<
-        boost::is_same<typename name_of<Computation>::type, Name>,
-        Computation,
-        computation::named<Name, Computation>
-    >::type;
-
     template <typename U>
     using raw = typename boost::remove_cv<
         typename boost::remove_reference<U>::type
     >::type;
 
+    template <typename Name, typename Computation, typename =
+        typename boost::enable_if<
+            boost::is_same<typename name_of<raw<Computation>>::type, Name>
+        >::type
+    >
+    static auto wrap_with_named(Computation&& c, int)
+    REACT_AUTO_RETURN(
+        std::forward<Computation>(c)
+    )
+
+    template <typename Name, typename Computation>
+    static auto wrap_with_named(Computation&& c, ...)
+    REACT_AUTO_RETURN(
+        computation::named<
+            Name, typename boost::remove_reference<Computation>::type
+        >(std::forward<Computation>(c))
+    )
+
+    // We use our own `filter` to create a view to a non-`const` sequence
+    // when the underlying sequence is a non-`const` lvalue.
+    template <typename Pred, typename Sequence>
+    static auto filter(Sequence& seq) REACT_AUTO_RETURN(
+        boost::fusion::filter_view<Sequence, Pred>{seq}
+    )
+
+    template <typename Pred, typename Sequence>
+    static auto filter(Sequence const& seq) REACT_AUTO_RETURN(
+        boost::fusion::filter_view<Sequence const, Pred>{seq}
+    )
+
     template <typename Name, typename Env, typename Computation>
-    static auto insert_one(Env&& env, Computation&& c)
+    static auto call_impl(Env&& env, Computation&& c)
     REACT_AUTO_RETURN(
         // We use push_front instead of push_back because using push_back
         // creates a type of view causing problems with retrieve. This is
         // due to a bug in Fusion. Using push_front does not change
         // anything else.
         boost::fusion::push_front(
-            boost::fusion::remove_if<
-                boost::is_same<
-                    name_of<boost::mpl::_1>, Name
-                >
+            filter<
+                boost::mpl::not_<boost::is_same<name_of<boost::mpl::_1>, Name>>
             >(std::forward<Env>(env)),
-            named<
-                Name, typename boost::remove_reference<Computation>::type
-            >(std::forward<Computation>(c))
+            wrap_with_named<Name>(std::forward<Computation>(c), 0)
         )
     )
 
@@ -115,9 +144,9 @@ public:
     static auto call(Env&& env, Head&& head, Tail&& ...tail)
     REACT_AUTO_RETURN(
         augment(
-            insert_one<
-                typename name_of<raw<Head>>::type
-            >(std::forward<Env>(env), std::forward<Head>(head)),
+            call_impl<typename name_of<raw<Head>>::type>(
+                std::forward<Env>(env), std::forward<Head>(head)
+            ),
             std::forward<Tail>(tail)...
         )
     )

@@ -46,7 +46,7 @@ BOOST_CONCEPT_ASSERT((Environment<
 
 
 int main() {
-    // bind
+    // augment
     boost::fusion::vector<Comp<1>> env1;
     auto env2 = augment(env1, Comp<2>{});
     auto env3_4 = augment(env2, Comp<3>{}, Comp<4>{});
