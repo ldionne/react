@@ -18,6 +18,12 @@ namespace react { namespace computation {
             static_assert(always_false,
                 "trying to execute an `extern_` computation");
         }
+
+        template <bool always_false = false>
+        static void retrieve(detail::dont_care, detail::dont_care) {
+            static_assert(always_false,
+                "trying to retrieve the result of an `extern_` computation");
+        }
     };
 }} // end namespace react::computation
 
