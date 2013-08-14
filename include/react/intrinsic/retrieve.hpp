@@ -17,6 +17,14 @@ namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
     struct retrieve_impl {
+        template <typename Name, typename Env>
+        static auto call(Env&& env)
+        REACT_AUTO_RETURN(
+            boost::remove_reference<Env>::type::template retrieve<Name>(
+                std::forward<Env>(env)
+            )
+        )
+
         template <typename Computation, typename Env>
         static auto call(Computation&& c, Env&& env)
         REACT_AUTO_RETURN(
@@ -24,13 +32,6 @@ namespace extension {
                 std::forward<Computation>(c), std::forward<Env>(env)
             )
         )
-
-        template <typename Name, typename Env, bool always_false = false>
-        static void call(Env&&) {
-            static_assert(always_false,
-                "There is no default implementation for "
-                "`react::retrieve<ComputationName>(Environment)`.");
-        }
     };
 } // end namespace extension
 

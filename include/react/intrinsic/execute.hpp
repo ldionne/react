@@ -17,36 +17,25 @@ namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
     struct execute_impl {
-        template <typename Env, bool always_false = false>
-        static void call(Env&&) {
-            static_assert(always_false,
-                "There is no default implementation for "
-                "`react::execute(Environment)`.");
-        }
+        template <typename Env>
+        static auto call(Env&& env)
+        REACT_AUTO_RETURN(
+            boost::remove_reference<Env>::type::execute(
+                std::forward<Env>(env)
+            )
+        )
 
         template <typename Computation, typename Env>
-        static auto execute_computation(Computation&& c, Env&& env, int)
+        static auto call(Computation&& c, Env&& env)
         REACT_AUTO_RETURN(
             boost::remove_reference<Computation>::type::execute(
                 std::forward<Computation>(c), std::forward<Env>(env)
             )
         )
-
-        template <typename Computation, typename Env>
-        static void execute_computation(Computation&& c, Env&& env, ...) { }
-
-    public:
-        template <typename Computation, typename Env>
-        static auto call(Computation&& c, Env&& env)
-        REACT_AUTO_RETURN(
-            execute_computation(
-                std::forward<Computation>(c), std::forward<Env>(env), 0
-            )
-        )
     };
 } // end namespace extension
 
-static constexpr struct {
+static constexpr struct execute {
     template <typename Env>
     auto operator()(Env&& env) const
     REACT_AUTO_RETURN(

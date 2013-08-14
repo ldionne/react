@@ -9,6 +9,7 @@
 #include <react/detail/auto_return.hpp>
 #include <react/tag_of.hpp>
 
+#include <boost/type_traits/remove_reference.hpp>
 #include <utility>
 
 
@@ -16,17 +17,17 @@ namespace react {
 namespace extension {
     template <typename Tag, typename Enable = void>
     struct augment_impl {
-        template <typename Env, typename ...Computations,
-                  bool always_false = false>
-        static void call(Env&&, Computations&& ...) {
-            static_assert(always_false,
-            "There is no default implementation for "
-            "`react::augment(Environment, Computations...)`.");
-        }
+        template <typename Env, typename ...Computations>
+        static auto call(Env&& env, Computations&& ...c)
+        REACT_AUTO_RETURN(
+            boost::remove_reference<Env>::type::augment(
+                std::forward<Env>(env), std::forward<Computations>(c)...
+            )
+        )
     };
 } // end namespace extension
 
-static constexpr struct {
+static constexpr struct augment {
     template <typename Env, typename ...Computations>
     auto operator()(Env&& env, Computations&& ...c) const
     REACT_AUTO_RETURN(
