@@ -11,19 +11,9 @@
 
 using namespace react;
 
-BOOST_CONCEPT_ASSERT((Computation<
-    computation_archetype<>,
-    dependencies_results<>
->));
-
-BOOST_CONCEPT_ASSERT((ComputationName<
-    computation_name_archetype<>
->));
-
-BOOST_CONCEPT_ASSERT((Environment<
-    environment_archetype<>,
-    available_names<>
->));
+BOOST_CONCEPT_ASSERT((Computation<computation_archetype<>>));
+BOOST_CONCEPT_ASSERT((ComputationName<computation_name_archetype<>>));
+BOOST_CONCEPT_ASSERT((Environment<environment_archetype<>>));
 
 
 int main() { }
