@@ -4,40 +4,31 @@
  */
 
 #include <react/computation/variable.hpp>
-#include <react/concepts.hpp>
+#include <react/concept/computation.hpp>
 
 #include <boost/concept/assert.hpp>
-#include <string>
+#include <boost/concept_archetype.hpp>
 
 
 using namespace react;
 
 template <typename T>
-using test_concept = Computation<
-    computation::variable<T>, dependencies_results<>
->;
+struct test_concept
+    : Computation<computation::variable<T>>,
+      Computation<computation::variable<T*>>,
+      Computation<computation::variable<T* const>>,
+      Computation<computation::variable<T&>>
+{ };
 
-// Check with primitive types, user-defined types and function types.
-BOOST_CONCEPT_ASSERT((test_concept<int>));
-BOOST_CONCEPT_ASSERT((test_concept<std::string>));
-BOOST_CONCEPT_ASSERT((test_concept<int*>));
-BOOST_CONCEPT_ASSERT((test_concept<void()>));
-
-BOOST_CONCEPT_ASSERT((test_concept<int const>));
-BOOST_CONCEPT_ASSERT((test_concept<std::string const>));
-BOOST_CONCEPT_ASSERT((test_concept<int* const>));
-
-
-// Check with [const] references.
-BOOST_CONCEPT_ASSERT((test_concept<int&>));
-BOOST_CONCEPT_ASSERT((test_concept<std::string&>));
-BOOST_CONCEPT_ASSERT((test_concept<int* &>));
-BOOST_CONCEPT_ASSERT((test_concept<void(&)()>));
-BOOST_CONCEPT_ASSERT((test_concept<int(&)[2]>));
-
-BOOST_CONCEPT_ASSERT((test_concept<int const&>));
-BOOST_CONCEPT_ASSERT((test_concept<std::string const&>));
-BOOST_CONCEPT_ASSERT((test_concept<int* const&>));
+using T = boost::copy_constructible_archetype<>;
+BOOST_CONCEPT_ASSERT((test_concept<T>));
+BOOST_CONCEPT_ASSERT((test_concept<T const>));
+BOOST_CONCEPT_ASSERT((test_concept<T()>));
+BOOST_CONCEPT_ASSERT((test_concept<T(T)>));
+BOOST_CONCEPT_ASSERT((test_concept<T[]>));
+BOOST_CONCEPT_ASSERT((test_concept<T[2]>));
+BOOST_CONCEPT_ASSERT((test_concept<T[2][4]>));
+BOOST_CONCEPT_ASSERT((test_concept<T[][2][4]>));
 
 
 int main() { }

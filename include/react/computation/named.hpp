@@ -6,40 +6,24 @@
 #ifndef REACT_COMPUTATION_NAMED_HPP
 #define REACT_COMPUTATION_NAMED_HPP
 
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/remove_cv.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <utility>
+#include <react/computation/noop.hpp>
 
 
 namespace react { namespace computation {
-    namespace named_detail {
-        struct as_base;
-
-        template <typename T>
-        using raw = typename boost::remove_cv<
-            typename boost::remove_reference<T>::type
-        >::type;
-    }
-
-    template <typename Name, typename Computation = named_detail::as_base>
+    /*!
+     * Computation giving a specific name to a computation.
+     *
+     * @tparam Name
+     *         The name representing the computation.
+     *
+     * @tparam Computation
+     *         The computation to wrap in such a way that it has the name
+     *         `Name`. It defaults to `noop`.
+     */
+    template <typename Name, typename Computation = noop>
     struct named : Computation {
         using Computation::Computation;
-
-        template <typename C, typename = typename boost::enable_if<
-            boost::is_same<Computation, named_detail::raw<C>>
-        >::type>
-        named(C&& c)
-            : Computation(std::forward<C>(c))
-        { }
-
         using Computation::operator=;
-        using name = Name;
-    };
-
-    template <typename Name>
-    struct named<Name, named_detail::as_base> {
         using name = Name;
     };
 }} // end namespace react::computation

@@ -15,12 +15,17 @@
 
 
 namespace react { namespace computation {
-    //! Computation implemented by another computation.
-    template <typename AliasedComputation>
-    struct alias : depends_on<AliasedComputation> {
+    /*!
+     * Computation implemented by another computation.
+     *
+     * @tparam Aliased
+     *         The name of the computation to alias.
+     */
+    template <typename Aliased>
+    struct alias : depends_on<Aliased> {
         template <typename Env>
         static auto retrieve(detail::dont_care, Env&& env) REACT_AUTO_RETURN(
-            react::retrieve<AliasedComputation>(std::forward<Env>(env))
+            react::retrieve<Aliased>(std::forward<Env>(env))
         )
     };
 }} // end namespace react::computation
