@@ -14,62 +14,36 @@
 #include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
 #include <boost/concept_archetype.hpp>
-#include <boost/mpl/for_each.hpp>
-#include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/push_back.hpp>
-#include <boost/mpl/transform_view.hpp>
-#include <boost/mpl/vector.hpp>
-#include <boost/type_traits/add_pointer.hpp>
 
 
 namespace react {
 namespace environment_detail {
-    template <typename Sequence>
-    using pointers_to = boost::mpl::transform_view<
-        Sequence,
-        boost::add_pointer<boost::mpl::_1>
-    >;
+    template <int>
+    struct comp
+        : computation_archetype<
+          boost::copy_constructible_archetype<
+          boost::default_constructible_archetype<>>>
+    { using name = comp; };
 
-    template <typename Env, typename AvailableNames>
-    class BasicEnvironmentCheck {
-    protected:
-        template <int>
-        struct self_named_computation
-            : computation_archetype<
-                boost::copy_constructible_archetype<
-                    boost::default_constructible_archetype<>
-                >
-            >
-        {
-            using name = self_named_computation;
-        };
+    template <typename Env, typename ...AvailableNames>
+    struct BasicEnvironment {
+        BOOST_CONCEPT_USAGE(BasicEnvironment) {
+            execute(env);
 
+            augment(env, comp<0>{});
+            augment(env, comp<0>{}, comp<1>{});
+            augment(env, comp<0>{}, comp<0>{});
+
+            allow_expansion((retrieve<AvailableNames>(env), 0)...);
+        }
+
+    private:
         static Env& env;
 
-        static constexpr struct {
-            template <typename Name>
-            void operator()(Name*) const {
-                retrieve<Name>(env);
-            }
-        } do_retrieve{};
-
-    public:
-        BOOST_CONCEPT_USAGE(BasicEnvironmentCheck) {
-            execute(env);
-            augment(env, self_named_computation<0>{});
-            augment(env, self_named_computation<0>{},
-                         self_named_computation<1>{});
-            augment(env, self_named_computation<0>{},
-                         self_named_computation<0>{});
-            boost::mpl::for_each<pointers_to<AvailableNames>>(do_retrieve);
-        }
+        template <typename ...Args>
+        static void allow_expansion(Args&& ...);
     };
 } // end namespace environment_detail
-
-template <typename ...ComputationNames>
-using available_names = typename boost::mpl::vector<
-    ComputationNames...
->::type;
 
 /*!
  * Specification of the `Environment` concept.
@@ -94,46 +68,43 @@ using available_names = typename boost::mpl::vector<
  * @tparam Env
  *         The type to be tested for modeling of the `Environment` concept.
  *
- * @tparam AvailableNames
- *         A Boost.MPL `ForwardSequence` of `ComputationName`s that can be
- *         retrieved from `Env`.
+ * @tparam AvailableNames...
+ *         A sequence of `ComputationName`s that can be retrieved from `Env`.
  */
-template <typename Env, typename AvailableNames>
-class Environment
-    : environment_detail::BasicEnvironmentCheck<Env, AvailableNames>
+template <typename Env, typename ...AvailableNames>
+struct Environment
+    : environment_detail::BasicEnvironment<Env, AvailableNames...>
 {
-    using Base = environment_detail::BasicEnvironmentCheck<Env, AvailableNames>;
-
-    template <int i>
-    using self_named_computation =
-                            typename Base::template self_named_computation<i>;
-
-    template <typename Sequence, typename T>
-    using push_back = typename boost::mpl::push_back<Sequence, T>::type;
-
-public:
     BOOST_CONCEPT_USAGE(Environment) {
-        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
-            decltype(augment(Base::env, self_named_computation<0>{})),
-            push_back<AvailableNames, self_named_computation<0>>
+        using namespace environment_detail;
+
+        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+            decltype(augment(env, comp<0>{})),
+            AvailableNames..., comp<0>
         >));
 
-        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
-            decltype(augment(Base::env, self_named_computation<0>{},
-                                        self_named_computation<1>{})),
-            push_back<
-                push_back<AvailableNames, self_named_computation<0>>,
-                self_named_computation<1>
-            >
+        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+            decltype(augment(env, comp<0>{}, comp<1>{})),
+            AvailableNames..., comp<0>, comp<1>
         >));
 
-        BOOST_CONCEPT_ASSERT((environment_detail::BasicEnvironmentCheck<
-            decltype(augment(Base::env, self_named_computation<0>{},
-                                        self_named_computation<0>{})),
-            push_back<AvailableNames, self_named_computation<0>>
+        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+            decltype(augment(env, comp<0>{}, comp<0>{})),
+            AvailableNames..., comp<0>
         >));
     }
+
+private:
+    static Env& env;
 };
+
+template <typename ...ComputationNames>
+struct available_names;
+
+template <typename Env, typename ...AvailableNames>
+struct Environment<Env, available_names<AvailableNames...>>
+    : Environment<Env, AvailableNames...>
+{ };
 } // end namespace react
 
 #endif // !REACT_CONCEPT_ENVIRONMENT_HPP
