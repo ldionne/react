@@ -7,12 +7,15 @@
 #define REACT_COMPUTATIONS_HPP
 
 #include <react/computation/alias.hpp>
+#include <react/computation/custom_stored.hpp>
 #include <react/computation/depends_on.hpp>
 #include <react/computation/extern.hpp>
 #include <react/computation/lazy.hpp>
 #include <react/computation/named.hpp>
 #include <react/computation/noop.hpp>
+#include <react/computation/static.hpp>
 #include <react/computation/strict.hpp>
+#include <react/computation/thread_local.hpp>
 #include <react/computation/union.hpp>
 #include <react/computation/variable.hpp>
 
