@@ -7,7 +7,6 @@
 #define REACT_ARCHETYPES_HPP
 
 #include <boost/concept_archetype.hpp>
-#include <boost/mpl/set.hpp>
 #include <utility>
 
 
@@ -26,10 +25,6 @@ namespace react {
         augment(Self&&, Computations&& ...);
     };
 
-
-    template <typename Base = boost::null_archetype<>>
-    struct computation_name_archetype;
-
     //! Archetype for the `Computation` concept.
     template <typename Base = boost::null_archetype<>>
     struct computation_archetype : Base {
@@ -38,15 +33,13 @@ namespace react {
 
         template <typename Self, typename Env>
         static boost::copy_constructible_archetype<> retrieve(Self&&, Env&&);
-
-        using dependencies = typename boost::mpl::set<>::type;
-        using name = computation_name_archetype<>;
     };
 
     //! Archetype for the `ComputationName` concept.
-    template <typename Base>
+    template <typename Base = boost::null_archetype<>>
     struct computation_name_archetype : Base {
-        using default_implementation = computation_archetype<>;
+        // Optional requirement:
+        // using default_implementation = computation_archetype<>;
     };
 } // end namespace react
 
