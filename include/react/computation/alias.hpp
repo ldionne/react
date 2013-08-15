@@ -16,10 +16,10 @@
 
 namespace react { namespace computation {
     /*!
-     * Computation implemented by another computation.
+     * Computation whose result is that of another computation.
      *
      * @tparam Aliased
-     *         The name of the computation to alias.
+     *         The name of the computation holding the targeted result.
      */
     template <typename Aliased>
     struct alias : depends_on<Aliased> {
