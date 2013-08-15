@@ -25,7 +25,7 @@ namespace react {
      */
     template <typename ...Computations>
     using computation_set = typename boost::mpl::set_insert_range<
-        boost::mpl::set<>,
+        typename boost::mpl::set<>::type,
         typename detail::bind<
             typename detail::complete_dependencies<
                 typename boost::mpl::vector<Computations...>::type
