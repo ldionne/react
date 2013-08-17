@@ -6,23 +6,26 @@
 #ifndef REACT_COMPUTATION_UNION_HPP
 #define REACT_COMPUTATION_UNION_HPP
 
+#include <react/computation/depends_on.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
-#include <boost/mpl/set_union.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <type_traits>
 #include <utility>
 
 
 namespace react { namespace computation {
     namespace union_detail {
-        using namespace boost;
-
         template <typename X, typename Y>
-        class union_of_2 {
+        struct union_of_2
+            : depends_on<
+                typename dependencies_of<X>::type,
+                typename dependencies_of<Y>::type
+            >
+        {
+        private:
             X x;
             Y y;
 
@@ -30,7 +33,7 @@ namespace react { namespace computation {
             union_of_2() = default;
 
             template <typename ...Args>
-            explicit union_of_2(Args const& ...args, typename enable_if_c<
+            explicit union_of_2(Args const& ...args, typename std::enable_if<
                 std::is_constructible<X, Args const&...>::value &&
                 std::is_constructible<Y, Args const&...>::value
             >::type* = nullptr)
@@ -38,7 +41,7 @@ namespace react { namespace computation {
             { }
 
             template <typename ...Args>
-            explicit union_of_2(Args&& ...args, typename enable_if_c<
+            explicit union_of_2(Args&& ...args, typename std::enable_if<
                 std::is_constructible<X, Args&&...>::value &&
                 !std::is_constructible<Y, Args&&...>::value
             >::type* = nullptr)
@@ -46,17 +49,12 @@ namespace react { namespace computation {
             { }
 
             template <typename ...Args>
-            explicit union_of_2(Args&& ...args, typename enable_if_c<
+            explicit union_of_2(Args&& ...args, typename std::enable_if<
                 !std::is_constructible<X, Args&&...>::value &&
                 std::is_constructible<Y, Args&&...>::value
             >::type* = nullptr)
                 : x{}, y{std::forward<Args>(args)...}
             { }
-
-            using dependencies = typename mpl::set_union<
-                typename dependencies_of<X>::type,
-                typename dependencies_of<Y>::type
-            >::type;
 
 #       define REACT_I_INSTANTIATE_UNION(FUNC, XY)                          \
             template <typename Env>                                         \
