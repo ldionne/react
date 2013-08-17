@@ -8,33 +8,46 @@
 
 #include <react/computation/noop.hpp>
 
-#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/fold.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/insert.hpp>
 #include <boost/mpl/is_sequence.hpp>
+#include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/set_insert_range.hpp>
+#include <boost/mpl/vector.hpp>
 
 
 namespace react { namespace computation {
+    namespace depends_on_detail {
+        using namespace boost::mpl;
+
+        template <typename ...Dependencies>
+        struct gather_dependencies
+            : fold<
+                typename vector<Dependencies...>::type,
+                typename set<>::type,
+                if_<is_sequence<_2>,
+                    set_insert_range<_1, _2>,
+                    insert<_1, _2>
+                >
+            >
+        { };
+    } // end namespace depends_on_detail
+
     /*!
      * Computation implemented as a `noop` depending on other computations.
      *
      * @tparam Dependencies...
      *         A sequence of `ComputationName`s on which this computation
-     *         depends. If there is a single Boost.MPL `Sequence` provided
-     *         as a template argument, the content of that sequence is
-     *         interpreted as being the sequence of `ComputationName`s.
+     *         depends. Any Boost.MPL `Sequence` encountered in
+     *         `Dependencies...` is flattened as-if its content
+     *         was part of `Dependencies...`.
      */
     template <typename ...Dependencies>
     struct depends_on : noop {
-        using dependencies = typename boost::mpl::set<Dependencies...>::type;
-    };
-
-    template <typename Dependencies>
-    struct depends_on<Dependencies> : noop {
-        using dependencies = typename boost::mpl::eval_if<
-            boost::mpl::is_sequence<Dependencies>,
-            boost::mpl::set_insert_range<boost::mpl::set0<>, Dependencies>,
-            boost::mpl::set<Dependencies>
+        using dependencies = typename depends_on_detail::gather_dependencies<
+            Dependencies...
         >::type;
     };
 }} // end namespace react::computation

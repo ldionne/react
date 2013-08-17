@@ -30,7 +30,7 @@ struct test {
 
     using with_mpl_sequence = Computation<
         computation::depends_on<
-            typename boost::mpl::vector<Dependencies...>::type
+            typename boost::mpl::vector<Dependencies..., Dependencies>::type...
         >,
         typename fake_result_of<
             Dependencies
