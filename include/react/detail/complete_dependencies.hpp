@@ -6,17 +6,14 @@
 #ifndef REACT_DETAIL_COMPLETE_DEPENDENCIES_HPP
 #define REACT_DETAIL_COMPLETE_DEPENDENCIES_HPP
 
+#include <react/detail/computation_of.hpp>
 #include <react/detail/dependency_graph.hpp>
-#include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/name_of.hpp>
 
-#include <boost/mpl/assert.hpp>
-#include <boost/mpl/at_default.hpp>
-#include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/graph_intrinsics.hpp>
-#include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/make_index_of.hpp>
 #include <boost/mpl/placeholders.hpp>
+#include <boost/mpl/transform_view.hpp>
 
 
 namespace react { namespace detail {
@@ -24,56 +21,40 @@ namespace react { namespace detail {
      * Given a set of computations, generate a superset of it which also
      * satisfies all of its dependencies.
      *
-     * If a computation is required to complete the set but is not specified
-     * in `Computations`, the default implementation of the computation is
-     * generated using the `default_implementation_of` intrinsic.
-     *
-     * @tparam Computations
-     *         A Boost.MPL `ForwardSequence` of `Computation`s representing
-     *         the computations whose dependencies must be satisfied.
+     * @tparam UnboundCustomizedComputations
+     *         A Boost.MPL `ForwardSequence` of types modeling the `Named`
+     *         concept. They represent the computations whose dependencies
+     *         must be satisfied. The actual type of which the dependencies
+     *         are satisfied is `computation_of<C, M>::type` for all `C`
+     *         in `UnboundCustomizedComputations`, with `M` being a Boost.MPL
+     *         `AssociativeSequence` mapping `name_of<C>::type` to `C` for all
+     *         `C` in `UnboundCustomizedComputations`.
      *
      * @return A Boost.MPL `ForwardSequence` of `Computation`s.
      */
-    template <typename Computations>
+    template <typename UnboundCustomizedComputations>
     class complete_dependencies {
-        using ProvidedComputations = typename boost::mpl::make_index_of<
-            Computations, name_of<boost::mpl::_1>
-        >::type;
-
-        BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
-
-        template <typename Name, bool always_false = false>
-        struct helpful_failure {
-            BOOST_MPL_ASSERT_MSG(
-                always_false,
-        MISSING_A_DEFAULT_IMPLEMENTATION_FOR_THE_FOLLOWING_COMPUTATION_NAME,
-                (Name)
-            );
-
-            static_assert(always_false,
-            "Missing a default implementation for some computation name. "
-            "The implementation for that computation name must be provided "
-            "explicitly or the computation name must define a default "
-            "implementation using the `react::default_implementation_of` "
-            "intrinsic.");
-
-            struct type;
-        };
-
+        // Note:
+        // We use inheritance here to hide the map from any lambda
+        // substitution mechanism, since the map could contain lambda
+        // placeholders that we want to preserve.
         template <typename Name>
-        struct GetOrGenerateComputation
-            : boost::mpl::lazy_at_default<
-                ProvidedComputations, Name,
-                boost::mpl::eval_if<has_type<default_implementation_of<Name>>,
-                    default_implementation_of<Name>,
-                    helpful_failure<Name>
-                >
+        struct computation_of
+            : detail::computation_of<
+                Name,
+                typename boost::mpl::make_index_of<
+                    UnboundCustomizedComputations, name_of<boost::mpl::_1>
+                >::type
             >
         { };
 
+        using CustomizedComputations = boost::mpl::transform_view<
+            UnboundCustomizedComputations,
+            computation_of<name_of<boost::mpl::_1>>
+        >;
+
         using SpannedDependencyGraph = dependency_graph<
-            Computations,
-            GetOrGenerateComputation<boost::mpl::_1>
+            CustomizedComputations, computation_of<boost::mpl::_1>
         >;
 
     public:

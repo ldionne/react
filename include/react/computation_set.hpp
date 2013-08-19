@@ -7,10 +7,7 @@
 #define REACT_COMPUTATION_SET_HPP
 
 #include <react/detail/complete_dependencies.hpp>
-#include <react/detail/bind.hpp>
 
-#include <boost/mpl/set.hpp>
-#include <boost/mpl/set_insert_range.hpp>
 #include <boost/mpl/vector.hpp>
 
 
@@ -24,13 +21,8 @@ namespace react {
      * substituted.
      */
     template <typename ...Computations>
-    using computation_set = typename boost::mpl::set_insert_range<
-        typename boost::mpl::set<>::type,
-        typename detail::bind<
-            typename detail::complete_dependencies<
-                typename boost::mpl::vector<Computations...>::type
-            >::type
-        >::type
+    using computation_set = typename detail::complete_dependencies<
+        typename boost::mpl::vector<Computations...>::type
     >::type;
 } // end namespace react
 
