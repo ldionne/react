@@ -7,13 +7,12 @@
 #define REACT_CONCEPT_COMPUTATION_HPP
 
 #include <react/archetypes.hpp>
-#include <react/concept/computation_name.hpp>
+#include <react/concept/named.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/name_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
-#include <boost/concept/assert.hpp>
 #include <boost/concept/usage.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/has_key.hpp>
@@ -31,7 +30,8 @@ struct fake_result_of {
 };
 
 /*!
- * Specification of the `Computation` concept.
+ * Specification of the `Computation` concept. `Computation` is a refinement
+ * of the `Named` concept.
  *
  *
  * ## Notation
@@ -48,7 +48,6 @@ struct fake_result_of {
  * | `execute(c, env)`          | Any type                                                | Execute `c` with `env` as `Environment`. See `execute` for details.
  * | `retrieve(c, env)`         | Any type                                                | Return the result of `c` with `env` as `Environment`. See `retrieve` for details.
  * | `dependencies_of<C>::type` | A Boost.MPL `AssociativeSequence` of `ComputationName`s | The names of the computations that must be executed before `c` when an `Environment` is executed. See `dependencies_of` for details.
- * | `name_of<C>::type`         | A `ComputationName`                                     | The name associated to `C`. See `name_of` for details.
  *
  *
  * @tparam C
@@ -59,7 +58,7 @@ struct fake_result_of {
  *         associating each dependency of `C` to its result type.
  */
 template <typename C, typename ...ResultsOfDependencies>
-class Computation {
+class Computation : Named<C> {
     using Results = typename boost::mpl::map<ResultsOfDependencies...>::type;
 
     struct GoodEnoughEnv : environment_archetype<> {
@@ -80,9 +79,6 @@ public:
 
         using Dependencies = typename dependencies_of<C>::type;
         static_assert(boost::mpl::is_sequence<Dependencies>::value, "");
-
-        using Name = typename name_of<C>::type;
-        BOOST_CONCEPT_ASSERT((ComputationName<Name>));
     }
 };
 } // end namespace react

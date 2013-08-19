@@ -41,6 +41,12 @@ namespace react {
         // Optional requirement:
         // using default_implementation = computation_archetype<>;
     };
+
+    //! Archetype for the `Named` concept.
+    template <typename Base = boost::null_archetype<>>
+    struct named_archetype : Base {
+
+    };
 } // end namespace react
 
 #endif // !REACT_ARCHETYPES_HPP

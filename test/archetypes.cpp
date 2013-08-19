@@ -14,6 +14,7 @@ using namespace react;
 BOOST_CONCEPT_ASSERT((Computation<computation_archetype<>>));
 BOOST_CONCEPT_ASSERT((ComputationName<computation_name_archetype<>>));
 BOOST_CONCEPT_ASSERT((Environment<environment_archetype<>>));
+BOOST_CONCEPT_ASSERT((Named<named_archetype<>>));
 
 
 int main() { }
