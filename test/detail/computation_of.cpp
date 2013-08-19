@@ -5,8 +5,10 @@
 
 #include <react/detail/computation_of.hpp>
 #include <react/computation/named.hpp>
+#include <react/intrinsic/name_of.hpp>
 #include <react/placeholder_for.hpp>
 
+#include <boost/mpl/identity.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -123,6 +125,26 @@ namespace with_default_implementation {
         comp<c1, comp<c2>>
     >::value, "");
 } // end namespace with_default_implementation
+
+namespace with_additional_stuff_to_evaluate_around_the_placeholder {
+    using namespace with_cycle_free_substitution;
+
+    static_assert(test<c1,
+        map<
+            pair<c1, comp<c1, boost::mpl::identity<placeholder_for<c2>>>>,
+            pair<c2, comp<c2>>
+        >,
+        comp<c1, comp<c2>>
+    >::value, "");
+
+    static_assert(test<c1,
+        map<
+            pair<c1, comp<c1, name_of<placeholder_for<c2>>>>,
+            pair<c2, comp<c2>>
+        >,
+        comp<c1, c2>
+    >::value, "");
+} // end namespace with_additional_stuff_to_evaluate_around_the_placeholder
 
 
 int main() { }
