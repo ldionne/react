@@ -8,6 +8,8 @@
 
 #include <react/detail/computation_of.hpp>
 
+#include <boost/mpl/bool.hpp>
+
 
 namespace react {
     /*!
@@ -18,13 +20,18 @@ namespace react {
      */
     template <typename Name>
     struct placeholder_for {
-        struct is_placeholder;
-
         template <typename Args, typename Kwargs>
         struct apply
             : detail::computation_of<Name, Kwargs>
         { };
     };
+
+    namespace detail { namespace custom_substitution_until_mpl11 {
+        template <typename Name>
+        struct is_placeholder<placeholder_for<Name>>
+            : boost::mpl::true_
+        { };
+    }}
 } // end namespace react
 
 #endif // !REACT_PLACEHOLDER_FOR_HPP

@@ -11,6 +11,7 @@
 #include <boost/mpl/any_of.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/at_default.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/mpl/deferred_apply.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/has_xxx.hpp>
@@ -24,7 +25,11 @@ namespace react { namespace detail {
 namespace custom_substitution_until_mpl11 {
     namespace mpl = boost::mpl;
 
-    BOOST_MPL_HAS_XXX_TRAIT_NAMED_DEF(is_placeholder, is_placeholder, false)
+    template <typename T>
+    struct is_placeholder
+        : boost::mpl::false_
+    { };
+
     BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
 
     template <typename F>

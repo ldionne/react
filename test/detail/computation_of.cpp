@@ -144,6 +144,38 @@ namespace with_additional_stuff_to_evaluate_around_the_placeholder {
         >,
         comp<c1, c2>
     >::value, "");
+
+    struct dummy;
+    static_assert(test<c1,
+        map<
+            pair<c1, comp<c1, boost::is_same<placeholder_for<c2>, placeholder_for<c3>>>>,
+            pair<c2, comp<dummy>>,
+            pair<c3, comp<dummy>>
+        >,
+        comp<c1, boost::is_same<comp<dummy>, comp<dummy>>::type>
+    >::value, "");
+
+    // Try with an expression that is invalid until the placeholder is
+    // replaced. This way, we make sure that we don't instantiate
+    // `some_nested_type` in any way before the placeholder is replaced
+    // by its computation itself.
+    template <typename T>
+    struct some_nested_type {
+        using type = typename T::some_nested_type;
+    };
+
+    struct nested;
+    struct nested_impl : computation::named<nested> {
+        struct some_nested_type;
+    };
+
+    static_assert(test<c1,
+        map<
+            pair<c1, comp<c1, some_nested_type<placeholder_for<nested>>>>,
+            pair<nested, nested_impl>
+        >,
+        comp<c1, some_nested_type<nested_impl>::type>
+    >::value, "");
 } // end namespace with_additional_stuff_to_evaluate_around_the_placeholder
 
 
