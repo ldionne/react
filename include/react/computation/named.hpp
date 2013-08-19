@@ -7,9 +7,13 @@
 #define REACT_COMPUTATION_NAMED_HPP
 
 #include <react/computation/noop.hpp>
+#include <react/intrinsic/name_of.hpp>
+
+#include <boost/mpl/always.hpp>
 
 
-namespace react { namespace computation {
+namespace react {
+namespace computation {
     /*!
      * Computation giving a specific name to a computation.
      *
@@ -26,6 +30,14 @@ namespace react { namespace computation {
         using Computation::operator=;
         using name = Name;
     };
-}} // end namespace react::computation
+} // end namespace computation
+
+namespace extension {
+    template <typename Name, typename Computation>
+    struct name_of_impl<computation::named<Name, Computation>>
+        : boost::mpl::always<Name>
+    { };
+} // end namespace extension
+} // end namespace react
 
 #endif // !REACT_COMPUTATION_NAMED_HPP

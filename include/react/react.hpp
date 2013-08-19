@@ -13,6 +13,5 @@
 #include <react/extensions.hpp>
 #include <react/intrinsics.hpp>
 #include <react/placeholder_for.hpp>
-#include <react/tag_of.hpp>
 
 #endif // !REACT_REACT_HPP

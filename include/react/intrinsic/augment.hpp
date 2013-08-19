@@ -7,20 +7,19 @@
 #define REACT_INTRINSIC_AUGMENT_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/tag_of.hpp>
+#include <react/detail/strip.hpp>
 
-#include <boost/type_traits/remove_reference.hpp>
 #include <utility>
 
 
 namespace react {
 namespace extension {
-    template <typename Tag, typename Enable = void>
+    template <typename T, typename Enable = void>
     struct augment_impl {
         template <typename Env, typename ...Computations>
         static auto call(Env&& env, Computations&& ...c)
         REACT_AUTO_RETURN(
-            boost::remove_reference<Env>::type::augment(
+            detail::strip<Env>::type::augment(
                 std::forward<Env>(env), std::forward<Computations>(c)...
             )
         )
@@ -32,7 +31,7 @@ static constexpr struct augment {
     auto operator()(Env&& env, Computations&& ...c) const
     REACT_AUTO_RETURN(
         extension::augment_impl<
-            typename tag_of<Env>::type
+            typename detail::strip<Env>::type
         >::call(std::forward<Env>(env), std::forward<Computations>(c)...)
     )
 } augment{};

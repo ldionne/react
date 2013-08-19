@@ -6,12 +6,11 @@
 #ifndef REACT_INTRINSIC_DEPENDENCIES_OF_HPP
 #define REACT_INTRINSIC_DEPENDENCIES_OF_HPP
 
-#include <react/tag_of.hpp>
+#include <react/detail/strip.hpp>
 
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/has_xxx.hpp>
 #include <boost/mpl/set.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 
 
 namespace react {
@@ -25,26 +24,23 @@ namespace dependencies_of_detail {
 } // end namespace dependencies_of_detail
 
 namespace extension {
-    template <typename Tag, typename Enable = void>
+    template <typename RawComputation, typename Enable = void>
     struct dependencies_of_impl {
-        template <typename Computation>
-        class apply {
-            using Noref = typename boost::remove_reference<Computation>::type;
-
-        public:
-            using type = typename boost::mpl::eval_if<
-                dependencies_of_detail::has_dependencies<Noref>,
-                dependencies_of_detail::nested_dependencies<Noref>,
+        template <typename>
+        struct apply
+            : boost::mpl::eval_if<
+                dependencies_of_detail::has_dependencies<RawComputation>,
+                dependencies_of_detail::nested_dependencies<RawComputation>,
                 boost::mpl::set<>
-            >::type;
-        };
+            >
+        { };
     };
 } // end namespace extension
 
 template <typename Computation>
 struct dependencies_of
     : extension::dependencies_of_impl<
-        typename tag_of<Computation>::type
+        typename detail::strip<Computation>::type
     >::template apply<Computation>
 { };
 } // end namespace react

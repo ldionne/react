@@ -6,10 +6,9 @@
 #ifndef REACT_INTRINSIC_DEFAULT_IMPLEMENTATION_OF_HPP
 #define REACT_INTRINSIC_DEFAULT_IMPLEMENTATION_OF_HPP
 
-#include <react/tag_of.hpp>
+#include <react/detail/strip.hpp>
 
 #include <boost/mpl/has_xxx.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 
 
@@ -23,7 +22,7 @@ namespace default_implementation_of_detail {
     };
 
     template <typename ComputationName>
-    struct default_impl
+    struct try_nested
         : boost::lazy_enable_if<
             has_default_implementation<ComputationName>,
             nested_default_implementation<ComputationName>
@@ -32,13 +31,11 @@ namespace default_implementation_of_detail {
 } // end namespace default_implementation_of_detail
 
 namespace extension {
-    template <typename Tag, typename Enable = void>
+    template <typename RawComputationName, typename Enable = void>
     struct default_implementation_of_impl {
-        template <typename ComputationName>
+        template <typename>
         struct apply
-            : default_implementation_of_detail::default_impl<
-                typename boost::remove_reference<ComputationName>::type
-            >
+            : default_implementation_of_detail::try_nested<RawComputationName>
         { };
     };
 } // end namespace extension
@@ -46,7 +43,7 @@ namespace extension {
 template <typename ComputationName>
 struct default_implementation_of
     : extension::default_implementation_of_impl<
-        typename tag_of<ComputationName>::type
+        typename detail::strip<ComputationName>::type
     >::template apply<ComputationName>
 { };
 } // end namespace react
