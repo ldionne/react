@@ -6,7 +6,12 @@
 #ifndef REACT_CONCEPT_COMPUTATION_NAME_HPP
 #define REACT_CONCEPT_COMPUTATION_NAME_HPP
 
+#include <react/intrinsic/default_implementation_of.hpp>
+#include <react/intrinsic/has_default_implementation.hpp>
+
 #include <boost/concept/usage.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/mpl/void.hpp>
 
 
 namespace react {
@@ -23,9 +28,10 @@ namespace react {
  *
  *
  * ## Valid expressions
- * | Expression                                          | Return type     | Semantics
- * | ----------                                          | -----------     | ---------
- * | `default_implementation_of<CN>::type<sub>opt</sub>` | A `Computation` | Return the default implementation of the computation represented by `CN`. See `default_implementation_of` for details.
+ * | Expression                                          | Return type                            | Semantics
+ * | ----------                                          | -----------                            | ---------
+ * | `default_implementation_of<CN>::type<sub>opt</sub>` | A `Computation`                        | Return the default implementation of the computation represented by `CN`. See `default_implementation_of` for details.
+ * | `has_default_implementation<CN>::type`              | A Boost.MPL boolean `IntegralConstant` | Return whether `CN` has a default implementation. See `has_default_implementation` for details.
  *
  *
  * @tparam CN
@@ -34,8 +40,12 @@ namespace react {
 template <typename CN>
 struct ComputationName {
     BOOST_CONCEPT_USAGE(ComputationName) {
-        // Optional requirement:
-        // using Default = typename default_implementation_of<CN>::type;
+        using HasDefault = typename has_default_implementation<CN>::type;
+
+        using Default = typename boost::mpl::eval_if<HasDefault,
+            default_implementation_of<CN>,
+            boost::mpl::void_
+        >::type;
     }
 };
 } // end namespace react

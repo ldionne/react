@@ -7,6 +7,7 @@
 #define REACT_DETAIL_COMPUTATION_OF_HPP
 
 #include <react/intrinsic/default_implementation_of.hpp>
+#include <react/intrinsic/has_default_implementation.hpp>
 
 #include <boost/mpl/any_of.hpp>
 #include <boost/mpl/assert.hpp>
@@ -135,7 +136,7 @@ namespace computation_of_detail {
         struct unbound_implementation_of
             : boost::mpl::lazy_at_default<
                 UnboundCustomizedComputations, Name,
-                boost::mpl::eval_if<has_type<default_implementation_of<Name>>,
+                boost::mpl::eval_if<has_default_implementation<Name>,
                     default_implementation_of<Name>,
                     helpful_failure<Name>
                 >
