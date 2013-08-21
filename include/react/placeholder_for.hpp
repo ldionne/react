@@ -6,9 +6,10 @@
 #ifndef REACT_PLACEHOLDER_FOR_HPP
 #define REACT_PLACEHOLDER_FOR_HPP
 
-#include <react/detail/computation_of.hpp>
-
+#include <boost/mpl/assert.hpp>
+#include <boost/mpl/at_default.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/is_eplaceholder.hpp>
 
 
 namespace react {
@@ -19,19 +20,43 @@ namespace react {
      * `Feature` inside the `computation_set`.
      */
     template <typename Feature>
-    struct placeholder_for {
-        template <typename Args, typename Kwargs>
-        struct apply
-            : detail::computation_of<Feature, Kwargs>
+    class placeholder_for {
+        template <typename ComputationMap, bool always_false = false>
+        struct helpful_failure {
+            BOOST_MPL_ASSERT_MSG(
+                always_false,
+THE_COMPUTATION_MAP_IS_MISSING_A_FEATURE_REQUIRED_FOR_PLACEHOLDER_SUBSTITUTION,
+                (ComputationMap, Feature)
+            );
+
+            static_assert(always_false,
+            "The computation map is missing a feature that is required to "
+            "perform placeholder substitution. The feature should either "
+            "provide a default implementation or the implementation of that "
+            "feature should be provided explicitly to the computation map.");
+
+            struct type;
+        };
+
+    public:
+        template <typename ...Args>
+        struct apply;
+
+        template <typename ComputationMap>
+        struct apply<ComputationMap>
+            : boost::mpl::lazy_at_default<
+                ComputationMap, Feature,
+                helpful_failure<ComputationMap>
+            >
         { };
     };
-
-    namespace detail { namespace custom_substitution_until_mpl11 {
-        template <typename Feature>
-        struct is_placeholder<placeholder_for<Feature>>
-            : boost::mpl::true_
-        { };
-    }}
 } // end namespace react
+
+namespace boost { namespace mpl {
+    template <typename Feature>
+    struct is_eplaceholder<react::placeholder_for<Feature>>
+        : true_
+    { };
+}} // end namespace boost::mpl
 
 #endif // !REACT_PLACEHOLDER_FOR_HPP
