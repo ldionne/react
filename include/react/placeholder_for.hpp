@@ -15,20 +15,20 @@ namespace react {
     /*!
      * Placeholder with a special meaning when used inside `computation_set`.
      *
-     * Its semantics is to be replaced by the `Computation` whose name is
-     * `Name` inside the `computation_set`.
+     * Its semantics is to be replaced by the `Computation` whose feature is
+     * `Feature` inside the `computation_set`.
      */
-    template <typename Name>
+    template <typename Feature>
     struct placeholder_for {
         template <typename Args, typename Kwargs>
         struct apply
-            : detail::computation_of<Name, Kwargs>
+            : detail::computation_of<Feature, Kwargs>
         { };
     };
 
     namespace detail { namespace custom_substitution_until_mpl11 {
-        template <typename Name>
-        struct is_placeholder<placeholder_for<Name>>
+        template <typename Feature>
+        struct is_placeholder<placeholder_for<Feature>>
             : boost::mpl::true_
         { };
     }}

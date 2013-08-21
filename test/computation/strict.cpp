@@ -15,7 +15,7 @@
 using namespace react;
 
 template <int>
-struct dependency : computation_name_archetype<> { };
+struct dependency : feature_archetype<> { };
 
 BOOST_CONCEPT_ASSERT((Computation<
     computation::strict<computation_archetype<>>

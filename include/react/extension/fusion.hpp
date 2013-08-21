@@ -6,12 +6,12 @@
 #ifndef REACT_EXTENSION_FUSION_HPP
 #define REACT_EXTENSION_FUSION_HPP
 
-#include <react/computation/named.hpp>
+#include <react/computation/implements.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/topological_indexing.hpp>
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/fusion/include/deref.hpp>
@@ -27,7 +27,6 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/vector.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/remove_cv.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <functional>
@@ -43,7 +42,8 @@ private:
     template <typename Sequence>
     struct as_mpl_vector
         : boost::mpl::copy<
-            Sequence, boost::mpl::back_inserter<boost::mpl::vector<>>
+            Sequence,
+            boost::mpl::back_inserter<typename boost::mpl::vector<>::type>
         >
     { };
 
@@ -89,26 +89,21 @@ struct augment_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
 private:
-    template <typename U>
-    using raw = typename boost::remove_cv<
-        typename boost::remove_reference<U>::type
-    >::type;
-
-    template <typename Name, typename Computation, typename =
+    template <typename Feature, typename Computation, typename =
         typename boost::enable_if<
-            boost::is_same<typename name_of<raw<Computation>>::type, Name>
+            boost::is_same<typename feature_of<Computation>::type, Feature>
         >::type
     >
-    static auto wrap_with_named(Computation&& c, int)
+    static auto implement(Computation&& c, int)
     REACT_AUTO_RETURN(
         std::forward<Computation>(c)
     )
 
-    template <typename Name, typename Computation>
-    static auto wrap_with_named(Computation&& c, ...)
+    template <typename Feature, typename Computation>
+    static auto implement(Computation&& c, ...)
     REACT_AUTO_RETURN(
-        computation::named<
-            Name, typename boost::remove_reference<Computation>::type
+        computation::implements<
+            Feature, typename boost::remove_reference<Computation>::type
         >(std::forward<Computation>(c))
     )
 
@@ -124,7 +119,7 @@ private:
         boost::fusion::filter_view<Sequence const, Pred>{seq}
     )
 
-    template <typename Name, typename Env, typename Computation>
+    template <typename Feature, typename Env, typename Computation>
     static auto call_impl(Env&& env, Computation&& c)
     REACT_AUTO_RETURN(
         // We use push_front instead of push_back because using push_back
@@ -133,9 +128,11 @@ private:
         // anything else.
         boost::fusion::push_front(
             filter<
-                boost::mpl::not_<boost::is_same<name_of<boost::mpl::_1>, Name>>
+                boost::mpl::not_<
+                    boost::is_same<feature_of<boost::mpl::_1>, Feature>
+                >
             >(std::forward<Env>(env)),
-            wrap_with_named<Name>(std::forward<Computation>(c), 0)
+            implement<Feature>(std::forward<Computation>(c), 0)
         )
     )
 
@@ -144,7 +141,7 @@ public:
     static auto call(Env&& env, Head&& head, Tail&& ...tail)
     REACT_AUTO_RETURN(
         augment(
-            call_impl<typename name_of<raw<Head>>::type>(
+            call_impl<typename feature_of<Head>::type>(
                 std::forward<Env>(env), std::forward<Head>(head)
             ),
             std::forward<Tail>(tail)...
@@ -162,13 +159,13 @@ template <typename T>
 struct retrieve_impl<
     T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
 > {
-    template <typename Name, typename Env>
+    template <typename Feature, typename Env>
     static auto call(Env&& env)
     REACT_AUTO_RETURN(
         retrieve(
             boost::fusion::deref(
                 boost::fusion::find_if<
-                    boost::is_same<Name, name_of<boost::mpl::_1>>
+                    boost::is_same<Feature, feature_of<boost::mpl::_1>>
                 >(env)
             ),
             env

@@ -15,7 +15,7 @@
 using namespace react;
 
 template <int>
-struct dependency : computation_name_archetype<> { };
+struct dependency : feature_archetype<> { };
 
 template <typename ...Dependencies>
 struct test {

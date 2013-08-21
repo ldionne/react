@@ -4,7 +4,7 @@
  */
 
 #include <react/extension/fusion.hpp>
-#include <react/computation/named.hpp>
+#include <react/computation/implements.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsic/augment.hpp>
@@ -20,7 +20,7 @@
 using namespace react;
 
 template <int i>
-struct Comp : computation::named<Comp<i>> {
+struct Comp : computation::implements<Comp<i>> {
     static constexpr int retrieve(detail::dont_care, detail::dont_care) {
         return i;
     }
@@ -33,15 +33,15 @@ struct Comp : computation::named<Comp<i>> {
 
 BOOST_CONCEPT_ASSERT((Environment<
     boost::fusion::vector<>,
-    available_names<>
+    available_features<>
 >));
 BOOST_CONCEPT_ASSERT((Environment<
     boost::fusion::vector<Comp<0>>,
-    available_names<Comp<0>>
+    available_features<Comp<0>>
 >));
 BOOST_CONCEPT_ASSERT((Environment<
     boost::fusion::vector<Comp<0>, Comp<1>>,
-    available_names<Comp<0>, Comp<1>>
+    available_features<Comp<0>, Comp<1>>
 >));
 
 

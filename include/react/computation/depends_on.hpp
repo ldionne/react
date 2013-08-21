@@ -36,13 +36,12 @@ namespace react { namespace computation {
     } // end namespace depends_on_detail
 
     /*!
-     * Computation implemented as a `noop` depending on other computations.
+     * Computation implemented as a `noop` depending on other features.
      *
      * @tparam Dependencies...
-     *         A sequence of `ComputationName`s on which this computation
-     *         depends. Any Boost.MPL `Sequence` encountered in
-     *         `Dependencies...` is flattened as-if its content
-     *         was part of `Dependencies...`.
+     *         A sequence of `Feature`s on which this computation depends.
+     *         Any Boost.MPL `Sequence` encountered in `Dependencies...` is
+     *         flattened as-if its content was part of `Dependencies...`.
      */
     template <typename ...Dependencies>
     struct depends_on : noop {

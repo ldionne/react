@@ -4,8 +4,8 @@
  */
 
 #include <react/detail/computation_of.hpp>
-#include <react/computation/named.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/computation/implements.hpp>
+#include <react/intrinsic/feature_of.hpp>
 #include <react/placeholder_for.hpp>
 
 #include <boost/mpl/identity.hpp>
@@ -22,7 +22,7 @@ using map = typename boost::mpl::map<Pairs...>::type;
 
 namespace without_substitution {
     template <int i>
-    struct comp : computation::named<comp<i>> { };
+    struct comp : computation::implements<comp<i>> { };
 
     template <typename Computation, typename ...Others>
     using test = boost::is_same<
@@ -40,13 +40,13 @@ namespace without_substitution {
 } // end namespace without_substitution
 
 namespace with_cycle_free_substitution {
-    template <typename Name, typename Map, typename Result>
+    template <typename Feature, typename Map, typename Result>
     using test = boost::is_same<
-        typename detail::computation_of<Name, Map>::type, Result
+        typename detail::computation_of<Feature, Map>::type, Result
     >;
 
-    template <typename Name, typename ...PossiblyPlaceholders>
-    struct comp : computation::named<Name> { };
+    template <typename Feature, typename ...PossiblyPlaceholders>
+    struct comp : computation::implements<Feature> { };
 
     struct c1; struct c2; struct c3; struct c4;
 
@@ -139,7 +139,7 @@ namespace with_additional_stuff_to_evaluate_around_the_placeholder {
 
     static_assert(test<c1,
         map<
-            pair<c1, comp<c1, name_of<placeholder_for<c2>>>>,
+            pair<c1, comp<c1, feature_of<placeholder_for<c2>>>>,
             pair<c2, comp<c2>>
         >,
         comp<c1, c2>
@@ -158,14 +158,14 @@ namespace with_additional_stuff_to_evaluate_around_the_placeholder {
     // Try with an expression that is invalid until the placeholder is
     // replaced. This way, we make sure that we don't instantiate
     // `some_nested_type` in any way before the placeholder is replaced
-    // by its computation itself.
+    // by the computation itself.
     template <typename T>
     struct some_nested_type {
         using type = typename T::some_nested_type;
     };
 
     struct nested;
-    struct nested_impl : computation::named<nested> {
+    struct nested_impl : computation::implements<nested> {
         struct some_nested_type;
     };
 

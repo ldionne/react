@@ -16,10 +16,10 @@ namespace react {
 namespace extension {
     template <typename T, typename Enable = void>
     struct retrieve_impl {
-        template <typename Name, typename Env>
+        template <typename Feature, typename Env>
         static auto call(Env&& env)
         REACT_AUTO_RETURN(
-            detail::strip<Env>::type::template retrieve<Name>(
+            detail::strip<Env>::type::template retrieve<Feature>(
                 std::forward<Env>(env)
             )
         )
@@ -34,12 +34,12 @@ namespace extension {
     };
 } // end namespace extension
 
-template <typename Name, typename Env>
+template <typename Feature, typename Env>
 auto retrieve(Env&& env)
 REACT_AUTO_RETURN(
     extension::retrieve_impl<
         typename detail::strip<Env>::type
-    >::template call<Name>(std::forward<Env>(env))
+    >::template call<Feature>(std::forward<Env>(env))
 )
 
 template <typename Computation, typename Env>

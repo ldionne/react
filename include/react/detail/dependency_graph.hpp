@@ -8,7 +8,7 @@
 
 #include <react/computation/depends_on.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/erase_key.hpp>
@@ -38,18 +38,17 @@ namespace dependency_graph_detail { struct default_; }
  *
  * @tparam GetComputation
  *         A Boost.MPL `LambdaExpression` returning the computation
- *         associated to the computation name (an arbitrary type) it
- *         is invoked with.
+ *         associated to the feature it is invoked with.
  */
 template <
     typename Computations,
     typename GetComputation = dependency_graph_detail::default_
 >
 class dependency_graph {
-    using ComputationNames = boost::mpl::transform_view<
-        Computations, name_of<boost::mpl::_1>
+    using Features = boost::mpl::transform_view<
+        Computations, feature_of<boost::mpl::_1>
     >;
-    using FakeRoot = computation::depends_on<ComputationNames>;
+    using FakeRoot = computation::depends_on<Features>;
 
 public:
     using vertices = typename boost::mpl::erase_key<
@@ -88,8 +87,8 @@ namespace extension {
             Computations, react::detail::dependency_graph_detail::default_
         >
     > {
-        using IndexedByName = typename make_index_of<
-            Computations, react::name_of<_1>
+        using IndexedByFeature = typename make_index_of<
+            Computations, react::feature_of<_1>
         >::type;
 
         template <typename Graph, typename Computation>
@@ -97,9 +96,9 @@ namespace extension {
             using type = transform_view<
                 filter_view<
                     typename react::dependencies_of<Computation>::type,
-                    has_key<IndexedByName, _1>
+                    has_key<IndexedByFeature, _1>
                 >,
-                at<IndexedByName, _1>
+                at<IndexedByFeature, _1>
             >;
         };
     };

@@ -23,17 +23,27 @@
 
 namespace react { namespace computation {
     namespace variable_detail {
+        using namespace boost;
+
         template <typename Array>
         struct make_array {
-            using type = boost::array<
-                typename boost::remove_extent<Array>::type,
-                boost::extent<Array>::value
+            using type = array<
+                typename remove_extent<Array>::type,
+                extent<Array>::value
             >;
         };
+
+        template <typename T>
+        struct adjust
+            : mpl::eval_if<is_function<T>, add_pointer<T>,
+              mpl::eval_if<is_array<T>, make_array<T>,
+                           /* else */   mpl::identity<T>
+            >>
+        { };
     } // end namespace variable_detail
 
     /*!
-     * Computation representing a single value.
+     * Computation implemented as a single value.
      *
      * When the result of the computation is retrieved, a reference to the
      * value is returned, with a `const` qualifier matching that of the
@@ -49,15 +59,7 @@ namespace react { namespace computation {
     template <typename Type>
     struct variable : noop {
     private:
-        using AdjustedType = typename
-        boost::mpl::eval_if<boost::is_function<Type>,
-            boost::add_pointer<Type>,
-        boost::mpl::eval_if<boost::is_array<Type>,
-            variable_detail::make_array<Type>,
-        /* else */
-            boost::mpl::identity<Type>
-        >>::type;
-
+        using AdjustedType = typename variable_detail::adjust<Type>::type;
         AdjustedType var_;
 
     public:

@@ -19,22 +19,22 @@ namespace react {
 /*!
  * Alias to a Boost.MPL `AssociativeSequence` containing all the
  * computations required to satisfy the dependencies of a sequence
- * of `Computations`.
+ * of `Implementation`s.
  *
- * All placeholders in `Computations` and their dependencies are
+ * All placeholders in `Implementations...` and their dependencies are
  * substituted.
  *
- * If `has_default_implementation<C>::value` is `true` for any `C` in
- * `Computations`, then `C` is replaced by `default_implementation_of<C>::type`
- * prior to processing.
+ * If `has_default_implementation<I>::value` is `true` for any `I` in
+ * `Implementations`, then `I` is replaced by
+ * `default_implementation_of<I>::type` prior to processing.
  */
-template <typename ...Computations>
+template <typename ...Implementations>
 using computation_set = typename detail::complete_dependencies<
     typename boost::mpl::vector<
         typename boost::mpl::eval_if<
-            has_default_implementation<Computations>,
-            default_implementation_of<Computations>,
-            boost::mpl::identity<Computations>
+            has_default_implementation<Implementations>,
+            default_implementation_of<Implementations>,
+            boost::mpl::identity<Implementations>
         >::type...
     >::type
 >::type;

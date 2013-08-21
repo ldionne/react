@@ -15,17 +15,12 @@
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/transform_view.hpp>
 #include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/remove_cv.hpp>
-#include <boost/type_traits/remove_reference.hpp>
 #include <utility>
 
 
 namespace react { namespace computation {
 namespace strict_detail {
     using namespace boost;
-
-    template <typename T>
-    using raw = typename remove_cv<typename remove_reference<T>::type>::type;
 
     template <typename Sequence>
     using pointers_to = mpl::transform_view<Sequence, add_pointer<mpl::_1>>;
@@ -59,7 +54,7 @@ namespace strict_detail {
         auto operator()(Computation&& c, Env&& env) const
         REACT_AUTO_RETURN(
             mpl::for_each<
-                pointers_to<typename dependencies_of<raw<Computation>>::type>
+                pointers_to<typename dependencies_of<Computation>::type>
             >(assert_retrievable_from<Env&&>{}),
             execute(std::forward<Computation>(c), std::forward<Env>(env))
         )
@@ -70,7 +65,7 @@ namespace strict_detail {
         auto operator()(Computation&& c, Env&& env) const
         REACT_AUTO_RETURN(
             mpl::for_each<
-                pointers_to<typename dependencies_of<raw<Computation>>::type>
+                pointers_to<typename dependencies_of<Computation>::type>
             >(assert_retrievable_from<Env&&>{}),
             retrieve(std::forward<Computation>(c), std::forward<Env>(env))
         )

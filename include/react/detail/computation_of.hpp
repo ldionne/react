@@ -106,20 +106,19 @@ namespace computation_of_detail {
         static constexpr bool value = false;
     };
 
-    template <typename Name>
+    template <typename Feature>
     struct helpful_failure {
         BOOST_MPL_ASSERT_MSG(
-            always_false<Name>::value,
-        MISSING_A_DEFAULT_IMPLEMENTATION_FOR_THE_FOLLOWING_COMPUTATION_NAME,
-            (Name)
+            always_false<Feature>::value,
+            MISSING_A_DEFAULT_IMPLEMENTATION_FOR_THE_FOLLOWING_FEATURE,
+            (Feature)
         );
 
-        static_assert(always_false<Name>::value,
-        "Missing a default implementation for some computation name. "
-        "The implementation for that computation name must be provided "
-        "explicitly or the computation name must define a default "
-        "implementation using the `react::default_implementation_of` "
-        "intrinsic.");
+        static_assert(always_false<Feature>::value,
+        "Missing a default implementation for some feature. "
+        "The implementation for that feature must be provided "
+        "explicitly or the feature must define a default implementation "
+        "using the `react::default_implementation_of` intrinsic.");
 
         struct type;
     };
@@ -130,51 +129,45 @@ namespace computation_of_detail {
     namespace mpl = custom_substitution_until_mpl11;
 #endif
 
-    template <typename UnboundCustomizedComputations>
-    struct given {
-        template <typename Name>
-        struct unbound_implementation_of
-            : boost::mpl::lazy_at_default<
-                UnboundCustomizedComputations, Name,
-                boost::mpl::eval_if<has_default_implementation<Name>,
-                    default_implementation_of<Name>,
-                    helpful_failure<Name>
-                >
+    template <typename Feature, typename Implementations>
+    struct implementation_of
+        : boost::mpl::lazy_at_default<
+            Implementations, Feature,
+            boost::mpl::eval_if<has_default_implementation<Feature>,
+                default_implementation_of<Feature>,
+                helpful_failure<Feature>
             >
-        { };
+        >
+    { };
 
-        template <typename Name>
-        struct bound_implementation_of
-            : mpl::apply<
-                typename unbound_implementation_of<Name>::type,
-                mpl::splat<UnboundCustomizedComputations>
-            >
-        { };
-    };
+    template <typename Feature, typename Implementations>
+    struct computation_of
+        : mpl::apply<
+            typename implementation_of<Feature, Implementations>::type,
+            mpl::splat<Implementations>
+        >
+    { };
 } // end namespace computation_of_detail
 
 /*!
- * Retrieve the fully-bound `Computation` associated to a type modeling
- * the `ComputationName` concept.
+ * Retrieve the computation associated to a feature.
  *
- * @tparam Name
- *         A model of the `ComputationName` concept representing the name of
- *         the computation that should be generated.
+ * @tparam Feature
+ *         A model of the `Feature` concept representing the computation that
+ *         should be generated.
  *
- * @tparam UnboundCustomizedComputations
- *         A Boost.MPL `AssociativeSequence` mapping `ComputationName`s to
- *         models of the `Named` concept. The values in the map may be
+ * @tparam Implementations
+ *         A Boost.MPL `AssociativeSequence` mapping `Feature`s to models
+ *         of the `Implementation` concept. The values in the map may be
  *         `LambdaExpression`s containing special placeholders, in which
  *         case they are substituted accordingly. Whenever the computation
- *         associated to a name that is not in `UnboundCustomizedComputations`
- *         is required, the missing computation is generated using the
+ *         associated to a feature that is not in `Implementations` is
+ *         required, the missing implementation is generated using the
  *         `default_implementation_of` intrinsic.
  */
-template <typename Name, typename UnboundCustomizedComputations>
+template <typename Feature, typename Implementations>
 struct computation_of
-    : computation_of_detail::given<
-        UnboundCustomizedComputations
-      >::template bound_implementation_of<Name>
+    : computation_of_detail::computation_of<Feature, Implementations>
 { };
 }} // end namespace react::detail
 

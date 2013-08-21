@@ -6,7 +6,7 @@
 #include <react/detail/topological_indexing.hpp>
 #include <react/archetypes.hpp>
 #include <react/computation/depends_on.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 
 #include <boost/mpl/back_inserter.hpp>
 #include <boost/mpl/copy.hpp>
@@ -20,8 +20,10 @@ using namespace react;
 
 template <typename ...Computations>
 using indexing_of = typename mpl::copy<
-    typename detail::topological_indexing<mpl::vector<Computations...>>::type,
-    mpl::back_inserter<mpl::vector<>>
+    typename detail::topological_indexing<
+        typename mpl::vector<Computations...>::type
+    >::type,
+    mpl::back_inserter<typename mpl::vector<>::type>
 >::type;
 
 // `mpl::vector_c<long>` creates a `mpl::vector<>` of `mpl::integral_c<long>`
@@ -47,8 +49,8 @@ static_assert(mpl::equal<
 
 namespace test_ordering_with_3_linear_computations {
     struct a { };
-    struct b : computation::depends_on<name_of<a>::type> { };
-    struct c : computation::depends_on<name_of<b>::type> { };
+    struct b : computation::depends_on<feature_of<a>::type> { };
+    struct c : computation::depends_on<feature_of<b>::type> { };
 
     static_assert(mpl::equal<
         indexing_of<a, b, c>, indices<0, 1, 2>

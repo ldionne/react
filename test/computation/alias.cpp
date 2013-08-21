@@ -14,9 +14,9 @@
 using namespace react;
 
 BOOST_CONCEPT_ASSERT((Computation<
-    computation::alias<computation_name_archetype<>>,
+    computation::alias<feature_archetype<>>,
     fake_result_of<
-        computation_name_archetype<>
+        feature_archetype<>
     >::with<
         boost::copy_constructible_archetype<>
     >

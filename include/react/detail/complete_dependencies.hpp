@@ -8,7 +8,7 @@
 
 #include <react/detail/computation_of.hpp>
 #include <react/detail/dependency_graph.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 
 #include <boost/mpl/graph_intrinsics.hpp>
 #include <boost/mpl/make_index_of.hpp>
@@ -21,36 +21,36 @@ namespace react { namespace detail {
      * Given a set of computations, generate a superset of it which also
      * satisfies all of its dependencies.
      *
-     * @tparam UnboundCustomizedComputations
-     *         A Boost.MPL `ForwardSequence` of types modeling the `Named`
-     *         concept. They represent the computations whose dependencies
-     *         must be satisfied. The actual type of which the dependencies
-     *         are satisfied is `computation_of<C, M>::type` for all `C`
-     *         in `UnboundCustomizedComputations`, with `M` being a Boost.MPL
-     *         `AssociativeSequence` mapping `name_of<C>::type` to `C` for all
-     *         `C` in `UnboundCustomizedComputations`.
+     * @tparam Implementations
+     *         A Boost.MPL `ForwardSequence` of types modeling the
+     *         `Implementation` concept. They represent the computations
+     *         whose dependencies must be satisfied. The actual type of which
+     *         the dependencies are satisfied is `computation_of<C, M>::type`
+     *         for all `C` in `UnboundCustomizedComputations`, with `M` being
+     *         a Boost.MPL `AssociativeSequence` mapping `feature_of<C>::type`
+     *         to `C` for all `C` in `UnboundCustomizedComputations`.
      *
      * @return A Boost.MPL `ForwardSequence` of `Computation`s.
      */
-    template <typename UnboundCustomizedComputations>
+    template <typename Implementations>
     class complete_dependencies {
         // Note:
         // We use inheritance here to hide the map from any lambda
         // substitution mechanism, since the map could contain lambda
         // placeholders that we want to preserve.
-        template <typename Name>
+        template <typename Feature>
         struct computation_of
             : detail::computation_of<
-                Name,
+                Feature,
                 typename boost::mpl::make_index_of<
-                    UnboundCustomizedComputations, name_of<boost::mpl::_1>
+                    Implementations, feature_of<boost::mpl::_1>
                 >::type
             >
         { };
 
         using CustomizedComputations = boost::mpl::transform_view<
-            UnboundCustomizedComputations,
-            computation_of<name_of<boost::mpl::_1>>
+            Implementations,
+            computation_of<feature_of<boost::mpl::_1>>
         >;
 
         using SpannedDependencyGraph = dependency_graph<

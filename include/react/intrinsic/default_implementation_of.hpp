@@ -16,35 +16,35 @@ namespace react {
 namespace default_implementation_of_detail {
     BOOST_MPL_HAS_XXX_TRAIT_DEF(default_implementation)
 
-    template <typename ComputationName>
+    template <typename Feature>
     struct nested_default_implementation {
-        using type = typename ComputationName::default_implementation;
+        using type = typename Feature::default_implementation;
     };
 
-    template <typename ComputationName>
+    template <typename Feature>
     struct try_nested
         : boost::lazy_enable_if<
-            has_default_implementation<ComputationName>,
-            nested_default_implementation<ComputationName>
+            has_default_implementation<Feature>,
+            nested_default_implementation<Feature>
         >
     { };
 } // end namespace default_implementation_of_detail
 
 namespace extension {
-    template <typename RawComputationName, typename Enable = void>
+    template <typename RawFeature, typename Enable = void>
     struct default_implementation_of_impl {
         template <typename>
         struct apply
-            : default_implementation_of_detail::try_nested<RawComputationName>
+            : default_implementation_of_detail::try_nested<RawFeature>
         { };
     };
 } // end namespace extension
 
-template <typename ComputationName>
+template <typename Feature>
 struct default_implementation_of
     : extension::default_implementation_of_impl<
-        typename detail::strip<ComputationName>::type
-    >::template apply<ComputationName>
+        typename detail::strip<Feature>::type
+    >::template apply<Feature>
 { };
 } // end namespace react
 

@@ -18,22 +18,22 @@ namespace has_default_implementation_detail {
 }
 
 namespace extension {
-    template <typename RawComputationName, typename Enable = void>
+    template <typename RawFeature, typename Enable = void>
     struct has_default_implementation_impl {
-        template <typename ComputationName>
+        template <typename Feature>
         struct apply
             : has_default_implementation_detail::has_type<
-                default_implementation_of<ComputationName>
+                default_implementation_of<Feature>
             >
         { };
     };
 } // end namespace extension
 
-template <typename ComputationName>
+template <typename Feature>
 struct has_default_implementation
     : extension::has_default_implementation_impl<
-        typename detail::strip<ComputationName>::type
-    >::template apply<ComputationName>
+        typename detail::strip<Feature>::type
+    >::template apply<Feature>
 { };
 } // end namespace react
 

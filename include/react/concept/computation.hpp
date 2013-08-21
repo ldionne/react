@@ -7,10 +7,10 @@
 #define REACT_CONCEPT_COMPUTATION_HPP
 
 #include <react/archetypes.hpp>
-#include <react/concept/named.hpp>
+#include <react/concept/implementation.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/concept/usage.hpp>
@@ -31,7 +31,7 @@ struct fake_result_of {
 
 /*!
  * Specification of the `Computation` concept. `Computation` is a refinement
- * of the `Named` concept.
+ * of the `Implementation` concept.
  *
  *
  * ## Notation
@@ -43,11 +43,11 @@ struct fake_result_of {
  *
  *
  * ## Valid expressions
- * | Expression                 | Return type                                             | Semantics
- * | ----------                 | -----------                                             | ---------
- * | `execute(c, env)`          | Any type                                                | Execute `c` with `env` as `Environment`. See `execute` for details.
- * | `retrieve(c, env)`         | Any type                                                | Return the result of `c` with `env` as `Environment`. See `retrieve` for details.
- * | `dependencies_of<C>::type` | A Boost.MPL `AssociativeSequence` of `ComputationName`s | The names of the computations that must be executed before `c` when an `Environment` is executed. See `dependencies_of` for details.
+ * | Expression                 | Return type                                     | Semantics
+ * | ----------                 | -----------                                     | ---------
+ * | `execute(c, env)`          | Any type                                        | Execute `c` with `env` as `Environment`. See `execute` for details.
+ * | `retrieve(c, env)`         | Any type                                        | Return the result of `c` with `env` as `Environment`. See `retrieve` for details.
+ * | `dependencies_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed before `c` when an `Environment` is executed. See `dependencies_of` for details.
  *
  *
  * @tparam C
@@ -58,14 +58,14 @@ struct fake_result_of {
  *         associating each dependency of `C` to its result type.
  */
 template <typename C, typename ...ResultsOfDependencies>
-class Computation : Named<C> {
+class Computation : Implementation<C> {
     using Results = typename boost::mpl::map<ResultsOfDependencies...>::type;
 
     struct GoodEnoughEnv : environment_archetype<> {
-        template <typename ComputationName, typename Self>
+        template <typename Feature, typename Self>
         static typename boost::lazy_enable_if<
-            boost::mpl::has_key<Results, ComputationName>,
-            boost::mpl::at<Results, ComputationName>
+            boost::mpl::has_key<Results, Feature>,
+            boost::mpl::at<Results, Feature>
         >::type retrieve(Self&&);
     };
 

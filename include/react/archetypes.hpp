@@ -17,7 +17,7 @@ namespace react {
         template <typename Self>
         static boost::copy_constructible_archetype<> execute(Self&&);
 
-        template <typename ComputationName, typename Self>
+        template <typename Feature, typename Self>
         static boost::copy_constructible_archetype<> retrieve(Self&&);
 
         template <typename Self, typename ...Computations>
@@ -35,16 +35,16 @@ namespace react {
         static boost::copy_constructible_archetype<> retrieve(Self&&, Env&&);
     };
 
-    //! Archetype for the `ComputationName` concept.
+    //! Archetype for the `Feature` concept.
     template <typename Base = boost::null_archetype<>>
-    struct computation_name_archetype : Base {
+    struct feature_archetype : Base {
         // Optional requirement:
         // using default_implementation = computation_archetype<>;
     };
 
-    //! Archetype for the `Named` concept.
+    //! Archetype for the `Implementation` concept.
     template <typename Base = boost::null_archetype<>>
-    struct named_archetype : Base {
+    struct implementation_archetype : Base {
 
     };
 } // end namespace react

@@ -9,7 +9,7 @@
 #include <react/detail/auto_return.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #include <utility>
@@ -35,7 +35,7 @@ namespace react { namespace computation {
         GetInstance get_instance;
 
     public:
-        using name = typename name_of<Computation>::type;
+        using feature = typename feature_of<Computation>::type;
         using dependencies = typename dependencies_of<Computation>::type;
 
         template <typename Self, typename Env>

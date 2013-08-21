@@ -6,7 +6,7 @@
 #include <react/detail/dependency_graph.hpp>
 #include <react/archetypes.hpp>
 #include <react/computation/depends_on.hpp>
-#include <react/intrinsic/name_of.hpp>
+#include <react/intrinsic/feature_of.hpp>
 
 #include <boost/mpl/graph_intrinsics.hpp>
 #include <boost/mpl/set.hpp>
@@ -25,7 +25,8 @@ using graph = detail::dependency_graph<
 
 template <typename Graph>
 using computations_in = typename mpl::set_insert_range<
-    mpl::set<>, typename mpl::vertices_of<Graph>::type
+    typename mpl::set<>::type,
+    typename mpl::vertices_of<Graph>::type
 >::type;
 
 static_assert(mpl::set_equal<
@@ -47,11 +48,11 @@ static_assert(mpl::set_equal<
 // Dependencies are handled by name.
 static_assert(mpl::set_equal<
     computations_in<graph<
-        computation::depends_on<name_of<computation_archetype<>>::type>,
+        computation::depends_on<feature_of<computation_archetype<>>::type>,
         computation_archetype<>
     >>,
     mpl::set<
-        computation::depends_on<name_of<computation_archetype<>>::type>,
+        computation::depends_on<feature_of<computation_archetype<>>::type>,
         computation_archetype<>
     >
 >::value, "");
@@ -60,15 +61,15 @@ static_assert(mpl::set_equal<
 static_assert(mpl::set_equal<
     computations_in<graph<
         computation::depends_on<
-            name_of<computation_archetype<>>::type,
-            name_of<computation_archetype<>>::type
+            feature_of<computation_archetype<>>::type,
+            feature_of<computation_archetype<>>::type
         >,
         computation_archetype<>
     >>,
     mpl::set<
         computation::depends_on<
-            name_of<computation_archetype<>>::type,
-            name_of<computation_archetype<>>::type
+            feature_of<computation_archetype<>>::type,
+            feature_of<computation_archetype<>>::type
         >,
         computation_archetype<>
     >
