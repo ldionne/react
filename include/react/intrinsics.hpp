@@ -12,6 +12,7 @@
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/has_default_implementation.hpp>
+#include <react/intrinsic/instantiate.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #endif // !REACT_INTRINSICS_HPP
