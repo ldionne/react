@@ -9,10 +9,12 @@
 #include <react/computation/alias.hpp>
 #include <react/computation/custom_stored.hpp>
 #include <react/computation/depends_on.hpp>
+#include <react/computation/executable_if.hpp>
 #include <react/computation/extern.hpp>
 #include <react/computation/implements.hpp>
 #include <react/computation/lazy.hpp>
 #include <react/computation/noop.hpp>
+#include <react/computation/retrievable_if.hpp>
 #include <react/computation/static.hpp>
 #include <react/computation/strict.hpp>
 #include <react/computation/thread_local.hpp>
