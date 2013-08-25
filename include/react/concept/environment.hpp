@@ -61,7 +61,7 @@ namespace environment_detail {
  * | Expression                      | Return type      | Semantics
  * | ----------                      | -----------      | ---------
  * | `retrieve<F>(env)`              | Any type         | Return the result of the computation associated to the feature `Feature` in `env`. If there is no such computation in the environment, the expression shall be ill-formed. See `retrieve` for details.
- * | `execute(env)`                  | Any type         | Execute all of the computations in `env` in an order such that all the dependencies of a computations are executed before it. See `execute` for details.
+ * | `execute(env)`                  | Any type         | Execute all of the computations in `env` in an order such that all the predecessors of a computation are executed before it and all its successors are executed after. See `execute` for details.
  * | `augment(env, computations...)` | An `Environment` | Return `env` with `feature_of<C>::type` implemented by `C` for all `C` in `computations...`. See `augment` for details.
  *
  *

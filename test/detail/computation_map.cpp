@@ -4,8 +4,8 @@
  */
 
 #include <react/detail/computation_map.hpp>
-#include <react/computation/depends_on.hpp>
-#include <react/computation/implements.hpp>
+#include <react/computation/implementing.hpp>
+#include <react/computation/requiring.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/placeholder_for.hpp>
 
@@ -21,23 +21,23 @@ namespace mpl = boost::mpl;
 using namespace react;
 using mpl::pair;
 using detail::computation_map;
-using computation::depends_on;
-using computation::implements;
+using computation::requiring;
+using computation::implementing;
 
 template <typename ...Pairs>
 using map = typename mpl::map<Pairs...>::type;
 
 namespace without_substitution {
     namespace with_redundant_dependencies {
-        struct c1 : implements<c1>, depends_on<> {
+        struct c1 : implementing<c1>, requiring<> {
             using default_implementation = c1;
         };
 
-        struct c2 : implements<c2>, depends_on<c1> {
+        struct c2 : implementing<c2>, requiring<c1> {
             using default_implementation = c2;
         };
 
-        struct c3 : implements<c3>, depends_on<c1> {
+        struct c3 : implementing<c3>, requiring<c1> {
             using default_implementation = c3;
         };
 
@@ -81,15 +81,15 @@ namespace without_substitution {
     } // end namespace with_redundant_dependencies
 
     namespace with_linear_dependency_chain {
-        struct c1 : implements<c1>, depends_on<> {
+        struct c1 : implementing<c1>, requiring<> {
             using default_implementation = c1;
         };
 
-        struct c2 : implements<c2>, depends_on<c1> {
+        struct c2 : implementing<c2>, requiring<c1> {
             using default_implementation = c2;
         };
 
-        struct c3 : implements<c3>, depends_on<c2> {
+        struct c3 : implementing<c3>, requiring<c2> {
 
         };
 
@@ -105,15 +105,15 @@ namespace without_substitution {
 
     namespace with_cyclic_dependency {
         struct c3;
-        struct c1 : implements<c1>, depends_on<c3> {
+        struct c1 : implementing<c1>, requiring<c3> {
             using default_implementation = c1;
         };
 
-        struct c2 : implements<c2>, depends_on<c1> {
+        struct c2 : implementing<c2>, requiring<c1> {
             using default_implementation = c2;
         };
 
-        struct c3 : implements<c3>, depends_on<c2> {
+        struct c3 : implementing<c3>, requiring<c2> {
 
         };
 
@@ -131,7 +131,7 @@ namespace without_substitution {
 
 namespace with_acyclic_substitution {
     template <typename Feature, typename ...PossiblyPlaceholders>
-    struct comp : implements<Feature> { };
+    struct comp : implementing<Feature> { };
 
     struct c1; struct c2; struct c3; struct c4;
 
@@ -210,7 +210,7 @@ namespace with_additional_stuff_to_evaluate_around_placeholders {
     };
 
     struct nested;
-    struct nested_impl : implements<nested> {
+    struct nested_impl : implementing<nested> {
         struct some_nested_type;
     };
 
@@ -255,11 +255,11 @@ namespace fetch_default_implementation {
     static_assert(boost::is_same<
         mpl::at<
             computation_map<
-                implements<defaults_to<comp<c1>>, comp<c2>>
+                implementing<defaults_to<comp<c1>>, comp<c2>>
             >,
             defaults_to<comp<c1>>
         >::type,
-        implements<defaults_to<comp<c1>>, comp<c2>>
+        implementing<defaults_to<comp<c1>>, comp<c2>>
     >::value, "");
 
     static_assert(boost::is_same<

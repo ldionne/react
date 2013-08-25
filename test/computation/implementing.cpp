@@ -1,9 +1,9 @@
 /*!
  * @file
- * This file contains unit tests for `react::computation::implements`.
+ * This file contains unit tests for `react::computation::implementing`.
  */
 
-#include <react/computation/implements.hpp>
+#include <react/computation/implementing.hpp>
 #include <react/archetypes.hpp>
 #include <react/concept/computation.hpp>
 #include <react/intrinsic/feature_of.hpp>
@@ -14,15 +14,15 @@
 
 using namespace react;
 
-using Wrapper = computation::implements<
+using Wrapper = computation::implementing<
     feature_archetype<>, computation_archetype<>
 >;
 
 struct Base
-    : computation::implements<feature_archetype<>>
+    : computation::implementing<feature_archetype<>>
 { };
 
-using Standalone = computation::implements<feature_archetype<>>;
+using Standalone = computation::implementing<feature_archetype<>>;
 
 BOOST_CONCEPT_ASSERT((Computation<Wrapper>));
 static_assert(boost::is_same<

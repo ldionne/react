@@ -6,7 +6,7 @@
 #ifndef REACT_COMPUTATION_ALIAS_HPP
 #define REACT_COMPUTATION_ALIAS_HPP
 
-#include <react/computation/depends_on.hpp>
+#include <react/computation/requiring.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsic/retrieve.hpp>
@@ -22,7 +22,7 @@ namespace react { namespace computation {
      *         The feature of the computation holding the targeted result.
      */
     template <typename AliasedFeature>
-    struct alias : depends_on<AliasedFeature> {
+    struct alias : requiring<AliasedFeature> {
         template <typename Env>
         static auto retrieve(detail::dont_care, Env&& env) REACT_AUTO_RETURN(
             react::retrieve<AliasedFeature>(std::forward<Env>(env))

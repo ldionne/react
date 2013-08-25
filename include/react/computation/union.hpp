@@ -6,11 +6,15 @@
 #ifndef REACT_COMPUTATION_UNION_HPP
 #define REACT_COMPUTATION_UNION_HPP
 
-#include <react/computation/depends_on.hpp>
+#include <react/computation/executed_after.hpp>
+#include <react/computation/executed_before.hpp>
+#include <react/computation/requiring.hpp>
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/predecessors_of.hpp>
+#include <react/intrinsic/requirements_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/successors_of.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -20,9 +24,17 @@ namespace react { namespace computation {
     namespace union_detail {
         template <typename X, typename Y>
         struct union_of_2
-            : depends_on<
-                typename dependencies_of<X>::type,
-                typename dependencies_of<Y>::type
+            : requiring<
+                typename requirements_of<X>::type,
+                typename requirements_of<Y>::type
+            >,
+            executed_before<
+                typename successors_of<X>::type,
+                typename successors_of<Y>::type
+            >,
+            executed_after<
+                typename predecessors_of<X>::type,
+                typename predecessors_of<Y>::type
             >
         {
         private:

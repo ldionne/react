@@ -6,7 +6,7 @@
 #ifndef REACT_COMPUTATION_EXTERN_HPP
 #define REACT_COMPUTATION_EXTERN_HPP
 
-#include <react/computation/implements.hpp>
+#include <react/computation/implementing.hpp>
 #include <react/detail/dont_care.hpp>
 
 #include <boost/mpl/assert.hpp>
@@ -30,7 +30,7 @@ namespace react { namespace computation {
      *         The feature whose implementation is to be late-bound.
      */
     template <typename Feature>
-    struct extern_ : implements<Feature> {
+    struct extern_ : implementing<Feature> {
         template <bool always_false = false>
         static void retrieve(detail::dont_care, detail::dont_care) {
             BOOST_MPL_ASSERT_MSG(always_false,

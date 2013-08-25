@@ -1,10 +1,10 @@
 /*!
  * @file
- * This file defines `react::computation::implements`.
+ * This file defines `react::computation::implementing`.
  */
 
-#ifndef REACT_COMPUTATION_IMPLEMENTS_HPP
-#define REACT_COMPUTATION_IMPLEMENTS_HPP
+#ifndef REACT_COMPUTATION_IMPLEMENTING_HPP
+#define REACT_COMPUTATION_IMPLEMENTING_HPP
 
 #include <react/computation/noop.hpp>
 #include <react/intrinsic/feature_of.hpp>
@@ -15,7 +15,7 @@
 namespace react {
 namespace computation {
     /*!
-     * Computation associating a specific feature to a computation.
+     * Wrapper associating a specific feature to another computation.
      *
      * @tparam Feature
      *         The feature representing the computation.
@@ -26,7 +26,7 @@ namespace computation {
      *         as `Feature`. It defaults to `noop`.
      */
     template <typename Feature, typename Computation = noop>
-    struct implements : Computation {
+    struct implementing : Computation {
         using Computation::Computation;
         using Computation::operator=;
         using feature = Feature;
@@ -35,10 +35,10 @@ namespace computation {
 
 namespace extension {
     template <typename Feature, typename Computation>
-    struct feature_of_impl<computation::implements<Feature, Computation>>
+    struct feature_of_impl<computation::implementing<Feature, Computation>>
         : boost::mpl::always<Feature>
     { };
 } // end namespace extension
 } // end namespace react
 
-#endif // !REACT_COMPUTATION_IMPLEMENTS_HPP
+#endif // !REACT_COMPUTATION_IMPLEMENTING_HPP

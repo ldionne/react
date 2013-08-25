@@ -7,8 +7,8 @@
 #define REACT_COMPUTATION_STRICT_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
+#include <react/intrinsic/requirements_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/mpl/for_each.hpp>
@@ -27,8 +27,8 @@ namespace strict_detail {
 
     template <typename Env>
     struct assert_retrievable_from {
-        template <typename Dependency, bool always_false = false>
-        void operator()(Dependency*) const {
+        template <typename Requirement, bool always_false = false>
+        void operator()(Requirement*) const {
             // Make sure that
             // 1. the code gets instantiated
             // 2. we don't get a warning for unreachable code
@@ -41,10 +41,10 @@ namespace strict_detail {
                 //
                 // If compilation fails here, a computation marked as `strict`
                 // was executed or its result was retrieved without all of its
-                // dependencies being in the environment.
+                // requirements being retrievable from the environment.
                 //
                 //////////////////////////////////////////////////////////////
-                retrieve<Dependency>(static_cast<Env>(*env));
+                retrieve<Requirement>(static_cast<Env>(*env));
             }
         }
     };
@@ -54,7 +54,7 @@ namespace strict_detail {
         auto operator()(Computation&& c, Env&& env) const
         REACT_AUTO_RETURN(
             mpl::for_each<
-                pointers_to<typename dependencies_of<Computation>::type>
+                pointers_to<typename requirements_of<Computation>::type>
             >(assert_retrievable_from<Env&&>{}),
             execute(std::forward<Computation>(c), std::forward<Env>(env))
         )
@@ -65,7 +65,7 @@ namespace strict_detail {
         auto operator()(Computation&& c, Env&& env) const
         REACT_AUTO_RETURN(
             mpl::for_each<
-                pointers_to<typename dependencies_of<Computation>::type>
+                pointers_to<typename requirements_of<Computation>::type>
             >(assert_retrievable_from<Env&&>{}),
             retrieve(std::forward<Computation>(c), std::forward<Env>(env))
         )
@@ -73,8 +73,8 @@ namespace strict_detail {
 } // end namespace strict_detail
 
 /*!
- * Wrapper to make sure that all the dependencies of a computation are
- * available in the environment when it is executed or its result is
+ * Wrapper to make sure that all the requirements of a computation are
+ * retrievable from the environment when it is executed or its result is
  * retrieved.
  */
 template <typename Computation>

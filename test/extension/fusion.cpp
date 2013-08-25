@@ -4,7 +4,7 @@
  */
 
 #include <react/extension/fusion.hpp>
-#include <react/computation/implements.hpp>
+#include <react/computation/implementing.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsic/augment.hpp>
@@ -20,7 +20,7 @@
 using namespace react;
 
 template <int i>
-struct Comp : computation::implements<Comp<i>> {
+struct Comp : computation::implementing<Comp<i>> {
     static constexpr int retrieve(detail::dont_care, detail::dont_care) {
         return i;
     }

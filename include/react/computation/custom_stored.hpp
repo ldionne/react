@@ -7,10 +7,12 @@
 #define REACT_COMPUTATION_CUSTOM_STORED_HPP
 
 #include <react/detail/auto_return.hpp>
-#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/feature_of.hpp>
+#include <react/intrinsic/predecessors_of.hpp>
+#include <react/intrinsic/requirements_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/successors_of.hpp>
 
 #include <utility>
 
@@ -36,7 +38,9 @@ namespace react { namespace computation {
 
     public:
         using feature = typename feature_of<Computation>::type;
-        using dependencies = typename dependencies_of<Computation>::type;
+        using requirements = typename requirements_of<Computation>::type;
+        using predecessors = typename predecessors_of<Computation>::type;
+        using successors = typename successors_of<Computation>::type;
 
         template <typename Self, typename Env>
         static auto execute(Self&& self, Env&& env) REACT_AUTO_RETURN(

@@ -6,7 +6,7 @@
 #ifndef REACT_EXTENSION_FUSION_HPP
 #define REACT_EXTENSION_FUSION_HPP
 
-#include <react/computation/implements.hpp>
+#include <react/computation/implementing.hpp>
 #include <react/detail/auto_return.hpp>
 #include <react/detail/topological_indexing.hpp>
 #include <react/intrinsic/augment.hpp>
@@ -102,7 +102,7 @@ private:
     template <typename Feature, typename Computation>
     static auto implement(Computation&& c, ...)
     REACT_AUTO_RETURN(
-        computation::implements<
+        computation::implementing<
             Feature, typename boost::remove_reference<Computation>::type
         >(std::forward<Computation>(c))
     )

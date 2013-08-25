@@ -8,10 +8,12 @@
 
 #include <react/archetypes.hpp>
 #include <react/concept/implementation.hpp>
-#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/feature_of.hpp>
+#include <react/intrinsic/predecessors_of.hpp>
+#include <react/intrinsic/requirements_of.hpp>
 #include <react/intrinsic/retrieve.hpp>
+#include <react/intrinsic/successors_of.hpp>
 
 #include <boost/concept/usage.hpp>
 #include <boost/mpl/at.hpp>
@@ -23,10 +25,10 @@
 
 
 namespace react {
-template <typename Dependency>
+template <typename Requirement>
 struct fake_result_of {
     template <typename Result>
-    using with = boost::mpl::pair<Dependency, Result>;
+    using with = boost::mpl::pair<Requirement, Result>;
 };
 
 /*!
@@ -40,6 +42,7 @@ struct fake_result_of {
  * | `C`        | A type modeling the `Computation` concept
  * | `c`        | An object of type `C`
  * | `env`      | An arbitrary `Environment`
+ * | `F`        | A type modeling the `Feature` concept
  *
  *
  * ## Valid expressions
@@ -47,19 +50,21 @@ struct fake_result_of {
  * | ----------                 | -----------                                     | ---------
  * | `execute(c, env)`          | Any type                                        | Execute `c` with `env` as `Environment`. See `execute` for details.
  * | `retrieve(c, env)`         | Any type                                        | Return the result of `c` with `env` as `Environment`. See `retrieve` for details.
- * | `dependencies_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed before `c` when an `Environment` is executed. See `dependencies_of` for details.
+ * | `requirements_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features that must be satisfied in an environment containing `C`. See `requirements_of` for details.
+ * | `predecessors_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed before `C` when an `Environment` is executed. See `predecessors_of` for details.
+ * | `successors_of<C>::type`   | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed after `C` when an `Environment` is executed. See `successors_of` for details.
  *
  *
  * @tparam C
  *         The type to be tested for modeling of the `Computation` concept.
  *
- * @tparam ResultsOfDependencies...
+ * @tparam ResultsOfRequirements...
  *         A sequence of instantiations of `fake_result_of<>::with`
- *         associating each dependency of `C` to its result type.
+ *         associating each requirement of `C` to its result type.
  */
-template <typename C, typename ...ResultsOfDependencies>
+template <typename C, typename ...ResultsOfRequirements>
 class Computation : Implementation<C> {
-    using Results = typename boost::mpl::map<ResultsOfDependencies...>::type;
+    using Results = typename boost::mpl::map<ResultsOfRequirements...>::type;
 
     struct GoodEnoughEnv : environment_archetype<> {
         template <typename Feature, typename Self>
@@ -77,8 +82,14 @@ public:
         execute(c, env);
         retrieve(c, env);
 
-        using Dependencies = typename dependencies_of<C>::type;
-        static_assert(boost::mpl::is_sequence<Dependencies>::value, "");
+        using Predecessors = typename predecessors_of<C>::type;
+        static_assert(boost::mpl::is_sequence<Predecessors>::value, "");
+
+        using Successors = typename successors_of<C>::type;
+        static_assert(boost::mpl::is_sequence<Successors>::value, "");
+
+        using Requirements = typename requirements_of<C>::type;
+        static_assert(boost::mpl::is_sequence<Requirements>::value, "");
     }
 };
 } // end namespace react
