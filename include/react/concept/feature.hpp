@@ -7,7 +7,6 @@
 #define REACT_CONCEPT_FEATURE_HPP
 
 #include <react/intrinsic/default_implementation_of.hpp>
-#include <react/intrinsic/has_default_implementation.hpp>
 
 #include <boost/concept/usage.hpp>
 #include <boost/mpl/eval_if.hpp>
@@ -29,10 +28,9 @@ namespace react {
  *
  *
  * ## Valid expressions
- * | Expression                                         | Return type                            | Semantics
- * | ----------                                         | -----------                            | ---------
- * | `default_implementation_of<F>::type<sub>opt</sub>` | A `Computation`                        | Return the default implementation of the computation represented by `F`. See `default_implementation_of` for details.
- * | `has_default_implementation<F>::type`              | A Boost.MPL boolean `IntegralConstant` | Return whether `F` has a default implementation. See `has_default_implementation` for details.
+ * | Expression                                         | Return type     | Semantics
+ * | ----------                                         | -----------     | ---------
+ * | `default_implementation_of<F>::type<sub>opt</sub>` | A `Computation` | Return the default implementation of the computation represented by `F`. See `default_implementation_of` for details.
  *
  *
  * @tparam F
@@ -41,11 +39,11 @@ namespace react {
 template <typename F>
 struct Feature {
     BOOST_CONCEPT_USAGE(Feature) {
-        using HasDefault = typename has_default_implementation<F>::type;
+        namespace mpl = boost::mpl;
 
-        using Default = typename boost::mpl::eval_if<HasDefault,
+        using Default = typename mpl::eval_if<has_default_implementation<F>,
             default_implementation_of<F>,
-            boost::mpl::void_
+            mpl::void_
         >::type;
     }
 };

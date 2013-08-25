@@ -10,7 +10,6 @@
 #include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/feature_of.hpp>
-#include <react/intrinsic/has_default_implementation.hpp>
 #include <react/intrinsic/instantiate.hpp>
 #include <react/intrinsic/predecessors_of.hpp>
 #include <react/intrinsic/requirements_of.hpp>

@@ -9,7 +9,6 @@
 #include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/feature_of.hpp>
-#include <react/intrinsic/has_default_implementation.hpp>
 #include <react/intrinsic/instantiate.hpp>
 
 #include <boost/mpl/assert.hpp>

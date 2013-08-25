@@ -15,6 +15,7 @@
 namespace react {
 namespace default_implementation_of_detail {
     BOOST_MPL_HAS_XXX_TRAIT_DEF(default_implementation)
+    BOOST_MPL_HAS_XXX_TRAIT_DEF(type)
 
     template <typename Feature>
     struct nested_default_implementation {
@@ -45,6 +46,13 @@ struct default_implementation_of
     : extension::default_implementation_of_impl<
         typename detail::strip<Feature>::type
     >::template apply<Feature>
+{ };
+
+template <typename T>
+struct has_default_implementation
+    : default_implementation_of_detail::has_type<
+        default_implementation_of<T>
+    >
 { };
 } // end namespace react
 
