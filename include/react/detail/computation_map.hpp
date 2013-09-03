@@ -7,9 +7,9 @@
 #define REACT_DETAIL_COMPUTATION_MAP_HPP
 
 #include <react/intrinsic/default_implementation_of.hpp>
-#include <react/intrinsic/dependencies_of.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/instantiate.hpp>
+#include <react/intrinsic/requirements_of.hpp>
 
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/at_default.hpp>
@@ -110,7 +110,7 @@ namespace computation_map_detail {
             using ToVisitNow = typename mpl::set_insert_range<
                 typename mpl::erase_key<ToVisit, Feature>::type,
                 mpl::filter_view<
-                    typename dependencies_of<Computation>::type,
+                    typename requirements_of<Computation>::type,
                     mpl::not_<mpl::has_key<VisitedNow, mpl::_1>>
                 >
             >::type;

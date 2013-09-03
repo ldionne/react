@@ -27,8 +27,8 @@ using test = Computation<
 >;
 
 BOOST_CONCEPT_ASSERT((test<>));
-BOOST_CONCEPT_ASSERT((test<dependency<1>>));
-BOOST_CONCEPT_ASSERT((test<dependency<1>, dependency<2>>));
+BOOST_CONCEPT_ASSERT((test<requirement<1>>));
+BOOST_CONCEPT_ASSERT((test<requirement<1>, requirement<2>>));
 
 
 int main() { }
