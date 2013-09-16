@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::executed_after`.
+ * Defines `react::computation::executed_after`.
  */
 
 #ifndef REACT_COMPUTATION_EXECUTED_AFTER_HPP

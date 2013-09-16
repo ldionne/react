@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::computation_map`.
+ * Defines `react::detail::computation_map`.
  */
 
 #ifndef REACT_DETAIL_COMPUTATION_MAP_HPP

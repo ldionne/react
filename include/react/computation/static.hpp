@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::static_`.
+ * Defines `react::computation::static_`.
  */
 
 #ifndef REACT_COMPUTATION_STATIC_HPP

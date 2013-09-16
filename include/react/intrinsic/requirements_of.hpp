@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::requirements_of` intrinsic.
+ * Defines the `react::requirements_of` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_REQUIREMENTS_OF_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::thread_local_`.
+ * Defines `react::computation::thread_local_`.
  */
 
 #ifndef REACT_COMPUTATION_THREAD_LOCAL_HPP

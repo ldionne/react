@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::dont_care`.
+ * Defines `react::detail::dont_care`.
  */
 
 #ifndef REACT_DETAIL_DONT_CARE_HPP

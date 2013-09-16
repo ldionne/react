@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines intrinsic operations for Boost.Fusion sequences.
+ * Defines intrinsic operations for Boost.Fusion sequences.
  */
 
 #ifndef REACT_EXTENSION_FUSION_HPP

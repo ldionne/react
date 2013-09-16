@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::union_`.
+ * Defines `react::computation::union_`.
  */
 
 #ifndef REACT_COMPUTATION_UNION_HPP

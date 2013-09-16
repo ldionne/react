@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::index_of`.
+ * Defines `react::detail::index_of`.
  */
 
 #ifndef REACT_DETAIL_INDEX_OF_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::executable_if`.
+ * Defines `react::computation::executable_if`.
  */
 
 #ifndef REACT_COMPUTATION_EXECUTABLE_IF_HPP

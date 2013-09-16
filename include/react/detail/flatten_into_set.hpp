@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::flatten_into_set`.
+ * Defines `react::detail::flatten_into_set`.
  */
 
 #ifndef REACT_DETAIL_FLATTEN_INTO_SET_HPP

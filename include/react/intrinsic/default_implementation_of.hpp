@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::default_implementation_of` intrinsic.
+ * Defines the `react::default_implementation_of` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_DEFAULT_IMPLEMENTATION_OF_HPP

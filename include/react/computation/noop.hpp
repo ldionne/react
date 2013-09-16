@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::noop`.
+ * Defines `react::computation::noop`.
  */
 
 #ifndef REACT_COMPUTATION_NOOP_HPP

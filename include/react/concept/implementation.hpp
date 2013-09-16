@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::Implementation` concept.
+ * Defines the `react::Implementation` concept.
  */
 
 #ifndef REACT_CONCEPT_IMPLEMENTATION_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::lazy`.
+ * Defines `react::computation::lazy`.
  */
 
 #ifndef REACT_COMPUTATION_LAZY_HPP

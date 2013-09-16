@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::retrieve` intrinsic.
+ * Defines the `react::retrieve` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_RETRIEVE_HPP

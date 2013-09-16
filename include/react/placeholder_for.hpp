@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::placeholder_for`.
+ * Defines `react::placeholder_for`.
  */
 
 #ifndef REACT_PLACEHOLDER_FOR_HPP

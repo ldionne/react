@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::retrievable_if`.
+ * Defines `react::computation::retrievable_if`.
  */
 
 #ifndef REACT_COMPUTATION_RETRIEVABLE_IF_HPP

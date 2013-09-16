@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::Feature` concept.
+ * Defines the `react::Feature` concept.
  */
 
 #ifndef REACT_CONCEPT_FEATURE_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::strict`.
+ * Defines `react::computation::strict`.
  */
 
 #ifndef REACT_COMPUTATION_STRICT_HPP

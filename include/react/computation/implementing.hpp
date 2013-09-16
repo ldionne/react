@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::implementing`.
+ * Defines `react::computation::implementing`.
  */
 
 #ifndef REACT_COMPUTATION_IMPLEMENTING_HPP

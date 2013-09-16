@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::extern_`.
+ * Defines `react::computation::extern_`.
  */
 
 #ifndef REACT_COMPUTATION_EXTERN_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::augment` intrinsic.
+ * Defines the `react::augment` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_AUGMENT_HPP

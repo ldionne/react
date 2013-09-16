@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `REACT_AUTO_RETURN` macro.
+ * Defines the `REACT_AUTO_RETURN` macro.
  */
 
 #ifndef REACT_DETAIL_AUTO_RETURN_HPP

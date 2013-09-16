@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::variable`.
+ * Defines `react::computation::variable`.
  */
 
 #ifndef REACT_COMPUTATION_VARIABLE_HPP

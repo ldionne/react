@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::alias`.
+ * Defines `react::computation::alias`.
  */
 
 #ifndef REACT_COMPUTATION_ALIAS_HPP

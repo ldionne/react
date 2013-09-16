@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the archetypes for all the concepts of the library.
+ * Defines the archetypes for all the concepts of the library.
  */
 
 #ifndef REACT_ARCHETYPES_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::executed_before`.
+ * Defines `react::computation::executed_before`.
  */
 
 #ifndef REACT_COMPUTATION_EXECUTED_BEFORE_HPP

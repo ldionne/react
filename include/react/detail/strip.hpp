@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::strip`.
+ * Defines `react::detail::strip`.
  */
 
 #ifndef REACT_DETAIL_STRIP_HPP

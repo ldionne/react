@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::execute` intrinsic.
+ * Defines the `react::execute` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_EXECUTE_HPP

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::requiring`.
+ * Defines `react::computation::requiring`.
  */
 
 #ifndef REACT_COMPUTATION_REQUIRING_HPP

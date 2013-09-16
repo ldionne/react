@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation_set`.
+ * Defines `react::computation_set`.
  */
 
 #ifndef REACT_COMPUTATION_SET_HPP

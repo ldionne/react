@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::predecessors_of` intrinsic.
+ * Defines the `react::predecessors_of` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_PREDECESSORS_OF_HPP

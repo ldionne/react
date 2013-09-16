@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::detail::in_execution_order`.
+ * Defines `react::detail::in_execution_order`.
  */
 
 #ifndef REACT_DETAIL_IN_EXECUTION_ORDER_HPP

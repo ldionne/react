@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::Environment` concept.
+ * Defines the `react::Environment` concept.
  */
 
 #ifndef REACT_CONCEPT_ENVIRONMENT_HPP

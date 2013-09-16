@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines `react::computation::custom_stored`.
+ * Defines `react::computation::custom_stored`.
  */
 
 #ifndef REACT_COMPUTATION_CUSTOM_STORED_HPP
