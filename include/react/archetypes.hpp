@@ -7,7 +7,6 @@
 #define REACT_ARCHETYPES_HPP
 
 #include <boost/concept_archetype.hpp>
-#include <utility>
 
 
 namespace react {
