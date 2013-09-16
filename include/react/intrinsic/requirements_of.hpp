@@ -37,6 +37,12 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The features that must be satisfied in an environment containing
+ * `Computation`.
+ */
 template <typename Computation>
 struct requirements_of
     : extension::requirements_of_impl<

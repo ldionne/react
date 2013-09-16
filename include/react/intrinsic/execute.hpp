@@ -32,23 +32,44 @@ namespace extension {
     };
 } // end namespace extension
 
-static constexpr struct execute {
+#ifdef REACT_DOXYGEN_INVOKED
+    /*!
+     * @ingroup intrinsics
+     *
+     * Execute all of the computations of an environment in the right order.
+     *
+     * The order is such that all the predecessors of a computation are
+     * executed before it and all its successors are executed after.
+     */
     template <typename Env>
-    auto operator()(Env&& env) const
-    REACT_AUTO_RETURN(
-        extension::execute_impl<
-            typename detail::strip<Env>::type
-        >::call(std::forward<Env>(env))
-    )
+    auto execute(Env&& env);
 
+    /*!
+     * @ingroup intrinsics
+     *
+     * Execute a computation in the given environment.
+     */
     template <typename Computation, typename Env>
-    auto operator()(Computation&& c, Env&& env) const
-    REACT_AUTO_RETURN(
-        extension::execute_impl<
-            typename detail::strip<Computation>::type
-        >::call(std::forward<Computation>(c), std::forward<Env>(env))
-    )
-} execute{};
+    auto execute(Computation&& c, Env&& env)
+#else
+    static constexpr struct execute {
+        template <typename Env>
+        auto operator()(Env&& env) const
+        REACT_AUTO_RETURN(
+            extension::execute_impl<
+                typename detail::strip<Env>::type
+            >::call(std::forward<Env>(env))
+        )
+
+        template <typename Computation, typename Env>
+        auto operator()(Computation&& c, Env&& env) const
+        REACT_AUTO_RETURN(
+            extension::execute_impl<
+                typename detail::strip<Computation>::type
+            >::call(std::forward<Computation>(c), std::forward<Env>(env))
+        )
+    } execute{};
+#endif
 } // end namespace react
 
 #endif // !REACT_INTRINSIC_EXECUTE_HPP

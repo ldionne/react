@@ -37,6 +37,12 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The features of the computations that must be executed before `Computation`
+ * when an environment is executed.
+ */
 template <typename Computation>
 struct predecessors_of
     : extension::predecessors_of_impl<

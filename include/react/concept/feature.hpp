@@ -28,9 +28,9 @@ namespace react {
  *
  *
  * ## Valid expressions
- * | Expression                                         | Return type     | Semantics
- * | ----------                                         | -----------     | ---------
- * | `default_implementation_of<F>::type<sub>opt</sub>` | A `Computation` | Return the default implementation of the computation represented by `F`. See `default_implementation_of` for details.
+ * | Expression                                         | Return type
+ * | ----------                                         | -----------
+ * | `default_implementation_of<F>::type<sub>opt</sub>` | A `Computation`
  *
  *
  * @tparam F

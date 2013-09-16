@@ -37,6 +37,12 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The features of the computations that must be executed after `Computation`
+ * when an environment is executed.
+ */
 template <typename Computation>
 struct successors_of
     : extension::successors_of_impl<

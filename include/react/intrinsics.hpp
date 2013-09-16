@@ -6,6 +6,10 @@
 #ifndef REACT_INTRINSICS_HPP
 #define REACT_INTRINSICS_HPP
 
+/*!
+ * @defgroup intrinsics Intrinsics
+ */
+
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/default_implementation_of.hpp>
 #include <react/intrinsic/execute.hpp>

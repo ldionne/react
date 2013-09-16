@@ -41,6 +41,11 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The default implementation of the computation represented by `Feature`.
+ */
 template <typename Feature>
 struct default_implementation_of
     : extension::default_implementation_of_impl<

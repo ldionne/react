@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::Computation` concept.
+ * Defines the `react::Computation` concept.
  */
 
 #ifndef REACT_CONCEPT_COMPUTATION_HPP
@@ -32,8 +32,11 @@ struct fake_result_of {
 };
 
 /*!
- * Specification of the `Computation` concept. `Computation` is a refinement
- * of the `Implementation` concept.
+ * Specification of the `Computation` concept.
+ *
+ *
+ * ## Refinement of
+ * `Implementation`
  *
  *
  * ## Notation
@@ -46,13 +49,13 @@ struct fake_result_of {
  *
  *
  * ## Valid expressions
- * | Expression                 | Return type                                     | Semantics
- * | ----------                 | -----------                                     | ---------
- * | `execute(c, env)`          | Any type                                        | Execute `c` with `env` as `Environment`. See `execute` for details.
- * | `retrieve(c, env)`         | Any type                                        | Return the result of `c` with `env` as `Environment`. See `retrieve` for details.
- * | `requirements_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features that must be satisfied in an environment containing `C`. See `requirements_of` for details.
- * | `predecessors_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed before `C` when an `Environment` is executed. See `predecessors_of` for details.
- * | `successors_of<C>::type`   | A Boost.MPL `AssociativeSequence` of `Feature`s | The features of the computations that must be executed after `C` when an `Environment` is executed. See `successors_of` for details.
+ * | Expression                 | Return type
+ * | ----------                 | -----------
+ * | `execute(c, env)`          | Any type
+ * | `retrieve(c, env)`         | Any type
+ * | `requirements_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s
+ * | `predecessors_of<C>::type` | A Boost.MPL `AssociativeSequence` of `Feature`s
+ * | `successors_of<C>::type`   | A Boost.MPL `AssociativeSequence` of `Feature`s
  *
  *
  * @tparam C

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::feature_of` intrinsic.
+ * Defines the `react::feature_of` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_FEATURE_OF_HPP
@@ -41,6 +41,11 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The feature implemented by `Implementation`.
+ */
 template <typename Implementation>
 struct feature_of
     : extension::feature_of_impl<

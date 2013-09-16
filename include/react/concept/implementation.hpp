@@ -31,10 +31,10 @@ namespace react {
  *
  *
  * ## Valid expressions
- * | Expression                | Return type     | Semantics
- * | ----------                | -----------     | ---------
- * | `feature_of<I>::type`     | A `Feature`     | The feature implemented by `I`. See `feature_of` for details.
- * | `instantiate<I, M>::type` | A `Computation` | The computation implementing the feature of `I`, parameterized with the computations in `M`. See `instantiate` for details.
+ * | Expression                | Return type
+ * | ----------                | -----------
+ * | `feature_of<I>::type`     | A `Feature`
+ * | `instantiate<I, M>::type` | A `Computation`
  *
  *
  * @tparam I

@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file defines the `react::instantiate` intrinsic.
+ * Defines the `react::instantiate` intrinsic.
  */
 
 #ifndef REACT_INTRINSIC_INSTANTIATE_HPP
@@ -40,6 +40,12 @@ namespace extension {
     };
 } // end namespace extension
 
+/*!
+ * @ingroup intrinsics
+ *
+ * The computation implementing the feature of `Implementation`,
+ * parameterized with the computations in `ComputationMap`.
+ */
 template <typename Implementation, typename ComputationMap>
 struct instantiate
     : extension::instantiate_impl<

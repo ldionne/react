@@ -34,21 +34,43 @@ namespace extension {
     };
 } // end namespace extension
 
-template <typename Feature, typename Env>
-auto retrieve(Env&& env)
-REACT_AUTO_RETURN(
-    extension::retrieve_impl<
-        typename detail::strip<Env>::type
-    >::template call<Feature>(std::forward<Env>(env))
-)
+#ifdef REACT_DOXYGEN_INVOKED
+    /*!
+     * @ingroup intrinsics
+     *
+     * Return the result of the computation associated to the feature
+     * `Feature` in the given environment.
+     *
+     * If there is no such computation in the environment, the expression
+     * shall be ill-formed.
+     */
+    template <typename Feature, typename Env>
+    auto retrieve(Env&& env);
 
-template <typename Computation, typename Env>
-auto retrieve(Computation&& c, Env&& env)
-REACT_AUTO_RETURN(
-    extension::retrieve_impl<
-        typename detail::strip<Computation>::type
-    >::call(std::forward<Computation>(c), std::forward<Env>(env))
-)
+    /*!
+     * @ingroup intrinsics
+     *
+     * Return the result of a computation in the given environment.
+     */
+    template <typename Computation, typename Env>
+    auto retrieve(Computation&& c, Env&& env);
+#else
+    template <typename Feature, typename Env>
+    auto retrieve(Env&& env)
+    REACT_AUTO_RETURN(
+        extension::retrieve_impl<
+            typename detail::strip<Env>::type
+        >::template call<Feature>(std::forward<Env>(env))
+    )
+
+    template <typename Computation, typename Env>
+    auto retrieve(Computation&& c, Env&& env)
+    REACT_AUTO_RETURN(
+        extension::retrieve_impl<
+            typename detail::strip<Computation>::type
+        >::call(std::forward<Computation>(c), std::forward<Env>(env))
+    )
+#endif
 } // end namespace react
 
 #endif // !REACT_INTRINSIC_RETRIEVE_HPP
