@@ -1,10 +1,12 @@
 /*!
  * @file
- * This file contains unit tests for the intrinsics for Boost.Fusion sequences.
+ * Contains unit tests for the intrinsics for Boost.Fusion sequences.
  */
 
 #include <react/extension/fusion.hpp>
+
 #include <react/computation/implementing.hpp>
+#include <react/concept/assert.hpp>
 #include <react/concepts.hpp>
 #include <react/detail/dont_care.hpp>
 #include <react/intrinsic/augment.hpp>
@@ -12,7 +14,6 @@
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/concept/assert.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <type_traits>
 
@@ -31,18 +32,18 @@ struct Comp : computation::implementing<Comp<i>> {
     }
 };
 
-BOOST_CONCEPT_ASSERT((Environment<
+REACT_CONCEPT_ASSERT(Environment<
     boost::fusion::vector<>,
     available_features<>
->));
-BOOST_CONCEPT_ASSERT((Environment<
+>);
+REACT_CONCEPT_ASSERT(Environment<
     boost::fusion::vector<Comp<0>>,
     available_features<Comp<0>>
->));
-BOOST_CONCEPT_ASSERT((Environment<
+>);
+REACT_CONCEPT_ASSERT(Environment<
     boost::fusion::vector<Comp<0>, Comp<1>>,
     available_features<Comp<0>, Comp<1>>
->));
+>);
 
 
 int main() {

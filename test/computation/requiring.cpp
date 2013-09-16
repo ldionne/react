@@ -1,13 +1,14 @@
 /*!
  * @file
- * This file contains unit tests for `react::computation::requiring`.
+ * Contains unit tests for `react::computation::requiring`.
  */
 
 #include <react/computation/requiring.hpp>
+
 #include <react/archetypes.hpp>
+#include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
 
-#include <boost/concept/assert.hpp>
 #include <boost/concept_archetype.hpp>
 
 
@@ -26,9 +27,9 @@ using test = Computation<
     >...
 >;
 
-BOOST_CONCEPT_ASSERT((test<>));
-BOOST_CONCEPT_ASSERT((test<requirement<1>>));
-BOOST_CONCEPT_ASSERT((test<requirement<1>, requirement<2>>));
+REACT_CONCEPT_ASSERT(test<>);
+REACT_CONCEPT_ASSERT(test<requirement<1>>);
+REACT_CONCEPT_ASSERT(test<requirement<1>, requirement<2>>);
 
 
 int main() { }

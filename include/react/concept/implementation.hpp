@@ -8,6 +8,7 @@
 
 #include <react/concept/assert.hpp>
 #include <react/concept/feature.hpp>
+#include <react/concept/usage.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/instantiate.hpp>
 
@@ -44,8 +45,8 @@ namespace react {
  *         computations with which it is possible to instantiate `I`.
  */
 template <typename I, typename ...C>
-class Implementation {
-    static void test() {
+struct Implementation {
+    REACT_CONCEPT_USAGE(Implementation) {
         using ImplementedFeature = typename feature_of<I>::type;
         REACT_CONCEPT_ASSERT(Feature<ImplementedFeature>);
 

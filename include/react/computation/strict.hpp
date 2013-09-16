@@ -81,7 +81,13 @@ namespace strict_detail {
  */
 template <typename Computation>
 struct strict : Computation {
-    using Computation::Computation;
+private:
+    // Avoid `using Computation::Computation`, which makes us unable to
+    // use `Computation` to refer to the template parameter with Clang.
+    using Computation_ = Computation;
+
+public:
+    using Computation_::Computation_;
     using Computation::operator=;
 
     template <typename Env>

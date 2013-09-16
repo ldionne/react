@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file contains unit tests for `react::detail::in_execution_order`.
+ * Contains unit tests for `react::detail::in_execution_order`.
  */
 
 #include <react/detail/in_execution_order.hpp>

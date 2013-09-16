@@ -8,6 +8,7 @@
 
 #include <react/archetypes.hpp>
 #include <react/concept/assert.hpp>
+#include <react/concept/usage.hpp>
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
@@ -32,7 +33,8 @@ namespace environment_detail {
     class BasicEnvironment {
         static Env& env;
 
-        static void test() {
+    public:
+        REACT_CONCEPT_USAGE(BasicEnvironment) {
             execute(env);
 
             augment(env, comp<0>{});
@@ -76,7 +78,8 @@ class Environment
 {
     static Env& env;
 
-    static void test() {
+public:
+    REACT_CONCEPT_USAGE(Environment) {
         using namespace environment_detail;
 
         REACT_CONCEPT_ASSERT(BasicEnvironment<

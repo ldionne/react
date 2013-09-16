@@ -1,12 +1,13 @@
 /*!
  * @file
- * This file contains unit tests for `react::computation::variable`.
+ * Contains unit tests for `react::computation::variable`.
  */
 
 #include <react/computation/variable.hpp>
+
+#include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
 
-#include <boost/concept/assert.hpp>
 #include <boost/concept_archetype.hpp>
 
 
@@ -21,14 +22,14 @@ struct test_concept
 { };
 
 using T = boost::copy_constructible_archetype<>;
-BOOST_CONCEPT_ASSERT((test_concept<T>));
-BOOST_CONCEPT_ASSERT((test_concept<T const>));
-BOOST_CONCEPT_ASSERT((test_concept<T()>));
-BOOST_CONCEPT_ASSERT((test_concept<T(T)>));
-BOOST_CONCEPT_ASSERT((test_concept<T[]>));
-BOOST_CONCEPT_ASSERT((test_concept<T[2]>));
-BOOST_CONCEPT_ASSERT((test_concept<T[2][4]>));
-BOOST_CONCEPT_ASSERT((test_concept<T[][2][4]>));
+REACT_CONCEPT_ASSERT(test_concept<T>);
+REACT_CONCEPT_ASSERT(test_concept<T const>);
+REACT_CONCEPT_ASSERT(test_concept<T()>);
+REACT_CONCEPT_ASSERT(test_concept<T(T)>);
+REACT_CONCEPT_ASSERT(test_concept<T[]>);
+REACT_CONCEPT_ASSERT(test_concept<T[2]>);
+REACT_CONCEPT_ASSERT(test_concept<T[2][4]>);
+REACT_CONCEPT_ASSERT(test_concept<T[][2][4]>);
 
 
 int main() { }

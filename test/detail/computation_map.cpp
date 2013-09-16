@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file contains unit tests for `react::detail::computation_map`.
+ * Contains unit tests for `react::detail::computation_map`.
  */
 
 #include <react/detail/computation_map.hpp>

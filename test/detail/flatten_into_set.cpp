@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file contains unit tests for `react::detail::flatten_into_set`.
+ * Contains unit tests for `react::detail::flatten_into_set`.
  */
 
 #include <react/detail/flatten_into_set.hpp>

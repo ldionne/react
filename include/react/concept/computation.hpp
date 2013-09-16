@@ -8,6 +8,7 @@
 
 #include <react/archetypes.hpp>
 #include <react/concept/implementation.hpp>
+#include <react/concept/usage.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/predecessors_of.hpp>
@@ -79,7 +80,8 @@ class Computation : Implementation<C> {
     static GoodEnoughEnv& env;
     static C& c;
 
-    static void test() {
+public:
+    REACT_CONCEPT_USAGE(Computation) {
         execute(c, env);
         retrieve(c, env);
 

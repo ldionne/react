@@ -29,10 +29,17 @@ namespace react { namespace computation {
      */
     template <typename Predicate, typename Computation>
     struct executable_if : Computation {
-        using Computation::Computation;
+    private:
+        // Avoid `using Computation::Computation`, which makes us unable to
+        // use `Computation` to refer to the template parameter with Clang.
+        using Computation_ = Computation;
+
+    public:
+        using Computation_::Computation_;
         using Computation::operator=;
 
-        template <typename Env, typename = typename std::enable_if<
+        template <typename Env, typename = typename
+        std::enable_if<
             boost::mpl::apply<Predicate, Env>::type::value
         >::type>
         static auto execute(executable_if& self, Env&& env)
@@ -43,7 +50,8 @@ namespace react { namespace computation {
             )
         )
 
-        template <typename Env, typename = typename std::enable_if<
+        template <typename Env, typename = typename
+        std::enable_if<
             boost::mpl::apply<Predicate, Env>::type::value
         >::type>
         static auto execute(executable_if const& self, Env&& env)

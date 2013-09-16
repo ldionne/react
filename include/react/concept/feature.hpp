@@ -6,6 +6,7 @@
 #ifndef REACT_CONCEPT_FEATURE_HPP
 #define REACT_CONCEPT_FEATURE_HPP
 
+#include <react/concept/usage.hpp>
 #include <react/intrinsic/default_implementation_of.hpp>
 
 #include <boost/mpl/eval_if.hpp>
@@ -36,8 +37,8 @@ namespace react {
  *         The type to be tested for modeling of the `Feature` concept.
  */
 template <typename F>
-class Feature {
-    static void test() {
+struct Feature {
+    REACT_CONCEPT_USAGE(Feature) {
         namespace mpl = boost::mpl;
 
         using Default = typename mpl::eval_if<has_default_implementation<F>,
