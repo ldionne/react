@@ -15,7 +15,6 @@
 #include <react/intrinsic/retrieve.hpp>
 #include <react/intrinsic/successors_of.hpp>
 
-#include <boost/concept/usage.hpp>
 #include <boost/mpl/at.hpp>
 #include <boost/mpl/has_key.hpp>
 #include <boost/mpl/is_sequence.hpp>
@@ -80,8 +79,7 @@ class Computation : Implementation<C> {
     static GoodEnoughEnv& env;
     static C& c;
 
-public:
-    BOOST_CONCEPT_USAGE(Computation) {
+    static void test() {
         execute(c, env);
         retrieve(c, env);
 

@@ -6,12 +6,11 @@
 #ifndef REACT_CONCEPT_IMPLEMENTATION_HPP
 #define REACT_CONCEPT_IMPLEMENTATION_HPP
 
+#include <react/concept/assert.hpp>
 #include <react/concept/feature.hpp>
 #include <react/intrinsic/feature_of.hpp>
 #include <react/intrinsic/instantiate.hpp>
 
-#include <boost/concept/assert.hpp>
-#include <boost/concept/usage.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
 
@@ -45,10 +44,10 @@ namespace react {
  *         computations with which it is possible to instantiate `I`.
  */
 template <typename I, typename ...C>
-struct Implementation {
-    BOOST_CONCEPT_USAGE(Implementation) {
+class Implementation {
+    static void test() {
         using ImplementedFeature = typename feature_of<I>::type;
-        BOOST_CONCEPT_ASSERT((Feature<ImplementedFeature>));
+        REACT_CONCEPT_ASSERT(Feature<ImplementedFeature>);
 
         using M = typename boost::mpl::map<
             boost::mpl::pair<typename feature_of<C>::type, C>...

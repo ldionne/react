@@ -7,12 +7,12 @@
 #define REACT_CONCEPT_ENVIRONMENT_HPP
 
 #include <react/archetypes.hpp>
+#include <react/concept/assert.hpp>
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
 
 #include <boost/concept/assert.hpp>
-#include <boost/concept/usage.hpp>
 #include <boost/concept_archetype.hpp>
 
 
@@ -25,9 +25,14 @@ namespace environment_detail {
           boost::default_constructible_archetype<>>>
     { using feature = comp; };
 
+    template <typename ...Args>
+    void allow_expansion(Args&& ...);
+
     template <typename Env, typename ...AvailableFeatures>
-    struct BasicEnvironment {
-        BOOST_CONCEPT_USAGE(BasicEnvironment) {
+    class BasicEnvironment {
+        static Env& env;
+
+        static void test() {
             execute(env);
 
             augment(env, comp<0>{});
@@ -36,12 +41,6 @@ namespace environment_detail {
 
             allow_expansion((retrieve<AvailableFeatures>(env), 0)...);
         }
-
-    private:
-        static Env& env;
-
-        template <typename ...Args>
-        static void allow_expansion(Args&& ...);
     };
 } // end namespace environment_detail
 
@@ -72,30 +71,29 @@ namespace environment_detail {
  *         A sequence of `Feature`s that can be retrieved from `Env`.
  */
 template <typename Env, typename ...AvailableFeatures>
-struct Environment
+class Environment
     : environment_detail::BasicEnvironment<Env, AvailableFeatures...>
 {
-    BOOST_CONCEPT_USAGE(Environment) {
+    static Env& env;
+
+    static void test() {
         using namespace environment_detail;
 
-        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+        REACT_CONCEPT_ASSERT(BasicEnvironment<
             decltype(augment(env, comp<0>{})),
             AvailableFeatures..., comp<0>
-        >));
+        >);
 
-        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+        REACT_CONCEPT_ASSERT(BasicEnvironment<
             decltype(augment(env, comp<0>{}, comp<1>{})),
             AvailableFeatures..., comp<0>, comp<1>
-        >));
+        >);
 
-        BOOST_CONCEPT_ASSERT((BasicEnvironment<
+        REACT_CONCEPT_ASSERT(BasicEnvironment<
             decltype(augment(env, comp<0>{}, comp<0>{})),
             AvailableFeatures..., comp<0>
-        >));
+        >);
     }
-
-private:
-    static Env& env;
 };
 
 template <typename ...Features>

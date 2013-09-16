@@ -8,7 +8,6 @@
 
 #include <react/intrinsic/default_implementation_of.hpp>
 
-#include <boost/concept/usage.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/void.hpp>
 
@@ -37,8 +36,8 @@ namespace react {
  *         The type to be tested for modeling of the `Feature` concept.
  */
 template <typename F>
-struct Feature {
-    BOOST_CONCEPT_USAGE(Feature) {
+class Feature {
+    static void test() {
         namespace mpl = boost::mpl;
 
         using Default = typename mpl::eval_if<has_default_implementation<F>,
