@@ -14,7 +14,7 @@
 #include <boost/assert.hpp>
 #include <boost/concept/assert.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 
 
 using namespace react;
@@ -27,7 +27,7 @@ struct Comp : computation::implementing<Comp<i>> {
 
     template <typename Other>
     friend constexpr bool operator==(Comp const&, Other const&) {
-        return boost::is_same<Comp, Other>::value;
+        return std::is_same<Comp, Other>::value;
     }
 };
 

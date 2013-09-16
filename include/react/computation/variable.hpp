@@ -10,14 +10,10 @@
 #include <react/detail/auto_return.hpp>
 #include <react/detail/dont_care.hpp>
 
-#include <boost/array.hpp>
+#include <array>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/mpl/identity.hpp>
-#include <boost/type_traits/add_pointer.hpp>
-#include <boost/type_traits/extent.hpp>
-#include <boost/type_traits/is_array.hpp>
-#include <boost/type_traits/is_function.hpp>
-#include <boost/type_traits/remove_extent.hpp>
+#include <type_traits>
 #include <utility>
 
 
@@ -27,17 +23,17 @@ namespace react { namespace computation {
 
         template <typename Array>
         struct make_array {
-            using type = array<
-                typename remove_extent<Array>::type,
-                extent<Array>::value
+            using type = std::array<
+                typename std::remove_extent<Array>::type,
+                std::extent<Array>::value
             >;
         };
 
         template <typename T>
         struct adjust
-            : mpl::eval_if<is_function<T>, add_pointer<T>,
-              mpl::eval_if<is_array<T>, make_array<T>,
-                           /* else */   mpl::identity<T>
+            : mpl::eval_if<std::is_function<T>, std::add_pointer<T>,
+              mpl::eval_if<std::is_array<T>,    make_array<T>,
+                           /* else */           mpl::identity<T>
             >>
         { };
     } // end namespace variable_detail
@@ -50,7 +46,7 @@ namespace react { namespace computation {
      * computation.
      *
      * If a function type is specified, a pointer to the function type is
-     * stored instead. If an array type is specified, a `boost::array` is
+     * stored instead. If an array type is specified, a `std::array` is
      * stored instead.
      *
      * @tparam Type

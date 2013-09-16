@@ -25,10 +25,8 @@
 #include <boost/mpl/not.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/transform.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <boost/type_traits/remove_reference.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <functional>
+#include <type_traits>
 #include <utility>
 
 
@@ -58,20 +56,20 @@ namespace fusion_detail {
     }
 
     template <typename Feature, typename Computation, typename =
-    typename enable_if<
-        is_same<typename feature_of<Computation>::type, Feature>
+    typename std::enable_if<
+        std::is_same<typename feature_of<Computation>::type, Feature>::value
     >::type>
     auto implement(Computation&& c) REACT_AUTO_RETURN(
         std::forward<Computation>(c)
     )
 
     template <typename Feature, typename Computation, typename =
-    typename disable_if<
-        is_same<typename feature_of<Computation>::type, Feature>
+    typename std::enable_if<
+        !std::is_same<typename feature_of<Computation>::type, Feature>::value
     >::type>
     auto implement(Computation&& c) REACT_AUTO_RETURN(
         computation::implementing<
-            Feature, typename remove_reference<Computation>::type
+            Feature, typename std::remove_reference<Computation>::type
         >(std::forward<Computation>(c))
     )
 
@@ -95,7 +93,7 @@ namespace fusion_detail {
         // anything else.
         fusion::push_front(
             filter<
-                mpl::not_<is_same<feature_of<mpl::_1>, Feature>>
+                mpl::not_<std::is_same<feature_of<mpl::_1>, Feature>>
             >(std::forward<Env>(env)),
             implement<Feature>(std::forward<Computation>(c))
         )
@@ -105,7 +103,9 @@ namespace fusion_detail {
 namespace extension {
 template <typename T>
 struct execute_impl<
-    T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
+    T, typename std::enable_if<
+        boost::fusion::traits::is_sequence<T>::type::value
+       >::type
 > {
     template <typename Computations>
     static void call(Computations const& computations) {
@@ -120,7 +120,9 @@ struct execute_impl<
 
 template <typename T>
 struct augment_impl<
-    T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
+    T, typename std::enable_if<
+        boost::fusion::traits::is_sequence<T>::type::value
+       >::type
 > {
     template <typename Env, typename Head, typename ...Tail>
     static auto call(Env&& env, Head&& head, Tail&& ...tail) REACT_AUTO_RETURN(
@@ -140,14 +142,16 @@ struct augment_impl<
 
 template <typename T>
 struct retrieve_impl<
-    T, typename boost::enable_if<boost::fusion::traits::is_sequence<T>>::type
+    T, typename std::enable_if<
+        boost::fusion::traits::is_sequence<T>::type::value
+       >::type
 > {
     template <typename Feature, typename Env>
     static auto call(Env&& env) REACT_AUTO_RETURN(
         retrieve(
             boost::fusion::deref(
                 boost::fusion::find_if<
-                    boost::is_same<Feature, feature_of<boost::mpl::_1>>
+                    std::is_same<Feature, feature_of<boost::mpl::_1>>
                 >(env)
             ),
             env

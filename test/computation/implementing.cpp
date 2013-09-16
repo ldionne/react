@@ -9,7 +9,7 @@
 #include <react/intrinsic/feature_of.hpp>
 
 #include <boost/concept/assert.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 
 
 using namespace react;
@@ -25,17 +25,17 @@ struct Base
 using Standalone = computation::implementing<feature_archetype<>>;
 
 BOOST_CONCEPT_ASSERT((Computation<Wrapper>));
-static_assert(boost::is_same<
+static_assert(std::is_same<
     feature_of<Wrapper>::type, feature_archetype<>
 >::value, "");
 
 BOOST_CONCEPT_ASSERT((Computation<Base>));
-static_assert(boost::is_same<
+static_assert(std::is_same<
     feature_of<Base>::type, feature_archetype<>
 >::value, "");
 
 BOOST_CONCEPT_ASSERT((Computation<Standalone>));
-static_assert(boost::is_same<
+static_assert(std::is_same<
     feature_of<Standalone>::type, feature_archetype<>
 >::value, "");
 

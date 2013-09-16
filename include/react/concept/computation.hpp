@@ -21,7 +21,7 @@
 #include <boost/mpl/is_sequence.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 
 
 namespace react {
@@ -71,10 +71,10 @@ class Computation : Implementation<C> {
 
     struct GoodEnoughEnv : environment_archetype<> {
         template <typename Feature, typename Self>
-        static typename boost::lazy_enable_if<
-            boost::mpl::has_key<Results, Feature>,
+        static typename std::enable_if<
+            boost::mpl::has_key<Results, Feature>::type::value,
             boost::mpl::at<Results, Feature>
-        >::type retrieve(Self&&);
+        >::type::type retrieve(Self&&);
     };
 
     static GoodEnoughEnv& env;

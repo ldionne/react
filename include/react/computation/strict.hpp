@@ -14,7 +14,7 @@
 #include <boost/mpl/for_each.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/transform_view.hpp>
-#include <boost/type_traits/add_pointer.hpp>
+#include <type_traits>
 #include <utility>
 
 
@@ -23,7 +23,9 @@ namespace strict_detail {
     using namespace boost;
 
     template <typename Sequence>
-    using pointers_to = mpl::transform_view<Sequence, add_pointer<mpl::_1>>;
+    using pointers_to = mpl::transform_view<
+        Sequence, std::add_pointer<mpl::_1>
+    >;
 
     template <typename Env>
     struct assert_retrievable_from {
@@ -35,7 +37,7 @@ namespace strict_detail {
             // 3. the code is never executed since it is useless to
             //    actually perform the retrieval
             if (always_false) {
-                typename add_pointer<Env>::type env = 0;
+                typename std::add_pointer<Env>::type env = 0;
 
                 //////////////////////////////////////////////////////////////
                 //

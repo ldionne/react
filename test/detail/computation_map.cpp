@@ -14,7 +14,7 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
-#include <boost/type_traits/is_same.hpp>
+#include <type_traits>
 
 
 namespace mpl = boost::mpl;
@@ -234,7 +234,7 @@ namespace fetch_default_implementation {
         using default_implementation = Computation;
     };
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<>,
             defaults_to<comp<c1>>
@@ -242,7 +242,7 @@ namespace fetch_default_implementation {
         comp<c1>
     >::value, "");
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<
                 comp<c2>
@@ -252,7 +252,7 @@ namespace fetch_default_implementation {
         comp<c1>
     >::value, "");
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<
                 implementing<defaults_to<comp<c1>>, comp<c2>>
@@ -262,7 +262,7 @@ namespace fetch_default_implementation {
         implementing<defaults_to<comp<c1>>, comp<c2>>
     >::value, "");
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<
                 comp<c2>
@@ -272,7 +272,7 @@ namespace fetch_default_implementation {
         comp<c1, comp<c2>>
     >::value, "");
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<
                 comp<c2, placeholder_for<c3>>,
@@ -283,7 +283,7 @@ namespace fetch_default_implementation {
         comp<c1, comp<c2, comp<c3>>>
     >::value, "");
 
-    static_assert(boost::is_same<
+    static_assert(std::is_same<
         mpl::at<
             computation_map<>,
             defaults_to<comp<c1, placeholder_for<defaults_to<comp<c2>>>>>

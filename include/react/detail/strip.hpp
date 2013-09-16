@@ -6,15 +6,14 @@
 #ifndef REACT_DETAIL_STRIP_HPP
 #define REACT_DETAIL_STRIP_HPP
 
-#include <boost/type_traits/remove_cv.hpp>
-#include <boost/type_traits/remove_reference.hpp>
+#include <type_traits>
 
 
 namespace react { namespace detail {
     template <typename T>
     struct strip
-        : boost::remove_cv<
-            typename boost::remove_reference<T>::type
+        : std::remove_cv<
+            typename std::remove_reference<T>::type
         >
     { };
 }} // end namespace react::detail

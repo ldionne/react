@@ -10,7 +10,7 @@
 #include <react/intrinsic/execute.hpp>
 
 #include <boost/mpl/apply.hpp>
-#include <boost/utility/enable_if.hpp>
+#include <type_traits>
 #include <utility>
 
 
@@ -32,8 +32,8 @@ namespace react { namespace computation {
         using Computation::Computation;
         using Computation::operator=;
 
-        template <typename Env, typename = typename boost::enable_if<
-            typename boost::mpl::apply<Predicate, Env>::type
+        template <typename Env, typename = typename std::enable_if<
+            boost::mpl::apply<Predicate, Env>::type::value
         >::type>
         static auto execute(executable_if& self, Env&& env)
         REACT_AUTO_RETURN(
@@ -43,8 +43,8 @@ namespace react { namespace computation {
             )
         )
 
-        template <typename Env, typename = typename boost::enable_if<
-            typename boost::mpl::apply<Predicate, Env>::type
+        template <typename Env, typename = typename std::enable_if<
+            boost::mpl::apply<Predicate, Env>::type::value
         >::type>
         static auto execute(executable_if const& self, Env&& env)
         REACT_AUTO_RETURN(
