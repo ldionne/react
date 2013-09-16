@@ -10,16 +10,17 @@ add_custom_target(check
     COMMENT "build and then run all the unit tests"
 )
 
+list(APPEND REACT_INCLUDES
+    ${react_SOURCE_DIR}/include
+    ${react_SOURCE_DIR}/ext/mpl_extensions/include
+    ${Boost_INCLUDE_DIRS}
+    ${react_SOURCE_DIR}/ext/mpl11/include
+)
+
 function(react_add_test name sources)
     add_executable(${name} EXCLUDE_FROM_ALL ${sources})
     set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/include
-    )
-    set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${react_SOURCE_DIR}/ext/mpl_extensions/include
-    )
-    set_property(TARGET ${name}
-        APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS}
+        APPEND PROPERTY INCLUDE_DIRECTORIES ${REACT_INCLUDES}
     )
     add_test(NAME ${name} COMMAND ${name})
     add_dependencies(unit ${name})
