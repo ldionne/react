@@ -5,10 +5,9 @@
 
 #include <react/computation/variable.hpp>
 
+#include <react/concept/archetypes.hpp>
 #include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
-
-#include <boost/concept_archetype.hpp>
 
 
 using namespace react;
@@ -21,7 +20,7 @@ struct test_concept
       Computation<computation::variable<T&>>
 { };
 
-using T = boost::copy_constructible_archetype<>;
+using T = copy_constructible_archetype<>;
 REACT_CONCEPT_ASSERT(test_concept<T>);
 REACT_CONCEPT_ASSERT(test_concept<T const>);
 REACT_CONCEPT_ASSERT(test_concept<T()>);

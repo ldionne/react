@@ -3,8 +3,6 @@
  * Contains unit tests for the concept archetypes.
  */
 
-#include <react/archetypes.hpp>
-
 #include <react/concepts.hpp>
 
 

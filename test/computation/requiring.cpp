@@ -5,11 +5,9 @@
 
 #include <react/computation/requiring.hpp>
 
-#include <react/archetypes.hpp>
+#include <react/concept/archetypes.hpp>
 #include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
-
-#include <boost/concept_archetype.hpp>
 
 
 using namespace react;
@@ -23,7 +21,7 @@ using test = Computation<
     typename fake_result_of<
         Requirements
     >::template with<
-        boost::copy_constructible_archetype<>
+        copy_constructible_archetype<>
     >...
 >;
 

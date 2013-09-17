@@ -6,7 +6,7 @@
 #ifndef REACT_CONCEPT_COMPUTATION_HPP
 #define REACT_CONCEPT_COMPUTATION_HPP
 
-#include <react/archetypes.hpp>
+#include <react/concept/archetypes.hpp>
 #include <react/concept/implementation.hpp>
 #include <react/concept/usage.hpp>
 #include <react/intrinsic/execute.hpp>

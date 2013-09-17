@@ -5,7 +5,7 @@
 
 #include <react/computation/executed_before.hpp>
 
-#include <react/archetypes.hpp>
+#include <react/concept/archetypes.hpp>
 #include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
 

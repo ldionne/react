@@ -6,15 +6,12 @@
 #ifndef REACT_CONCEPT_ENVIRONMENT_HPP
 #define REACT_CONCEPT_ENVIRONMENT_HPP
 
-#include <react/archetypes.hpp>
+#include <react/concept/archetypes.hpp>
 #include <react/concept/assert.hpp>
 #include <react/concept/usage.hpp>
 #include <react/intrinsic/augment.hpp>
 #include <react/intrinsic/execute.hpp>
 #include <react/intrinsic/retrieve.hpp>
-
-#include <boost/concept/assert.hpp>
-#include <boost/concept_archetype.hpp>
 
 
 namespace react {
@@ -22,8 +19,12 @@ namespace environment_detail {
     template <int>
     struct comp
         : computation_archetype<
-          boost::copy_constructible_archetype<
-          boost::default_constructible_archetype<>>>
+            copy_constructible_archetype<
+                default_constructible_archetype<
+                    destructible_archetype<>
+                >
+            >
+        >
     { using feature = comp; };
 
     template <typename ...Args>

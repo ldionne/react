@@ -5,11 +5,9 @@
 
 #include <react/computation/alias.hpp>
 
-#include <react/archetypes.hpp>
+#include <react/concept/archetypes.hpp>
 #include <react/concept/assert.hpp>
 #include <react/concept/computation.hpp>
-
-#include <boost/concept_archetype.hpp>
 
 
 using namespace react;
@@ -19,7 +17,7 @@ REACT_CONCEPT_ASSERT(Computation<
     fake_result_of<
         feature_archetype<>
     >::with<
-        boost::copy_constructible_archetype<>
+        copy_constructible_archetype<>
     >
 >);
 
