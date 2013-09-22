@@ -27,9 +27,9 @@
 #include <boost/mpl/or.hpp>
 #include <boost/mpl/pair.hpp>
 #include <boost/mpl/placeholders.hpp>
-#include <boost/mpl/sequence_facade.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/set_insert_range.hpp>
+#include <boost/preprocessor/cat.hpp>
 
 
 namespace react {
@@ -59,9 +59,11 @@ namespace computation_map_detail {
     };
 
     template <typename ...Implementations>
-    struct computation_map : mpl::sequence_facade {
+    struct computation_map {
         template <typename Feature>
         struct at;
+
+        using tag = computation_map;
 
     private:
         using ProvidedImplementations = typename mpl::map<
@@ -192,7 +194,48 @@ namespace detail {
             boost::mpl::identity<ImplementationsOrFeatures>
         >::type...
     >;
-}
+} // end namespace detail
 } // end namespace react
+
+#define REACT_FORWARD_TO_COMPUTATION_MAP(intrinsic)                         \
+    template <typename ...Implementations>                                  \
+    struct BOOST_PP_CAT(intrinsic, _impl)<                                  \
+        react::computation_map_detail::computation_map<Implementations...>  \
+    >                                                                       \
+    {                                                                       \
+        template <typename Self, typename ...Args>                          \
+        struct apply                                                        \
+            : Self::template intrinsic<Args...>                             \
+        { };                                                                \
+    };                                                                      \
+/**/
+
+#define REACT_FORWARD_TO_COMPUTATION_MAP_NULLARY(intrinsic)                 \
+    template <typename ...Implementations>                                  \
+    struct BOOST_PP_CAT(intrinsic, _impl)<                                  \
+        react::computation_map_detail::computation_map<Implementations...>  \
+    >                                                                       \
+    {                                                                       \
+        template <typename Self>                                            \
+        struct apply                                                        \
+            : Self::intrinsic                                               \
+        { };                                                                \
+    };                                                                      \
+/**/
+
+namespace boost { namespace mpl {
+    REACT_FORWARD_TO_COMPUTATION_MAP(at)
+    REACT_FORWARD_TO_COMPUTATION_MAP(has_key)
+    REACT_FORWARD_TO_COMPUTATION_MAP(key_type)
+    REACT_FORWARD_TO_COMPUTATION_MAP(value_type)
+    REACT_FORWARD_TO_COMPUTATION_MAP(insert)
+
+    REACT_FORWARD_TO_COMPUTATION_MAP_NULLARY(begin)
+    REACT_FORWARD_TO_COMPUTATION_MAP_NULLARY(end)
+    REACT_FORWARD_TO_COMPUTATION_MAP_NULLARY(clear)
+}}
+
+#undef REACT_FORWARD_TO_COMPUTATION_MAP_NULLARY
+#undef REACT_FORWARD_TO_COMPUTATION_MAP
 
 #endif // !REACT_DETAIL_COMPUTATION_MAP_HPP

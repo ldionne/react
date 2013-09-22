@@ -8,8 +8,6 @@
 
 #include <boost/mpl/assert.hpp>
 #include <boost/mpl/at_default.hpp>
-#include <boost/mpl/bool.hpp>
-#include <boost/mpl/is_eplaceholder.hpp>
 
 
 namespace react {
@@ -51,12 +49,5 @@ THE_COMPUTATION_MAP_IS_MISSING_A_FEATURE_REQUIRED_FOR_PLACEHOLDER_SUBSTITUTION,
         { };
     };
 } // end namespace react
-
-namespace boost { namespace mpl {
-    template <typename Feature>
-    struct is_eplaceholder<react::placeholder_for<Feature>>
-        : true_
-    { };
-}} // end namespace boost::mpl
 
 #endif // !REACT_PLACEHOLDER_FOR_HPP
