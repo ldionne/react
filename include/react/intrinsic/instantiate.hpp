@@ -13,11 +13,21 @@
 #include <boost/mpl/identity.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/or.hpp>
-#include <boost/mpl11/detail/either.hpp>
 
 
 namespace react {
 namespace instantiate_detail {
+    template <typename Left, typename Right>
+    auto either_impl(typename Left::type*) -> Left;
+
+    template <typename Left, typename Right>
+    auto either_impl(...) -> Right;
+
+    template <typename Left, typename Right>
+    struct either
+        : decltype(either_impl<Left, Right>(nullptr))
+    { };
+
     template <typename T>
     struct is_placeholder
         : boost::mpl::false_
@@ -66,7 +76,7 @@ namespace extension {
             struct replace<F<T...>>
                 : boost::mpl::if_<
                     instantiate_detail::any_is_placeholder_expr<T...>,
-                    boost::mpl11::detail::either<
+                    instantiate_detail::either<
                         F<typename replace<T>::type...>,
                         boost::mpl::identity<F<typename replace<T>::type...>>
                     >,
