@@ -40,8 +40,8 @@ namespace extension {
 /*!
  * @ingroup intrinsics
  *
- * The features that must be satisfied in an environment containing
- * `Computation`.
+ * The features that must be retrievable from an environment in order for
+ * `Computation` to be retrievable and executable.
  */
 template <typename Computation>
 struct requirements_of
