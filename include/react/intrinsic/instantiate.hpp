@@ -6,6 +6,7 @@
 #ifndef REACT_INTRINSIC_INSTANTIATE_HPP
 #define REACT_INTRINSIC_INSTANTIATE_HPP
 
+#include <react/detail/either.hpp>
 #include <react/detail/strip.hpp>
 #include <react/placeholder_for.hpp>
 
@@ -17,17 +18,6 @@
 
 namespace react {
 namespace instantiate_detail {
-    template <typename Left, typename Right>
-    auto either_impl(typename Left::type*) -> Left;
-
-    template <typename Left, typename Right>
-    auto either_impl(...) -> Right;
-
-    template <typename Left, typename Right>
-    struct either
-        : decltype(either_impl<Left, Right>(nullptr))
-    { };
-
     template <typename T>
     struct is_placeholder
         : boost::mpl::false_
@@ -76,7 +66,7 @@ namespace extension {
             struct replace<F<T...>>
                 : boost::mpl::if_<
                     instantiate_detail::any_is_placeholder_expr<T...>,
-                    instantiate_detail::either<
+                    detail::either<
                         F<typename replace<T>::type...>,
                         boost::mpl::identity<F<typename replace<T>::type...>>
                     >,
