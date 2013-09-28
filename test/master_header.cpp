@@ -1,6 +1,6 @@
 /*!
  * @file
- * This file tests the inclusion of the master header of the library.
+ * Tests the inclusion of the master header of the library.
  */
 
 #include <react/react.hpp>
