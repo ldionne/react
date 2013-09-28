@@ -11,8 +11,9 @@
 #include <react/sandbox/implements.hpp>
 #include <react/sandbox/requires.hpp>
 
+#include <boost/mpl/and.hpp>
 #include <boost/mpl/assoc_equal.hpp>
-#include <boost/mpl/identity.hpp>
+#include <boost/mpl/bool.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
 
@@ -20,6 +21,9 @@
 namespace mpl = boost::mpl;
 using namespace react;
 using mpl::pair;
+
+template <typename ...T>
+struct set;
 
 template <typename ...Requirements>
 struct requirements {
@@ -32,160 +36,166 @@ struct requirements {
     { };
 };
 
+template <typename ...Requirements>
+struct requirements<set<Requirements...>>
+    : requirements<Requirements...>
+{ };
+
+template <typename ...RequirementSets>
+struct requirement_sets {
+    template <typename ...Computations>
+    struct generates
+        : mpl::and_<
+            typename requirements<RequirementSets>::template
+            generates<Computations...>...,
+            mpl::true_,
+            mpl::true_
+        >
+    { };
+};
+
 #define STATIC_ASSERT(...) static_assert(__VA_ARGS__::value, #__VA_ARGS__)
 
+namespace no_sub {
+namespace repeated_deps {
+    struct A_comp : implements<struct A> { };
+    struct B_comp : implements<struct B>, requires<struct A> { };
+    struct C_comp : implements<struct C>, requires<struct A> { };
 
-namespace without_substitution {
-    namespace with_redundant_dependencies {
-        struct c1 : implements<c1>, defaults_to<c1>               { };
-        struct c2 : implements<c2>, defaults_to<c2>, requires<c1> { };
-        struct c3 : implements<c3>, defaults_to<c3>, requires<c1> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
+    struct C_req : implements<struct C>, defaults_to<C_comp> { };
 
-        STATIC_ASSERT(
-            requirements<c1>::
-            generates<pair<c1, c1>>
-        );
+    STATIC_ASSERT(
+        requirements<A_req>::
+        generates<pair<struct A, A_comp>>
+    );
 
-        STATIC_ASSERT(
-            requirements<c1, c2>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, c2>
-            >
-        );
+    STATIC_ASSERT(
+        requirement_sets<
+            set<B_req>,
+            set<B_req, A_req>
+        >::generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>
+        >
+    );
 
-        STATIC_ASSERT(
-            requirements<c1, c2, c3>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, c2>,
-                pair<c3, c3>
-            >
-        );
+    STATIC_ASSERT(
+        requirement_sets<
+            set<C_req>,
+            set<C_req, A_req>
+        >::generates<
+            pair<struct A, A_comp>,
+            pair<struct C, C_comp>
+        >
+    );
 
-        STATIC_ASSERT(
-            requirements<c2>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, c2>
-            >
-        );
+    STATIC_ASSERT(
+        requirement_sets<
+            set<A_req, B_req, C_req>,
+            set<B_req, C_req>
+        >::generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>,
+            pair<struct C, C_comp>
+        >
+    );
+} // end namespace repeated_deps
 
-        STATIC_ASSERT(
-            requirements<c3>::
-            generates<
-                pair<c1, c1>,
-                pair<c3, c3>
-            >
-        );
-    } // end namespace with_redundant_dependencies
+namespace linear_deps {
+    template <int>
+    struct feature;
 
-    namespace with_linear_dependency_chain {
-        struct c1 : implements<c1>, defaults_to<c1>               { };
-        struct c2 : implements<c2>, defaults_to<c2>, requires<c1> { };
-        struct c3 : implements<c3>, defaults_to<c3>, requires<c2> { };
+    template <int i>
+    struct comp
+        : implements<feature<i>>,
+          requires<feature<i - 1>>
+    { };
 
-        STATIC_ASSERT(
-            requirements<c3>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, c2>,
-                pair<c3, c3>
-            >
-        );
-    } // end namespace with_linear_dependency_chain
+    template <>
+    struct comp<0>
+        : implements<feature<0>>
+    { };
 
-    namespace with_cyclic_dependency {
-        struct c1 : implements<c1>, defaults_to<c1>, requires<struct c3> { };
-        struct c2 : implements<c2>, defaults_to<c2>, requires<c1> { };
-        struct c3 : implements<c3>, defaults_to<c3>, requires<c2> { };
+    template <int i>
+    struct req
+        : implements<feature<i>>,
+          defaults_to<comp<i>>
+    { };
 
-        STATIC_ASSERT(
-            requirements<c3>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, c2>,
-                pair<c3, c3>
-            >
-        );
-    } // end namespace with_cyclic_dependency
-} // end namespace without_substitution
+    STATIC_ASSERT(
+        requirements<req<0>>::
+        generates<
+            pair<feature<0>, comp<0>>
+        >
+    );
 
-namespace substitution_edge_cases {
-    // A requires B. A is a placeholder expression containing computation_of<B>
-    namespace scenario1 {
-        struct B : implements<B>, defaults_to<B> { };
-        template <typename = computation_of<B>>
-        struct A_default : implements<struct A> { };
-        struct A : implements<A>, requires<B>, defaults_to<A_default<>> { };
+    STATIC_ASSERT(
+        requirement_sets<
+            set<req<1>>,
+            set<req<1>, req<0>>
+        >::generates<
+            pair<feature<0>, comp<0>>,
+            pair<feature<1>, comp<1>>
+        >
+    );
 
-        STATIC_ASSERT(
-            requirements<A, B>::
-            generates<
-                pair<A, A_default<B>>,
-                pair<B, B>
-            >
-        );
-    }
+    STATIC_ASSERT(
+        requirement_sets<
+            set<req<2>>,
 
-    // A requires B. B is a placeholder expression containing computation_of<A>
-    namespace scenario2 {
-        struct A : implements<A>, requires<struct B>, defaults_to<A> { };
-        template <typename = computation_of<A>>
-        struct B_default : implements<struct B> { };
-        struct B : implements<B>, defaults_to<B_default<>> { };
+            set<req<2>, req<1>>,
+            set<req<2>, req<0>>,
 
-        STATIC_ASSERT(
-            requirements<A, B>::
-            generates<
-                pair<A, A>,
-                pair<B, B_default<A>>
-            >
-        );
-    }
+            set<req<2>, req<1>, req<0>>
+        >::generates<
+            pair<feature<0>, comp<0>>,
+            pair<feature<1>, comp<1>>,
+            pair<feature<2>, comp<2>>
+        >
+    );
+} // end namespace linear_deps
 
-    // A requires B _and_ B requires A. A is a placeholder expression
-    // containing computation_of<B>
-    namespace scenario3 {
-        struct B : implements<B>, defaults_to<B>, requires<struct A> { };
-        template <typename = computation_of<B>>
-        struct A_default : implements<struct A> { };
-        struct A : implements<A>, requires<B>, defaults_to<A_default<>> { };
+namespace cyclic_deps {
+    struct A_comp : implements<struct A>, requires<struct C> { };
+    struct B_comp : implements<struct B>, requires<struct A> { };
+    struct C_comp : implements<struct C>, requires<struct B> { };
 
-        STATIC_ASSERT(
-            requirements<A, B>::
-            generates<
-                pair<A, A_default<B>>,
-                pair<B, B>
-            >
-        );
-    }
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
+    struct C_req : implements<struct C>, defaults_to<C_comp> { };
 
-    // A requires B _and_ B requires A. B is a placeholder expression
-    // containing computation_of<A>
-    namespace scenario4 {
-        struct A : implements<A>, requires<struct B>, defaults_to<A> { };
-        template <typename = computation_of<A>>
-        struct B_default : implements<struct B> { };
-        struct B : implements<B>, requires<A>, defaults_to<B_default<>> { };
+    STATIC_ASSERT(
+        requirement_sets<
+            set<A_req>,
+            set<B_req>,
+            set<C_req>,
 
-        STATIC_ASSERT(
-            requirements<A, B>::
-            generates<
-                pair<A, A>,
-                pair<B, B_default<A>>
-            >
-        );
-    }
+            set<A_req, B_req>,
+            set<A_req, C_req>,
+            set<B_req, C_req>
 
-    // A requires A
-    namespace scenario5 {
-        struct A : requires<A>, implements<A>, defaults_to<A> { };
-        STATIC_ASSERT(requirements<A>::generates<pair<A, A>>);
-    }
-} // end namespace substitution_edge_cases
+            set<A_req, B_req, C_req>
+        >::generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>,
+            pair<struct C, C_comp>
+        >
+    );
+} // end namespace cyclic_deps
 
-namespace with_acyclic_substitution {
+// A requires A
+namespace self_loop {
+    struct A_comp : implements<struct A>, requires<struct A> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    STATIC_ASSERT(requirements<A_req>::generates<pair<struct A, A_comp>>);
+} // end namespace self_loop
+} // end namespace no_sub
+
+namespace sub {
+namespace acyclic_sub {
     template <typename Feature, typename ...PossiblyPlaceholders>
     struct comp
         : implements<Feature>,
@@ -228,120 +238,245 @@ namespace with_acyclic_substitution {
             pair<c1, comp<c1, comp<c2, comp<c3>, comp<c4>>>>
         >
     );
-} // end namespace with_acyclic_substitution
-
-namespace with_additional_stuff_to_evaluate_around_placeholders {
-    using namespace with_acyclic_substitution;
-
-    STATIC_ASSERT(
-        requirements<
-            comp<c1, mpl::identity<computation_of<c2>>>,
-            comp<c2>
-        >::generates<
-            pair<c2, comp<c2>>,
-            pair<c1, comp<c1, comp<c2>>>
-        >
-    );
-
-    STATIC_ASSERT(
-        requirements<
-            comp<c1, feature_of<computation_of<c2>>>,
-            comp<c2>
-        >::generates<
-            pair<c2, comp<c2>>,
-            pair<c1, comp<c1, c2>>
-        >
-    );
 
     // Try with an expression that is invalid until the placeholder is
     // replaced. This way, we make sure that we don't instantiate
-    // `some_nested_type` in any way before the placeholder is replaced
+    // `nested_xyz` in any way before the placeholder is replaced
     // by the computation itself.
     template <typename T> struct nested_xyz { using type = typename T::xyz; };
-    struct nested;
-    struct nested_impl : implements<nested>, defaults_to<nested_impl> {
-        struct xyz;
-    };
+    struct nested_comp : implements<struct nested> { struct xyz; };
+    struct nested_req : implements<struct nested>, defaults_to<nested_comp> { };
 
     STATIC_ASSERT(
         requirements<
-            comp<c1, nested_xyz<computation_of<nested>>>,
-            nested_impl
+            comp<c1, nested_xyz<computation_of<struct nested>>>,
+            nested_req
         >::generates<
-            pair<nested, nested_impl>,
-            pair<c1, comp<c1, nested_xyz<nested_impl>::type>>
+            pair<struct nested, nested_comp>,
+            pair<c1, comp<c1, nested_xyz<nested_comp>::type>>
         >
     );
-} // end namespace with_additional_stuff_to_evaluate_around_placeholders
+} // end namespace acyclic_sub
 
-namespace a_single_default_implementation_is_required {
-    struct default_c2 : implements<struct c2>, defaults_to<default_c2> { };
-    struct default_c3 : implements<struct c3>, defaults_to<default_c3> { };
-    struct c2 : implements<c2> { };
-    struct c3 : implements<c3> { };
+namespace edge_cases {
+// A requires B. A is a placeholder expression containing computation_of<B>
+namespace sc1 {
+    template <typename = computation_of<struct B>>
+    struct A_comp : implements<struct A>, requires<struct B> { };
+    struct B_comp : implements<struct B> { };
 
-    namespace one_requirement_specifies_one_implementation {
-        struct c1 : implements<c1>, defaults_to<c1>, requires<default_c2> { };
-        STATIC_ASSERT(
-            requirements<c1, c2>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, default_c2>
-            >
-        );
-    }
-
-    namespace one_requirement_specifies_two_implementations {
-        struct c1
-            : implements<c1>, defaults_to<c1>,
-              requires<default_c2, default_c3>
-        { };
-        STATIC_ASSERT(
-            requirements<c1, c2, c3>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, default_c2>,
-                pair<c3, default_c3>
-            >
-        );
-    }
-
-    namespace default_implementation_provided_in_feature_map {
-        struct c1 : implements<c1>, defaults_to<c1>, requires<c2> { };
-        STATIC_ASSERT(
-            requirements<c1, default_c2>::
-            generates<
-                pair<c1, c1>,
-                pair<c2, default_c2>
-            >
-        );
-    }
-} // end namespace a_single_default_implementation_is_required
-
-namespace multiple_identical_default_implementations_are_accepted {
-    struct default_c3 : implements<struct c3>, defaults_to<default_c3> { };
-    struct c1 : implements<c1>, defaults_to<c1>, requires<default_c3> { };
-    struct c2 : implements<c2>, defaults_to<c2>, requires<default_c3> { };
-    struct c3 : implements<c3> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp<>> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
 
     STATIC_ASSERT(
-        requirements<c1, c2>::
+        requirements<A_req, B_req>::
         generates<
-            pair<c1, c1>,
-            pair<c2, c2>,
-            pair<c3, default_c3>
+            pair<struct A, A_comp<B_comp>>,
+            pair<struct B, B_comp>
         >
     );
+}
+
+// A requires B. B is a placeholder expression containing computation_of<A>
+namespace sc2 {
+    struct A_comp : implements<struct A>, requires<struct B> { };
+    template <typename = computation_of<struct A>>
+    struct B_comp : implements<struct B> { };
+
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp<>> { };
 
     STATIC_ASSERT(
-        requirements<c1, c2, default_c3>::
+        requirements<A_req, B_req>::
         generates<
-            pair<c1, c1>,
-            pair<c2, c2>,
-            pair<c3, default_c3>
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp<A_comp>>
         >
     );
-} // end namespace multiple_identical_default_implementations_are_accepted
+}
+
+// A requires B _and_ B requires A. A is a placeholder expression
+// containing computation_of<B>
+namespace sc3 {
+    struct B_comp : implements<struct B>, requires<struct A> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
+
+    template <typename = computation_of<struct B>>
+    struct A_comp : implements<struct A>, requires<struct B> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp<>> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req>::
+        generates<
+            pair<struct A, A_comp<B_comp>>,
+            pair<struct B, B_comp>
+        >
+    );
+}
+
+// A requires B _and_ B requires A. B is a placeholder expression
+// containing computation_of<A>
+namespace sc4 {
+    struct A_comp : implements<struct A>, requires<struct B> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    template <typename = computation_of<struct A>>
+    struct B_comp : implements<struct B>, requires<struct A> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp<>> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req>::
+        generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp<A_comp>>
+        >
+    );
+}
+
+// A is a placeholder expression containing computation_of<C>. B requires C
+// with a default implementation.
+//
+// Substituting this is hard because we need to instantiate B while we're
+// instantiating A in order to get C's default implementation from B's
+// requirements.
+namespace sc5 {
+    template <typename = computation_of<struct C>>
+    struct A_comp : implements<struct A> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp<>> { };
+
+    struct C_comp : implements<struct C> { };
+    struct C_req : implements<struct C>, defaults_to<C_comp> { };
+
+    struct B_comp : implements<struct B>, requires<C_req> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req>::
+        generates<
+            pair<struct A, A_comp<C_comp>>,
+            pair<struct B, B_comp>,
+            pair<struct C, C_comp>
+        >
+    );
+}
+
+// A contains computation_of<D>, B contains computation_of<A> and
+// C requires D with default implementation.
+//
+// This one is hardcore because we can't instantiate B (because it requires A)
+// while we're instantiating A. So we need to instantiate in this order:
+// - C
+// - D via C's requirements
+// - A
+// - B
+namespace sc6 {
+    template <typename = computation_of<struct D>>
+    struct A_comp : implements<struct A> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp<>> { };
+
+    template <typename = computation_of<struct A>>
+    struct B_comp : implements<struct B> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp<>> { };
+
+    struct C_comp : implements<struct C>, requires<D_req> { };
+    struct C_req : implements<struct C>, defaults_to<C_comp> { };
+
+    struct D_comp : implements<struct D> { };
+    struct D_req : implements<struct D>, defaults_to<D_comp> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req, C_req>::
+        generates<
+            pair<struct A, A_comp<D_comp>>,
+            pair<struct B, B_comp<A_comp<D_comp>>>,
+            pair<struct C, C_comp>,
+            pair<struct D, D_comp>
+        >
+    );
+}
+} // end namespace edge_cases
+} // end namespace sub
+
+namespace defaults {
+namespace single_req {
+    struct B_comp : implements<struct B> { };
+    struct B_req_nodef : implements<struct B> { };
+    struct B_req_def : implements<struct B>, defaults_to<B_comp> { };
+
+    struct A_comp : implements<struct A>, requires<B_req_def> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req_nodef>::
+        generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>
+        >
+    );
+} // end namespace single_req
+
+namespace multi_req {
+    struct C_comp : implements<struct C> { };
+    struct C_req_nodef : implements<struct C> { };
+    struct C_req_def : implements<struct C>, defaults_to<C_comp> { };
+
+    struct B_comp : implements<struct B> { };
+    struct B_req_nodef : implements<struct B> { };
+    struct B_req_def : implements<struct B>, defaults_to<B_comp> { };
+
+    struct A_comp : implements<struct A>, requires<B_req_def, C_req_def> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req_nodef, C_req_nodef>::
+        generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>,
+            pair<struct C, C_comp>
+        >
+    );
+} // end namespace multi_req
+
+namespace single_fmap {
+    struct B_comp : implements<struct B> { };
+    struct B_req_nodef : implements<struct B> { };
+    struct B_req_def : implements<struct B>, defaults_to<B_comp> { };
+
+    struct A_comp : implements<struct A>, requires<B_req_nodef> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    STATIC_ASSERT(
+        requirements<A_req, B_req_def>::
+        generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>
+        >
+    );
+} // end namespace single_fmap
+
+namespace identical_dupes {
+    struct C_comp : implements<struct C> { };
+    struct C_req_nodef : implements<struct C> { };
+    struct C_req_def : implements<struct C>, defaults_to<C_comp> { };
+
+    struct B_comp : implements<struct B>, requires<C_req_def> { };
+    struct B_req : implements<struct B>, defaults_to<B_comp> { };
+
+    struct A_comp : implements<struct A>, requires<C_req_def> { };
+    struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    STATIC_ASSERT(
+        requirement_sets<
+            set<A_req, B_req>,
+            set<A_req, B_req, C_req_def>
+        >::generates<
+            pair<struct A, A_comp>,
+            pair<struct B, B_comp>,
+            pair<struct C, C_comp>
+        >
+    );
+} // end namespace identical_dupes
+} // end namespace defaults
 
 
 int main() { }
