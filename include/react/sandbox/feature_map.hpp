@@ -7,36 +7,30 @@
 #define REACT_FEATURE_MAP_HPP
 
 #include <react/sandbox/bind.hpp>
+#include <react/sandbox/can_be_bound.hpp>
 #include <react/sandbox/default_of.hpp>
+#include <react/sandbox/detail/has_default.hpp>
 #include <react/sandbox/feature_of.hpp>
 #include <react/sandbox/requirements_of.hpp>
 
 #include <boost/mpl/at.hpp>
-#include <boost/mpl/begin.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/deref.hpp>
 #include <boost/mpl/empty.hpp>
 #include <boost/mpl/end.hpp>
 #include <boost/mpl/erase_key.hpp>
 #include <boost/mpl/find_if.hpp>
-#include <boost/mpl/front.hpp>
+#include <boost/mpl/fold.hpp>
 #include <boost/mpl/has_key.hpp>
-#include <boost/mpl/identity.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/insert.hpp>
-#include <boost/mpl/is_sequence.hpp>
-#include <boost/mpl/iterator_range.hpp>
-#include <boost/mpl/joint_view.hpp>
-#include <boost/mpl/key_type.hpp>
+#include <boost/mpl/inserter.hpp>
 #include <boost/mpl/map.hpp>
-#include <boost/mpl/next.hpp>
-#include <boost/mpl/not.hpp>
 #include <boost/mpl/pair.hpp>
+#include <boost/mpl/partition.hpp>
 #include <boost/mpl/placeholders.hpp>
 #include <boost/mpl/set.hpp>
 #include <boost/mpl/set_insert_range.hpp>
-#include <boost/mpl/value_type.hpp>
-#include <boost/mpl/value_view.hpp>
 #include <type_traits>
 
 
@@ -44,120 +38,226 @@ namespace react {
 namespace feature_map_detail {
     namespace mpl = boost::mpl;
 
-    /*!
-     * @internal
-     * Returns whether a `Requirement` has a default implementation.
-     */
-    template <typename Requirement>
-    constexpr auto has_default(int) -> decltype(
-        (typename default_of<Requirement>::type*)nullptr, true
-    ) { return true; }
+    template <typename Dependent, typename T>
+    struct make_dependent_on { using type = T; };
 
-    template <typename Requirement>
-    constexpr bool has_default(...) { return false; }
+    template <
+        typename Satisfied = mpl::map0<>,
+        typename RequirementsWithoutDefault = mpl::set0<>
+    >
+    struct in_context {
+        /*!
+         * @internal
+         * See `instantiate_requirement` for why we remove the feature of
+         * `Requirement` from the `Satisfied` features before using
+         * `can_be_bound`.
+         */
+        template <typename Requirement>
+        struct requirement_can_be_satisfied
+            : can_be_bound<
+                typename default_of<Requirement>::type,
+                typename mpl::erase_key<Satisfied,
+                    typename feature_of<Requirement>::type
+                >::type
+            >
+        { };
 
+        template <typename Unsatisfied>
+        struct remove_non_defaults;
 
-    template <typename Requirements, typename PartialFeatureMap>
-    struct make_iterator;
+        template <typename Unsatisfied>
+        struct apply
+            : remove_non_defaults<Unsatisfied>
+        { };
 
-    struct end_iterator;
-    struct tag;
+        template <typename Unsatisfied,
+                  bool = mpl::empty<Unsatisfied>::value>
+        struct handle_all_satisfied;
 
-    template <typename Requirements>
-    struct feature_map_impl {
-        using tag = feature_map_detail::tag;
+        template <typename Unsatisfied,
+                  typename IterToSatisfy = typename mpl::find_if<
+                    Unsatisfied, requirement_can_be_satisfied<mpl::_1>
+                  >::type,
+                  bool = std::is_same<
+                    IterToSatisfy, typename mpl::end<Unsatisfied>::type
+                >::value>
+        struct check_for_cycle;
 
-    private:
-        friend mpl::begin_impl<tag>;
-        using requirements = typename mpl::set_insert_range<
-            mpl::set0<>, Requirements
-        >::type;
-    };
+        template <typename Unsatisfied, typename ToSatisfy>
+        struct instantiate_requirement;
 
-    template <typename Pointee, typename LazyNext>
-    struct lazy_next_iterator {
-        using type = Pointee;
-    };
+        template <typename Unsatisfied, typename Computation,
+                  typename Feature = typename feature_of<Computation>::type,
+                  bool = mpl::has_key<Satisfied, Feature>::value>
+        struct handle_duplicates;
 
-    template <typename Requirements, typename PartialFeatureMap>
-    struct make_non_empty_iterator {
-
-        template <typename First, typename Rest>
-        struct make_iterator_with_default {
-
-            template <typename Feature, typename Computation>
-            struct instantiate_unseen_feature {
-                using NewRequirements = typename mpl::set_insert_range<
-                    Rest, typename requirements_of<Computation>::type
-                >::type;
-
-                using NewFeatureMap = typename mpl::insert<
-                    PartialFeatureMap, mpl::pair<Feature, Computation>
-                >::type;
-
-                using type = lazy_next_iterator<
-                    Computation, make_iterator<NewRequirements, NewFeatureMap>
-                >;
-            };
-
-            template <typename Feature, typename Computation>
-            struct skip_seen_feature {
-                static_assert(std::is_same<
-                    typename mpl::at<PartialFeatureMap, Feature>::type,
-                    Computation
-                >::value,
-                "while instantiating the feature_map: two requirements or "
-                "more specify different default implementations");
-
-                using type = typename make_iterator<
-                    Rest, PartialFeatureMap
-                >::type;
-            };
-
-            using AvailableComputations = mpl::joint_view<
-                // This contains all the fully-bound computations.
-                mpl::value_view<PartialFeatureMap>,
-
-                // This contains all the computations that are not bound
-                // yet, except the one associated to the current
-                // requirement (because we're trying to satisfy it).
-                mpl::iterator_range<
-                    typename make_iterator<Rest, PartialFeatureMap>::type,
-                    end_iterator
+        /*!
+         * @internal
+         * First, we filter all requirements without a default implementation.
+         * For these requirements, we have nothing to instantiate.
+         *
+         * We also keep track of the requirements without a default
+         * implementation in order to make sure that each of their
+         * features are implemented by some computation at some point.
+         */
+        template <typename Unsatisfied>
+        struct remove_non_defaults {
+            using Partitioned = typename mpl::partition<
+                Unsatisfied,
+                detail::has_default<mpl::_1>,
+                mpl::inserter<mpl::set0<>, mpl::insert<mpl::_1, mpl::_2>>,
+                mpl::inserter<
+                    RequirementsWithoutDefault,
+                    // We only insert the requirements whose feature was not
+                    // already satisfied. This is only an optimization.
+                    mpl::if_<
+                        mpl::has_key<Satisfied, feature_of<mpl::_2>>,
+                        mpl::_1,
+                        mpl::insert<mpl::_1, mpl::_2>
+                    >
                 >
-            >;
-
-            using Computation = typename bind<
-                typename default_of<First>::type,
-                AvailableComputations
             >::type;
 
-            using Feature = typename feature_of<Computation>::type;
-
-            using type = typename mpl::if_<
-                mpl::has_key<PartialFeatureMap, Feature>,
-                skip_seen_feature<Feature, Computation>,
-                instantiate_unseen_feature<Feature, Computation>
-            >::type::type;
+            using type = typename in_context<
+                Satisfied, typename mpl::second<Partitioned>::type
+            >::template handle_all_satisfied<
+                typename mpl::first<Partitioned>::type
+            >::type;
         };
 
-        using First = typename mpl::front<Requirements>::type;
-        using Rest = typename mpl::erase_key<Requirements, First>::type;
+        /*!
+         * @internal
+         * If all the requirements have been satisfied, we're done.
+         *
+         * We also make sure that the feature of all the requirements that
+         * did not provide a default implementation have been implemented.
+         */
+        template <typename EmptyUnsatisfied>
+        struct handle_all_satisfied<EmptyUnsatisfied, true> {
+            using UnimplementedFeatures = typename make_dependent_on<
+                EmptyUnsatisfied,
+                mpl::fold<
+                    RequirementsWithoutDefault, mpl::set0<>,
+                    mpl::if_<mpl::has_key<Satisfied, feature_of<mpl::_2>>,
+                        mpl::_1,
+                        mpl::insert<mpl::_1, feature_of<mpl::_2>>
+                    >
+                >
+            >::type::type;
 
-        using type = typename mpl::if_c<has_default<First>(int{}),
-            make_iterator_with_default<First, Rest>,
-            make_iterator<Rest, PartialFeatureMap>
-        >::type::type;
+            static_assert(mpl::empty<UnimplementedFeatures>::value,
+            "some feature is missing an implementation because no "
+            "requirement specified a default implementation for it");
+
+            using type = Satisfied;
+        };
+
+        /*!
+         * @internal
+         * If some requirements are still unsatisfied, we proceed to check
+         * for circular dependencies in the substitution.
+         */
+        template <typename Unsatisfied>
+        struct handle_all_satisfied<Unsatisfied, false>
+            : check_for_cycle<Unsatisfied>
+        { };
+
+        /*!
+         * @internal
+         * If there is a circular dependency in the substitution required by
+         * some requirements, we trigger an assertion and stop here.
+         */
+        template <typename Unsatisfied, typename IterToSatisfy>
+        struct check_for_cycle<Unsatisfied, IterToSatisfy, true> {
+            static_assert(
+                !make_dependent_on<Unsatisfied, mpl::true_>::type::value,
+            "there is a circular dependency in the substitution required "
+            "by some requirements");
+        };
+
+        /*!
+         * @internal
+         * If there is no circular dependency in the substitution, we find
+         * the next requirement to satisfy and we proceed to instantiate it.
+         */
+        template <typename Unsatisfied, typename IterToSatisfy>
+        struct check_for_cycle<Unsatisfied, IterToSatisfy, false>
+            : instantiate_requirement<
+                typename mpl::erase_key<Unsatisfied,
+                    typename mpl::deref<IterToSatisfy>::type
+                >::type,
+                typename mpl::deref<IterToSatisfy>::type
+            >
+        { };
+
+        /*!
+         * @internal
+         * We instantiate the requirement that we want to satisfy and
+         * proceed to check whether we have already instantiated a
+         * requirement for the same feature.
+         *
+         * @note
+         * We make sure that `Satisfied` does not contain the feature of
+         * the requirement that we're instantiating. Otherwise, if duplicate
+         * default implementations were provided, a computation could use
+         * `computation_of<self>` to refer to the first default
+         * implementation, which is not desirable.
+         */
+        template <typename Unsatisfied, typename ToSatisfy>
+        struct instantiate_requirement
+            : handle_duplicates<
+                Unsatisfied,
+                typename bind<
+                    typename default_of<ToSatisfy>::type,
+                    typename mpl::erase_key<
+                        Satisfied, typename feature_of<ToSatisfy>::type
+                    >::type
+                >::type
+            >
+        { };
+
+        /*!
+         * @internal
+         * If we have not already satisfied a requirement for the same
+         * feature, we augment the context with the newly satisfied
+         * requirement and we continue in that context.
+         */
+        template <typename Unsatisfied, typename Computation, typename Feature>
+        struct handle_duplicates<Unsatisfied, Computation, Feature, false>
+            : in_context<
+                typename mpl::insert<
+                    Satisfied, mpl::pair<Feature, Computation>
+                >::type,
+                RequirementsWithoutDefault
+            >::template apply<
+                typename mpl::set_insert_range<
+                    Unsatisfied,
+                    typename requirements_of<Computation>::type
+                >::type
+            >
+        { };
+
+        /*!
+         * @internal
+         * If we have already satisfied a requirement for the same feature,
+         * we make sure both default implementations were the same. Otherwise
+         * it is ambiguous which implementation should be used.
+         *
+         * If no ambiguity arises, we just skip this requirement since we
+         * have already seen it.
+         */
+        template <typename Unsatisfied, typename Computation, typename Feature>
+        struct handle_duplicates<Unsatisfied, Computation, Feature, true>
+            : apply<Unsatisfied>
+        {
+            static_assert(std::is_same<
+                typename mpl::at<Satisfied, Feature>::type,
+                Computation
+            >::value,
+            "two requirements or more specify different default "
+            "implementations for the same feature");
+        };
     };
-
-    template <typename Requirements, typename PartialFeatureMap>
-    struct make_iterator
-        : mpl::if_<
-            mpl::empty<Requirements>,
-            mpl::identity<end_iterator>,
-            make_non_empty_iterator<Requirements, PartialFeatureMap>
-        >::type
-    { };
 } // end namespace feature_map_detail
 
 /*!
@@ -165,91 +265,11 @@ namespace feature_map_detail {
  */
 template <typename ...Requirements>
 struct feature_map
-    : feature_map<typename boost::mpl::set<Requirements...>::type>
-{ };
-
-/*!
- *
- */
-template <typename Requirements>
-struct feature_map<Requirements>
-    : boost::mpl::if_<boost::mpl::is_sequence<Requirements>,
-        feature_map_detail::feature_map_impl<Requirements>,
-        feature_map_detail::feature_map_impl<boost::mpl::set1<Requirements>>
-    >::type
+    : feature_map_detail::in_context<>::template
+        apply<
+            typename boost::mpl::set<Requirements...>::type
+        >::type
 { };
 } // end namespace react
-
-namespace boost { namespace mpl {
-    template <typename Pointee, typename LazyNext>
-    struct next<
-        react::feature_map_detail::lazy_next_iterator<Pointee, LazyNext>
-    >
-        : LazyNext
-    { };
-
-    template <>
-    struct begin_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap>
-        struct apply
-            : react::feature_map_detail::make_iterator<
-                typename FeatureMap::requirements, map0<>
-            >
-        { };
-    };
-
-    template <>
-    struct end_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap>
-        struct apply
-            : identity<react::feature_map_detail::end_iterator>
-        { };
-    };
-
-    template <>
-    struct at_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap, typename Feature>
-        struct apply
-            : deref<
-                typename find_if<
-                    FeatureMap,
-                    std::is_same<Feature, key_type<FeatureMap, _1>>
-                >::type
-            >
-        { };
-    };
-
-    template <>
-    struct has_key_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap, typename Feature>
-        struct apply
-            : not_<
-                std::is_same<
-                    typename find_if<
-                        FeatureMap,
-                        std::is_same<Feature, key_type<FeatureMap, _1>>
-                    >::type,
-                    typename end<FeatureMap>::type
-                >
-            >
-        { };
-    };
-
-    template <>
-    struct value_type_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap, typename Computation>
-        struct apply
-            : identity<Computation>
-        { };
-    };
-
-    template <>
-    struct key_type_impl<react::feature_map_detail::tag> {
-        template <typename FeatureMap, typename Computation>
-        struct apply
-            : react::feature_of<Computation>
-        { };
-    };
-}} // end namespace boost::mpl
 
 #endif // !REACT_FEATURE_MAP_HPP

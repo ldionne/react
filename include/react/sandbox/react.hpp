@@ -56,9 +56,10 @@
  *
  *
  * ## Valid expressions
- * | Expression           |
- * | ----------           |
- * | `bind<UC, FM>::type` |
+ * | Expression                   |
+ * | ----------                   |
+ * | `bind<UC, FM>::type`         |
+ * | `can_be_bound<UC, FM>::type` |
  */
 
 /*!
@@ -107,6 +108,7 @@
 #include <react/sandbox/after.hpp>
 #include <react/sandbox/before.hpp>
 #include <react/sandbox/bind.hpp>
+#include <react/sandbox/can_be_bound.hpp>
 #include <react/sandbox/computation_of.hpp>
 #include <react/sandbox/default_of.hpp>
 #include <react/sandbox/defaults_to.hpp>

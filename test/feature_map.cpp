@@ -11,13 +11,14 @@
 #include <react/sandbox/implements.hpp>
 #include <react/sandbox/requires.hpp>
 
-#include <boost/mpl/and.hpp>
 #include <boost/mpl/assoc_equal.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/map.hpp>
 #include <boost/mpl/pair.hpp>
+#include <boost/mpl11/operator/and.hpp>
 
 
+namespace mpl11 = boost::mpl11;
 namespace mpl = boost::mpl;
 using namespace react;
 using mpl::pair;
@@ -45,12 +46,12 @@ template <typename ...RequirementSets>
 struct requirement_sets {
     template <typename ...Computations>
     struct generates
-        : mpl::and_<
+        : mpl11::and_<
             typename requirements<RequirementSets>::template
             generates<Computations...>...,
             mpl::true_,
             mpl::true_
-        >
+        >::type
     { };
 };
 
@@ -59,11 +60,12 @@ struct requirement_sets {
 namespace no_sub {
 namespace repeated_deps {
     struct A_comp : implements<struct A> { };
-    struct B_comp : implements<struct B>, requires<struct A> { };
-    struct C_comp : implements<struct C>, requires<struct A> { };
-
     struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    struct B_comp : implements<struct B>, requires<A_req> { };
     struct B_req : implements<struct B>, defaults_to<B_comp> { };
+
+    struct C_comp : implements<struct C>, requires<A_req> { };
     struct C_req : implements<struct C>, defaults_to<C_comp> { };
 
     STATIC_ASSERT(
@@ -104,24 +106,25 @@ namespace repeated_deps {
 } // end namespace repeated_deps
 
 namespace linear_deps {
-    template <int>
-    struct feature;
-
-    template <int i>
-    struct comp
-        : implements<feature<i>>,
-          requires<feature<i - 1>>
-    { };
-
-    template <>
-    struct comp<0>
-        : implements<feature<0>>
-    { };
+    template <int> struct feature;
+    template <int> struct comp;
+    template <int> struct req;
 
     template <int i>
     struct req
         : implements<feature<i>>,
           defaults_to<comp<i>>
+    { };
+
+    template <int i>
+    struct comp
+        : implements<feature<i>>,
+          requires<req<i - 1>>
+    { };
+
+    template <>
+    struct comp<0>
+        : implements<feature<0>>
     { };
 
     STATIC_ASSERT(
@@ -158,12 +161,13 @@ namespace linear_deps {
 } // end namespace linear_deps
 
 namespace cyclic_deps {
-    struct A_comp : implements<struct A>, requires<struct C> { };
-    struct B_comp : implements<struct B>, requires<struct A> { };
-    struct C_comp : implements<struct C>, requires<struct B> { };
-
+    struct A_comp : implements<struct A>, requires<struct C_req> { };
     struct A_req : implements<struct A>, defaults_to<A_comp> { };
+
+    struct B_comp : implements<struct B>, requires<A_req> { };
     struct B_req : implements<struct B>, defaults_to<B_comp> { };
+
+    struct C_comp : implements<struct C>, requires<B_req> { };
     struct C_req : implements<struct C>, defaults_to<C_comp> { };
 
     STATIC_ASSERT(
@@ -174,7 +178,7 @@ namespace cyclic_deps {
 
             set<A_req, B_req>,
             set<A_req, C_req>,
-            set<B_req, C_req>
+            set<B_req, C_req>,
 
             set<A_req, B_req, C_req>
         >::generates<
@@ -378,7 +382,7 @@ namespace sc6 {
     struct B_comp : implements<struct B> { };
     struct B_req : implements<struct B>, defaults_to<B_comp<>> { };
 
-    struct C_comp : implements<struct C>, requires<D_req> { };
+    struct C_comp : implements<struct C>, requires<struct D_req> { };
     struct C_req : implements<struct C>, defaults_to<C_comp> { };
 
     struct D_comp : implements<struct D> { };
